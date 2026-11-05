@@ -383,7 +383,7 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
       <a href="#s01"><b>S-01</b>Load-bearing?</a>
       <a href="#c01"><b>C-01</b>Work sequence</a>
       <a href="#e01"><b>E-01</b>Electrics</a>
-      <a href="#a02"><b>A-02</b>Wardrobe</a>
+      <a href="#a02"><b>A-02</b>Storage</a>
       <a href="#f01"><b>F-01</b>Flood resilience</a>
       <a href="#q01"><b>Q-01</b>Materials &amp; budget</a>
       <a href="#g02"><b>G-02</b>DIY or pro</a>
@@ -400,7 +400,7 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
 <section class="hero" id="g01">
   <div class="eyebrow"><span class="label">Sheet G-01 · Overview</span><span class="label">Scale: schematic, ±10 cm</span></div>
   <h1>One 14.5 m² entrance hall where the office and corridor used to be</h1>
-  <p class="lede">Take out the plasterboard office wall, rebuild the flood-damaged walls in moisture-resistant board, and add a coat wardrobe. The work starts after Bouchet BTP's drainage works this November, and it has to fit inside Suravenir's 1,800 € cash payout.</p>
+  <p class="lede">Take out the plasterboard office wall, rebuild the flood-damaged walls in moisture-resistant board, and add a hall cabinet for coats and shoes. The work starts after Bouchet BTP's drainage works this November, and it has to fit inside Suravenir's 1,800 € cash payout.</p>
   <div class="figures">
     <div><span class="label">Insurance payout</span><span class="big">1,800 €</span><span class="small muted">auto-réparation, Suravenir</span></div>
     <div><span class="label">This plan, as selected</span><span class="big good" id="figTotal">0 €</span><span class="small muted" id="figLeft">updates with the checklist (Q-01)</span></div>
@@ -443,7 +443,7 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
   <div class="stack" style="margin-top:2rem">
     <h2 style="font-size:1.5rem">The plan in six decisions</h2>
     <ol class="tight" style="max-width:80ch">
-      <li><b>Layout A (recommended):</b> the wardrobe goes on the back wall you share with the buanderie, and a bench goes under the window. It's an inside wall, so there's no cold-wall mould behind the coats. Three other layouts are on A-01.</li>
+      <li><b>Layout E (recommended):</b> a hall cabinet on the back wall you share with the buanderie: two painted cupboards for coats, an open bench nook between them with a shoe shelf, hooks and a lamp, and a rug. It looks like an entrance hall, not a bedroom wardrobe. It's an inside wall, so there's no cold-wall mould behind the coats. Four other layouts are on A-01.</li>
       <li><b>Strip out now, rebuild after the drainage.</b> Wet board and insulation come out this month so the walls can dry. Nothing new goes up until the pipe is fixed and moisture readings match a dry wall.</li>
       <li><b>Lay the green BA13 hydro board horizontally, with the first course 1.20 m high and a 1 cm gap at the floor.</b> After a flood up to 50 cm you replace one strip, not whole walls.</li>
       <li><b>Hire an electrician for half a day</b> (about 380 €). They confirm the removed circuits are safe, run the new drops from the ceiling, and put the ground floor on its own 30 mA RCD so you can switch it off during a flood. You do the rest yourselves.</li>
@@ -457,24 +457,48 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
 <section class="sheet pb" id="a01">
   <div class="sheet-head">
     <span class="sheet-code">A-01</span><h2>Layout options for the merged hall</h2>
-    <p class="sub">Four ways to use the roughly 3.40 × 3.27 m space plus the corridor. Click an option to see its plan. The button under each one loads its wardrobe into the budget on Q-01.</p>
+    <p class="sub">Five ways to use the roughly 3.40 × 3.27 m space plus the corridor. Click an option to see its plan. The button under each one loads its wardrobe into the budget on Q-01.</p>
   </div>
   <div class="tabs noprint" role="tablist" aria-label="Layout options">
-    <button class="tab" role="tab" id="tab-A" aria-controls="opt-A" aria-selected="true" data-opt="A"><span class="t-code">Option A <span class="rec">Recommended</span></span><span class="t-name">Storage wall at the back</span><span class="t-meta">2.38 m built-in · ≈11 m² clear</span></button>
+    <button class="tab" role="tab" id="tab-E" aria-controls="opt-E" aria-selected="true" data-opt="E"><span class="t-code">Option E <span class="rec">Recommended</span></span><span class="t-name">Hall cabinet + bench nook</span><span class="t-meta">2 cupboards + nook · ≈11.3 m² clear</span></button>
+    <button class="tab" role="tab" id="tab-A" aria-controls="opt-A" aria-selected="false" data-opt="A"><span class="t-code">Option A</span><span class="t-name">Storage wall at the back</span><span class="t-meta">2.38 m built-in · ≈11 m² clear</span></button>
     <button class="tab" role="tab" id="tab-B" aria-controls="opt-B" aria-selected="false" data-opt="B"><span class="t-code">Option B</span><span class="t-name">Long side wardrobe</span><span class="t-meta">2.50 m on the stone wall · ≈10.8 m² clear</span></button>
     <button class="tab" role="tab" id="tab-C" aria-controls="opt-C" aria-selected="false" data-opt="C"><span class="t-code">Option C</span><span class="t-name">Hall + work corner</span><span class="t-meta">1.50 m PAX + desk · ≈10.5 m² clear</span></button>
     <button class="tab" role="tab" id="tab-D" aria-controls="opt-D" aria-selected="false" data-opt="D"><span class="t-code">Option D</span><span class="t-name">Open mudroom</span><span class="t-meta">hooks + bench · ≈12.3 m² clear</span></button>
   </div>
 
   <div class="stack" style="margin-top:1rem">
+    <!-- E -->
+    <div class="opt-panel" id="opt-E" role="tabpanel" aria-labelledby="tab-E">
+      <div class="planbox">
+        <div data-plan="E" role="img" aria-label="Option E plan: two cupboards with a bench nook between them on the back wall, rug in the middle, mirror and console shelf on the stone wall"></div>
+        <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>cupboards</span></div>
+      </div>
+      <div class="opt-side">
+        <h3>Option E · Hall cabinet + bench nook <span class="rec">Recommended</span></h3>
+        <p>Same back wall as Option A, but it reads as hall furniture, not a bedroom wardrobe. Two 50 cm cupboards with painted doors and wooden knobs stand on legs either side of an open 1.38 m nook. The nook has a bench to sit on for shoes, a shoe shelf under it, five hooks for everyday coats, and a shelf with baskets and a small lamp. A rug in the middle and a round mirror over a slim shelf by the door finish it.</p>
+        <dl class="kv">
+          <dt>Cupboards</dt><dd>2 × 50 × 58 × 216 cm on 15 cm legs</dd>
+          <dt>Nook</dt><dd>1.38 m: bench at 45 cm, shoe shelf, 5 hooks, shelf at 2.00 m</dd>
+          <dt>Coat space</dt><dd>96 cm of rail behind doors (about 16 coats) + 5 hooks</dd>
+          <dt>Clear floor</dt><dd>≈ 11.3 m²</dd>
+          <dt>Cost</dt><dd>≈ 450 € + ≈ 95 € for the rug, mirror and shelf</dd>
+        </dl>
+        <div class="pc">
+          <div class="pro"><h4>For</h4><ul><li>Looks like an entrance, not a bedroom</li><li>Everyday coats and shoes have their own place, and the rest hides behind doors</li><li>A seat for putting shoes on</li><li>Cupboards on legs and a wall-hung bench: the floor stays clear for mopping after a flood</li><li>Nothing to build: no cheek wall, no niche</li></ul></div>
+          <div class="con"><h4>Against</h4><ul><li>Less closed storage than A's 2.38 m wardrobe</li><li>About 225 € more than A with a curtain front</li></ul></div>
+        </div>
+        <button class="btn noprint" type="button" data-apply="E">Use Option E in the budget</button>
+      </div>
+    </div>
     <!-- A -->
-    <div class="opt-panel" id="opt-A" role="tabpanel" aria-labelledby="tab-A">
+    <div class="opt-panel is-hidden" id="opt-A" role="tabpanel" aria-labelledby="tab-A">
       <div class="planbox">
         <div data-plan="A" role="img" aria-label="Option A plan: built-in wardrobe on the back wall, bench under the window"></div>
         <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>wardrobe</span><span><i class="sw new"></i>to build (red)</span></div>
       </div>
       <div class="opt-side">
-        <h3>Option A · Storage wall at the back <span class="rec">Recommended</span></h3>
+        <h3>Option A · Storage wall at the back</h3>
         <p>The wardrobe fills the old office's back wall, the one shared with the buanderie, from floor to ceiling. A bench with shoe space sits under the window, with hooks and a mirror on the stone wall. From the front door you look into one clear, bright room.</p>
         <dl class="kv">
           <dt>Wardrobe</dt><dd>2.38 × 0.60 × 2.50 m, built-in niche</dd>
@@ -661,10 +685,71 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
 <!-- ================= A-02 ================= -->
 <section class="sheet" id="a02">
   <div class="sheet-head">
-    <span class="sheet-code">A-02</span><h2>Wardrobe design and sizes</h2>
+    <span class="sheet-code">A-02</span><h2>Hall cabinet and wardrobe: design and sizes</h2>
     <p class="sub">Coats need 55–60 cm of depth. Allow 25–30 cm of rail per person per season; long coats hang about 1.40–1.50 m and jackets about 1.00 m.</p>
   </div>
   <div class="stack">
+      <div class="planbox elev elev-wide">
+        <svg viewBox="0 0 720 366" role="img" aria-label="Front elevation of the Option E hall cabinet: two 50 cm cupboards either side of a 1.38 m bench nook">
+          <defs><pattern id="concHatchE" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" style="fill:var(--stone-bg)"/><line x1="0" y1="0" x2="0" y2="10" style="stroke:var(--stone-line)" stroke-width="1.5"/></pattern></defs>
+          <rect x="40" y="318" width="640" height="14" fill="url(#concHatchE)"/>
+          <line x1="40" y1="318" x2="680" y2="318" class="p-line"/><line x1="40" y1="40" x2="680" y2="40" class="p-line"/>
+          <text x="44" y="32" class="p-small">ceiling 2.50 m · beam at 2.32 m</text>
+          <!-- left cupboard: 50 cm = 98 px, 15 cm legs, 201 cm frame -->
+          <rect x="128" y="78" width="98" height="223" class="p-ward"/><rect x="138" y="88" width="78" height="96" class="p-thin"/><rect x="138" y="196" width="78" height="95" class="p-thin"/>
+          <circle cx="216" cy="199" r="4" style="fill:var(--ink)"/>
+          <rect x="133" y="301" width="5" height="17" class="p-thin"/><rect x="216" y="301" width="5" height="17" class="p-thin"/>
+          <!-- right cupboard -->
+          <rect x="495" y="78" width="98" height="223" class="p-ward"/><rect x="505" y="88" width="78" height="96" class="p-thin"/><rect x="505" y="196" width="78" height="95" class="p-thin"/>
+          <circle cx="505" cy="199" r="4" style="fill:var(--ink)"/>
+          <rect x="500" y="301" width="5" height="17" class="p-thin"/><rect x="583" y="301" width="5" height="17" class="p-thin"/>
+          <!-- nook: painted back to 1.85 m, cap rail, shelf at 2.00, hooks at 1.62, bench at 0.47, shoe shelf at 0.18 -->
+          <rect x="226" y="112" width="269" height="189" style="fill:var(--hydro-pale);stroke:var(--ink-2)"/>
+          <rect x="226" y="93" width="269" height="4" class="p-tile"/>
+          <rect x="250" y="76" width="54" height="17" class="p-thin"/><rect x="312" y="78" width="50" height="15" class="p-thin"/>
+          <path d="M440 93 v-8 h10 v8 Z M432 85 l8 -16 h10 l8 16 Z" class="p-thin"/>
+          <g style="fill:var(--hydro)"><circle cx="263" cy="138" r="4"/><circle cx="310" cy="138" r="4"/><circle cx="360" cy="138" r="4"/><circle cx="410" cy="138" r="4"/><circle cx="457" cy="138" r="4"/></g>
+          <rect x="253" y="144" width="22" height="92" class="p-board2"/><rect x="399" y="144" width="22" height="88" class="p-board2"/>
+          <rect x="226" y="261" width="269" height="6" class="p-tile"/><rect x="234" y="254" width="140" height="7" style="fill:var(--sheet);stroke:var(--ink-2)"/>
+          <rect x="226" y="296" width="269" height="4" class="p-tile"/>
+          <g class="p-thin"><rect x="248" y="287" width="32" height="9"/><rect x="300" y="287" width="32" height="9"/><rect x="352" y="287" width="32" height="9"/><rect x="420" y="287" width="32" height="9"/></g>
+          <text x="177" y="70" text-anchor="middle" class="p-small">coats</text><text x="544" y="70" text-anchor="middle" class="p-small">coats</text>
+          <text x="360" y="62" text-anchor="middle" class="p-small">shelf · baskets · lamp</text>
+          <text x="360" y="128" text-anchor="middle" class="p-small">hooks for everyday coats</text>
+          <text x="420" y="250" text-anchor="middle" class="p-small">bench</text>
+          <text x="360" y="312" text-anchor="middle" class="p-small" style="fill:var(--water)">shoes · floor left clear</text>
+          <!-- dims left -->
+          <g class="p-dim"><line x1="90" y1="40" x2="90" y2="318"/><line x1="84" y1="78" x2="96" y2="78"/><line x1="84" y1="95" x2="96" y2="95"/><line x1="84" y1="138" x2="96" y2="138"/><line x1="84" y1="266" x2="96" y2="266"/><line x1="84" y1="301" x2="96" y2="301"/><line x1="84" y1="318" x2="96" y2="318"/></g>
+          <text x="80" y="76" text-anchor="end" class="p-dimt">2.16</text><text x="80" y="99" text-anchor="end" class="p-dimt">2.00</text><text x="80" y="142" text-anchor="end" class="p-dimt">1.62</text>
+          <text x="80" y="270" text-anchor="end" class="p-dimt">0.47</text><text x="80" y="303" text-anchor="end" class="p-dimt">0.15</text>
+          <!-- width dims -->
+          <g class="p-dim"><line x1="128" y1="352" x2="593" y2="352"/><line x1="128" y1="346" x2="128" y2="358"/><line x1="226" y1="346" x2="226" y2="358"/><line x1="495" y1="346" x2="495" y2="358"/><line x1="593" y1="346" x2="593" y2="358"/></g>
+          <text x="177" y="346" text-anchor="middle" class="p-dimt">0.50</text><text x="360" y="346" text-anchor="middle" class="p-dimt">1.38</text><text x="544" y="346" text-anchor="middle" class="p-dimt">0.50</text>
+          <text x="604" y="200" class="p-dimt">2.38 m</text><text x="604" y="220" class="p-small">depth 0.58</text><text x="604" y="238" class="p-small">bench 0.40</text>
+        </svg>
+        <div class="legend"><span><i class="sw ward"></i>cupboards, painted doors</span><span><i class="sw water"></i>floor kept clear for floods</span></div>
+      </div>
+      <p class="small muted">Front view of Option E. Each door gets 6 cm MDF strips glued on before painting, which turns a plain IKEA door into a cabinet door. Knobs face the nook.</p>
+    <div class="two">
+      <div class="stack">
+      <h3>Option E · Hall cabinet <span class="rec">Recommended</span></h3>
+      <ul class="tight">
+        <li><b>Cupboards:</b> 2 × IKEA PAX frames 50 × 58 × 201 cm on 15 cm galvanised legs with an aluminium kick strip. FORSAND doors painted in your colour, with MDF strips for a shaker look and wooden knobs. Inside: hat shelf at 1.81 m, rail at 1.73 m, shoe shelf. About <b>350 €</b>.</li>
+        <li><b>Nook:</b> a 140 × 40 cm oak-look bench on a hidden wall batten at 45 cm, a shoe shelf at 18 cm, the back wall painted the door colour, 5 hooks at 1.62 m, and a shelf at 2.00 m with an LED strip under it. About <b>100 €</b>. It all hangs on the wall, so you can mop underneath.</li>
+        <li><b>Finishing touches:</b> rug 160 × 230 cm, round mirror 60 cm and a slim shelf on the stone wall by the door. About <b>95 €</b>, optional.</li>
+        <li><b>More coats?</b> Make the right cupboard 100 cm wide (two doors) and the nook 88 cm.</li>
+      </ul>
+      </div>
+      <div class="stack">
+      <h3>Choosing the colour</h3>
+      <p>A muted green, terracotta or deep blue on the doors and the nook wall gives the hall character without making it smaller. Keep the walls around it in the washable white. In the 3D model, <b>Wardrobe front</b> switches the door colour.</p>
+      <div class="note"><span class="label">Why this works as an entrance</span>
+        <p>The open nook with its bench, hooks and lamp is what people see first, so the hall reads as a place to arrive, not a storage room. Everything else hides behind two doors.</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="stack" style="margin-top:2rem">
       <div class="planbox elev elev-wide">
         <svg viewBox="0 0 720 366" role="img" aria-label="Front elevation of the 2.38 metre built-in wardrobe with three bays">
           <defs>
@@ -724,7 +809,7 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
       <p class="small muted">Elevation of the built-in wardrobe in Option A, drawn with doors removed. In Option B the same three-bay logic stretches to 2.50 m (3 × 83 cm).</p>
     <div class="two">
       <div class="stack">
-      <h3>Route 1 · Built-in niche, wall-hung metal interior <span class="rec">Recommended</span></h3>
+      <h3>Route 1 · Built-in niche, wall-hung metal interior (Options A and B)</h3>
       <p>Build the niche (A: 238 × 60 cm; B: 250 × 60 cm) floor to ceiling and tile its floor along with the hall. Hang the inside on a <b>wall-mounted rail system</b> such as IKEA BOAXEL or Leroy Merlin Spaceo crémaillères: vertical tracks screwed to the wall carry the shelves and rails. Nothing chipboard touches the floor, so a flood leaves the interior intact and you mop underneath.</p>
       <ul class="tight">
         <li><b>Front, choice 1:</b> three sliding doors of about 80 cm on an aluminium track, one of them a mirror. Size the doors with the store's calculator once the niche is built. About 280 € for doors and track.</li>
@@ -821,9 +906,9 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
       </div>
     <div class="two">
       <div class="floodcard">
-        <span class="label" style="color:var(--water)">Flood-day checklist · print it and stick it inside the wardrobe door</span>
+        <span class="label" style="color:var(--water)">Flood-day checklist · print it and stick it inside a cupboard door</span>
         <ol>
-          <li>Fit the front-door barrier. Store it in the hall wardrobe so it's within reach.</li>
+          <li>Fit the front-door barrier. Store it in a hall cupboard so it's within reach.</li>
           <li>Switch off the <b>RDC</b> RCD in the panel. Upstairs keeps its power.</li>
           <li>Lift shoes, bags and boxes off the floor. The washer and dryer are already raised.</li>
           <li>Garage: move the car if it's safe. If water reaches the boiler, shut the gas at the meter.</li>
@@ -860,9 +945,9 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
         <button class="btn" type="button" data-preset="up">Comfort upgrade</button>
       </div>
       <ul class="tight small muted">
-        <li><b>Recommended</b> (≈ 1,640 €): Layout A with the curtain-front niche, electrician for the panel, existing floor kept, buanderie and WC walls repaired too. It leaves about 160 € (9%) as contingency.</li>
+        <li><b>Recommended</b> (≈ 1,865 €): Layout E with the hall cabinet and bench nook, electrician for the panel, existing floor kept, buanderie and WC walls repaired too. That's about 65 € over the payout. It drops to ≈ 1,615 € if the buanderie and WC walls turn out sound, or to ≈ 1,765 € if you add the bench nook later. Option A with a curtain front comes to ≈ 1,640 €.</li>
         <li><b>Lowest cost</b> (≈ 1,190 €): open coat wall and no electrician. You'd only swap devices on existing circuits yourselves, with no panel work.</li>
-        <li><b>Comfort upgrade</b> (≈ 2,780 €): sliding doors, full retile, cement board at the base, dehumidifier, raised machines. It shows what the payout <i>doesn't</i> cover.</li>
+        <li><b>Comfort upgrade</b> (≈ 2,875 €): hall cabinet with the rug, mirror and shelf, full retile, cement board at the base, dehumidifier, raised machines. It shows what the payout <i>doesn't</i> cover.</li>
         <li>Items marked <span class="grp" style="margin:0">choose one</span> are alternatives: ticking one unticks the others.</li>
         <li>The backflow valve and the flood barrier start unticked. They're the most useful flood measures, but they cost more than is left. Ask about Fonds Barnier aid first (G-04) and about who pays for drain work (Bouchet BTP).</li>
       </ul>
@@ -890,7 +975,7 @@ footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
         <tr><td>Painting</td><td class="yes">You</td><td>Easy</td><td>Primer first on all new board</td><td class="n">20–30 €/m²</td></tr>
         <tr><td>Floor strip repair</td><td class="yes">You</td><td>Easy</td><td>Tile inlay or divider profile</td><td class="n">100–200 €</td></tr>
         <tr><td>Full retile, 60 × 60 porcelain</td><td>You or a tiler</td><td>Hard</td><td>Large tiles need a dead-flat floor and a levelling-clip system</td><td class="n">40–60 €/m² labour</td></tr>
-        <tr><td>Wardrobe (niche or PAX)</td><td class="yes">You</td><td>Medium</td><td>Anchor every tall unit to the wall</td><td class="n">—</td></tr>
+        <tr><td>Hall cabinet or wardrobe</td><td class="yes">You</td><td>Medium</td><td>Anchor every tall unit to the wall</td><td class="n">—</td></tr>
         <tr><td>Backflow valve on the sewer branch</td><td class="prof">Bouchet BTP or plumber</td><td>Pro</td><td>Cheapest while the trench is open</td><td class="n">≈ 280 € in trench</td></tr>
         <tr><td>Flood barrier (batardeau)</td><td>Supplier, or you for removable kits</td><td>Medium</td><td>Buy a tested product. Apply for aid <i>before</i> you buy</td><td class="n">400–900 €</td></tr>
         <tr><td>Gas boiler (service, raising it)</td><td class="prof">Gas engineer</td><td>Pro only</td><td>Never DIY on gas</td><td class="n">120–180 € service</td></tr>
@@ -1151,6 +1236,19 @@ function planSVG(mode){
     o += rect(703,430,30,100,'p-furn-dash') + '<text x="725" y="418" class="p-small" text-anchor="end">shoe cabinet</text>';
     o += text(545,440,'HALL','p-room') + text(545,466,'≈ 14.5 m² incl. stairs','p-area') + text(545,490,'≈ 12.3 m² clear floor','p-small');
   }
+  if(mode === 'E'){
+    o += wardrobe(495,253,50,58,true) + wardrobe(683,253,50,58,true);
+    o += '<path d="M545 311 A50 50 0 0 1 495 361 M683 311 A50 50 0 0 0 733 361" class="p-swing"/>';
+    o += rect(545,253,138,40,'p-furn') + text(614,284,'bench','p-small');
+    o += '<line x1="556" y1="257" x2="672" y2="257" style="stroke:var(--hydro);stroke-width:3"/>';
+    for(var hk=566;hk<=662;hk+=24){ o += '<circle cx="'+hk+'" cy="257" r="4" style="fill:var(--hydro)"/>'; }
+    o += text(614,337,'hall cabinet: 2 cupboards + bench nook','p-small',' style="fill:var(--hydro-ink);font-weight:700"');
+    o += '<rect x="525" y="355" width="160" height="190" rx="4" style="fill:none;stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:6 4"/>';
+    o += text(605,537,'rug 160 × 230','p-small');
+    o += '<line x1="729" y1="375" x2="729" y2="465" style="stroke:var(--ink);stroke-width:5"/><circle cx="719" cy="420" r="13" style="fill:none;stroke:var(--ink);stroke-width:2"/>';
+    o += '<text x="720" y="484" class="p-small" text-anchor="end">mirror + shelf</text>';
+    o += text(605,430,'HALL','p-room') + text(605,456,'≈ 14.5 m² incl. stairs','p-area') + text(605,480,'≈ 11.3 m² clear floor','p-small');
+  }
   if(mode === 'elec'){
     // removed devices
     o += '<g class="p-x"><path d="M482 400 l16 16 M498 400 l-16 16"/><path d="M482 540 l16 16 M498 540 l-16 16"/></g>';
@@ -1197,7 +1295,7 @@ var CATS = [
   {id:"floor", name:"Floor and skirting", note:"Repair the strip if the existing floor is sound. Retile only if it's damaged or mismatched."},
   {id:"paint", name:"Ceiling and paint", note:"Repaint the whole ceiling, because patches always show."},
   {id:"elec", name:"Electrics", note:"Material for 3 sockets, 2 switches and 1 new ceiling point. The electrician does the panel work."},
-  {id:"ward", name:"Wardrobe and furniture", note:"Pick one wardrobe route. The bench and desk are extras."},
+  {id:"ward", name:"Hall cabinet, wardrobe and furniture", note:"Pick one storage route. The bench nook, bench, desk and finishing touches are extras."},
   {id:"flood", name:"Flood protection", note:"The valve and the barrier start unticked. They matter most, but the payout doesn't stretch to them."},
   {id:"wc", name:"Buanderie and WC walls (if damaged)", note:"Lower 1.20 m course in both rooms, plus repainting."}
 ];
@@ -1236,8 +1334,11 @@ var ITEMS = [
   {id:"e5",cat:"elec",name:"Ceiling lights, simple LED",store:"Leroy Merlin",qty:2,price:22,p:["up"]},
   {id:"e6",cat:"elec",name:"Smoke alarm NF EN 14604",detail:"if this floor has none",store:"Castorama",qty:1,price:15,p:[]},
 
-  {id:"r1",cat:"ward",group:"ward",name:"Built-in niche, 3 sliding doors (1 mirror)",detail:"doors + track ≈ 280 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"Leroy Merlin + IKEA",qty:1,price:450,p:["up"]},
-  {id:"r2",cat:"ward",group:"ward",name:"Built-in niche, curtain front",detail:"ceiling track + curtain ≈ 55 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"IKEA + Brico Dépôt",qty:1,price:225,p:["rec"]},
+  {id:"r8",cat:"ward",group:"ward",name:"Hall cabinet: two painted cupboards (Option E)",detail:"2 PAX frames 50 × 58 × 201 on 15 cm legs, 2 FORSAND doors with shaker strips, paint, wooden knobs, rails, shelves",store:"IKEA + Leroy Merlin",qty:1,price:350,p:["rec","up"]},
+  {id:"r9",cat:"ward",name:"Bench nook between the cupboards (Option E)",detail:"wall-hung oak-look bench 140 × 40, shoe shelf, 5 hooks, shelf + LED strip",store:"Leroy Merlin + IKEA",qty:1,price:100,p:["rec","up"]},
+  {id:"r10",cat:"ward",name:"Finishing touches: rug, round mirror, slim shelf",detail:"rug 160 × 230 ≈ 50 €, mirror 60 cm ≈ 30 €, shelf + brackets ≈ 15 €",store:"IKEA",qty:1,price:95,p:["up"]},
+  {id:"r1",cat:"ward",group:"ward",name:"Built-in niche, 3 sliding doors (1 mirror)",detail:"doors + track ≈ 280 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"Leroy Merlin + IKEA",qty:1,price:450,p:[]},
+  {id:"r2",cat:"ward",group:"ward",name:"Built-in niche, curtain front",detail:"ceiling track + curtain ≈ 55 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"IKEA + Brico Dépôt",qty:1,price:225,p:[]},
   {id:"r3",cat:"ward",group:"ward",name:"IKEA PAX 150 cm (100 + 50, 236 high)",detail:"3 FORSAND doors, hinges, rails, shelves, 2 pull-out shoe shelves",store:"IKEA",qty:1,price:430,p:[]},
   {id:"r4",cat:"ward",group:"ward",name:"IKEA PAX 250 cm for Option B",detail:"100 + 100 + 50, 5 doors, interior",store:"IKEA",qty:1,price:690,p:[]},
   {id:"r5",cat:"ward",group:"ward",name:"Open coat wall",detail:"hook rail, wall-hung bench, wall-hung shoe cabinet",store:"IKEA",qty:1,price:150,p:["low"]},
@@ -1255,12 +1356,12 @@ var ITEMS = [
   {id:"b3",cat:"wc",name:"Paint for damp rooms, 10 L",store:"Leroy Merlin",qty:1,price:55,p:["rec","low","up"]},
   {id:"b4",cat:"wc",name:"Skirting 10 m + mastic",store:"Brico Dépôt",qty:1,price:30,p:["rec","low","up"]}
 ];
-var LAYOUT_APPLY = { A:{ward:"r2", on:["r6"], off:["r7"]}, B:{ward:"r2", on:["r6"], off:["r7"]}, C:{ward:"r3", on:["r7"], off:["r6"]}, D:{ward:"r5", on:[], off:["r6","r7"]} };
+var LAYOUT_APPLY = { E:{ward:"r8", on:["r9"], off:["r6","r7"]}, A:{ward:"r2", on:["r6"], off:["r7","r9","r10"]}, B:{ward:"r2", on:["r6"], off:["r7","r9","r10"]}, C:{ward:"r3", on:["r7"], off:["r6","r9","r10"]}, D:{ward:"r5", on:[], off:["r6","r7","r9","r10"]} };
 
 var saved = load();
 var state = saved && saved.v === 1 ? saved : null;
 function presetState(name){
-  var s = {v:1, on:{}, qty:{}, price:{}, bought:{}, steps:{}, layout:"A"};
+  var s = {v:1, on:{}, qty:{}, price:{}, bought:{}, steps:{}, layout:"E"};
   ITEMS.forEach(function(it){ s.on[it.id] = it.p.indexOf(name) >= 0; });
   return s;
 }
@@ -1390,7 +1491,7 @@ var PHASES = [
   {name:"Phase 1 · Strip-out", when:"weekends of 14 and 21 Nov", steps:[
     {id:"s6",t:"Protect and make the electrics safe",d:"Cover the stairs and floor and tape plastic over the doorways. Switch off the circuits, test every conductor with the VAT tester, photograph each box, disconnect, cap with Wago connectors and label.",tags:["diy"],time:"2 h"},
     {id:"s7",t:"Remove the office door, frame and skirting",d:"Unscrew the frame (huisserie) from the studs. Keep the door if it's undamaged; it can go to a reuse point at the déchetterie.",tags:["diy"],time:"1 h"},
-    {id:"s8",t:"Take down the partition",d:"Score the joints, remove one face, inspect the frame (S-01 check 8), then the second face, then cut out the studs and rails. For Option A, keep the top 60 cm of frame as the wardrobe cheek.",tags:["diy"],time:"3 h"},
+    {id:"s8",t:"Take down the partition",d:"Score the joints, remove one face, inspect the frame (S-01 check 8), then the second face, then cut out the studs and rails. For Option A, keep the top 60 cm of frame as the wardrobe cheek. For Option E, take the whole frame out.",tags:["diy"],time:"3 h"},
     {id:"s9",t:"Cut out the flood-damaged board on the remaining walls",d:"Cut horizontally at 1.20 m, or 30 cm above the highest stain if that's higher. Pull out any wet insulation. Do the buanderie and WC at the same time if they're affected.",tags:["diy"],time:"4 h"},
     {id:"s10",t:"Sort and take away the waste",d:"Plasterboard to the plâtre skip, metal, insulation and wood separately. The déchetterie is free with your badge.",tags:["diy"],time:"2 h"}
   ]},
@@ -1414,8 +1515,8 @@ var PHASES = [
     {id:"s19",t:"Prime and paint",d:"Primer on all new board and patches, then two coats of washable paint on the walls. Repaint the whole ceiling.",tags:["diy"],time:"2 days"},
     {id:"s20",t:"Fit the skirting",d:"Tile or PVC, covering the 1 cm gap, sealed to the floor with flexible mastic.",tags:["diy"],time:"3 h"},
     {id:"s21",t:"Electrician's second fix",d:"Faceplates and lights on, RCD test button tried, sign-off.",tags:["pro"],time:"2 h"},
-    {id:"s22",t:"Build and fix the wardrobe",d:"Anchor every tall unit to the wall. Put the water sensor on the floor by the door.",tags:["diy"],time:"1 day"},
-    {id:"s23",t:"Close the file",d:"Take final photos and file the receipts and Bouchet BTP's report with your insurance papers. Print the flood-day checklist (F-01) and stick it inside the wardrobe door.",tags:["diy"],time:"1 h"}
+    {id:"s22",t:"Build and fix the hall cabinet",d:"Anchor every tall unit to the wall. Put the water sensor on the floor by the door.",tags:["diy"],time:"1 day"},
+    {id:"s23",t:"Close the file",d:"Take final photos and file the receipts and Bouchet BTP's report with your insurance papers. Print the flood-day checklist (F-01) and stick it inside a cupboard door.",tags:["diy"],time:"1 h"}
   ]}
 ];
 function renderSteps(){
@@ -1453,7 +1554,7 @@ var TASKS = [
   ["Strip-out (2 weekend days)",2,3,"diy"],
   ["Drainage works, Bouchet BTP (dates TBC)",3,5,"ext"],
   ["Drying + weekly moisture readings",3,7,"wait"],
-  ["Order materials and wardrobe",5,6,"diy"],
+  ["Order materials and cupboards",5,6,"diy"],
   ["Electrician first fix + RCD",6,6,"pro"],
   ["Holiday buffer",8,9,"off"],
   ["Re-board walls, patch ceiling",10,11,"diy"],
@@ -1461,7 +1562,7 @@ var TASKS = [
   ["Jointing, 3 coats + sanding",11,12,"diy"],
   ["Prime, paint, skirting",12,13,"diy"],
   ["Electrician second fix",13,13,"pro"],
-  ["Wardrobe, final photos, receipts",14,14,"diy"],
+  ["Hall cabinet, final photos, receipts",14,14,"diy"],
   ["Spare week",15,15,"off"],
   ["Barrier: ask about aid, then order and fit",2,15,"par"]
 ];
@@ -1485,7 +1586,7 @@ function renderGantt(){
 renderGantt();
 
 /* ---------------- Init ---------------- */
-showOpt(state.layout && /^[ABCD]$/.test(state.layout) ? state.layout : "A");
+showOpt(state.layout && /^[ABCDE]$/.test(state.layout) ? state.layout : "E");
 update();
 document.getElementById("printBtn").addEventListener("click", function(){ window.print(); });
 })();

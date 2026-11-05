@@ -117,7 +117,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
         <div class="lab">Scene (ground floor)</div>
         <div class="seg scenes" id="scenes">
           <button type="button" data-scene="before"><span>Before</span><small>as photographed</small></button>
-          <button type="button" data-scene="A"><span>After · A <span class="rec">Rec.</span></span><small>wardrobe on back wall</small></button>
+          <button type="button" data-scene="E"><span>After · E <span class="rec">Rec.</span></span><small>hall cabinet + bench nook</small></button>
+          <button type="button" data-scene="A"><span>After · A</span><small>wardrobe on back wall</small></button>
           <button type="button" data-scene="B"><span>After · B</span><small>side wardrobe</small></button>
           <button type="button" data-scene="C"><span>After · C</span><small>hall + desk</small></button>
           <button type="button" data-scene="D"><span>After · D</span><small>open mudroom</small></button>
@@ -1576,8 +1577,8 @@ var $ = function(s){ return document.querySelector(s); };
    ===================================================================== */
 var KEY = 'maisonModel3D.v1';
 var coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
-var DEF = {level:'ground', scene:'A', view:'overview', ceiling:false, cut:true, labels:true, lamps:true, flood:false, build:false, open:false,
-  hq:!coarse, front:'white', floor:'existing', paint:'warm', hidden:{}};
+var DEF = {level:'ground', scene:'E', view:'overview', ceiling:false, cut:true, labels:true, lamps:true, flood:false, build:false, open:false,
+  hq:!coarse, front:'sage', floor:'existing', paint:'warm', hidden:{}};
 var S = Object.assign({}, DEF);
 try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && typeof sv === 'object') Object.assign(S, sv); } catch (e) {}
 if (!S.hidden || typeof S.hidden !== 'object') S.hidden = {}; else S.hidden = Object.assign({}, S.hidden);
@@ -1773,7 +1774,7 @@ MAT.ghost = new T.MeshStandardMaterial({color: 0xffffff, transparent: true, opac
 MAT.coats = [0x1f2c45, 0x8a5f37, 0x3d4a2e, 0x4a4a4a, 0x6e2321, 0x15191d, 0xa9a397, 0x2d5677].map(function(c){ return std({color: c, roughness: 1, envMapIntensity: 0.15}); });
 MAT.shoes = [0x3b2a20, 0x1d1d1d, 0xe2ddd2, 0x5a6b7a, 0x8a4b2f, 0xb9a48a].map(function(c){ return std({color: c, roughness: 0.75}); });
 MAT.boxes = [0x3f7fc4, 0xe9e5dc, 0x6e8f5f, 0xd9a441, 0x9b9b9b].map(function(c){ return std({color: c, roughness: 0.6}); });
-var DOORFIN = {white: std({color: 0xf2f1ec, roughness: 0.5}), oak: uvs(std({map: oakTexV, roughness: 0.55}), 1.0), sage: std({color: 0xa7b7a2, roughness: 0.6})};
+var DOORFIN = {white: std({color: 0xf2f1ec, roughness: 0.5}), oak: uvs(std({map: oakTexV, roughness: 0.55}), 1.0), sage: std({color: 0x4d684e, roughness: 0.6})};
 
 var cubeRT = new T.WebGLCubeRenderTarget(256);
 cubeRT.texture.encoding = T.sRGBEncoding;
@@ -2234,6 +2235,43 @@ function paxUnit(gx, gz, W, D, H, fin){
   return g;
 }
 
+/* ---------- Option E: hall cabinet (painted cupboards + open bench nook), a hall rather than a bedroom wardrobe ---------- */
+var KILIM = null;
+function kilimMat(){
+  if (KILIM) return KILIM;
+  var c = mkCanvas(256, 384), g = c.getContext('2d');
+  g.fillStyle = '#efe4d2'; g.fillRect(0, 0, 256, 384);
+  g.fillStyle = '#b8714f'; g.fillRect(0, 0, 256, 14); g.fillRect(0, 370, 256, 14); g.fillRect(0, 0, 10, 384); g.fillRect(246, 0, 10, 384);
+  g.fillStyle = '#4d655d'; g.fillRect(22, 28, 212, 5); g.fillRect(22, 351, 212, 5); g.fillRect(22, 28, 5, 328); g.fillRect(229, 28, 5, 328);
+  for (var k = 0; k < 3; k++) { var cy = 85 + k * 107; g.fillStyle = k % 2 ? '#b8714f' : '#4d655d';
+    g.beginPath(); g.moveTo(128, cy - 44); g.lineTo(196, cy); g.lineTo(128, cy + 44); g.lineTo(60, cy); g.closePath(); g.fill();
+    g.fillStyle = '#d9b874'; g.beginPath(); g.moveTo(128, cy - 18); g.lineTo(156, cy); g.lineTo(128, cy + 18); g.lineTo(100, cy); g.closePath(); g.fill(); }
+  for (var x = 30; x < 230; x += 14) { g.fillStyle = '#b8714f'; g.fillRect(x, 40, 7, 7); g.fillRect(x + 7, 337, 7, 7); }
+  var t = toTex(c, true); t.wrapS = t.wrapT = T.ClampToEdgeWrapping;
+  KILIM = std({map: t, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}); return KILIM;
+}
+function hallCupboard(x1, W, knobLeft, fin, ci){
+  var z1 = 2.53, D = 0.58, y0 = 0.15, H = 2.01;
+  [[x1 + 0.05, z1 + 0.06], [x1 + W - 0.05, z1 + 0.06], [x1 + 0.05, z1 + D - 0.06], [x1 + W - 0.05, z1 + D - 0.06]].forEach(function(l){ cyl(l[0], y0 / 2, l[1], 0.017, y0, MAT.metal, null, 'y', 10); });
+  box(x1 + 0.02, 0.01, z1 + D - 0.035, x1 + W - 0.02, y0, z1 + D - 0.02, MAT.alu);
+  box(x1, y0, z1, x1 + 0.018, y0 + H, z1 + D, MAT.white); box(x1 + W - 0.018, y0, z1, x1 + W, y0 + H, z1 + D, MAT.white);
+  box(x1, y0, z1, x1 + W, y0 + 0.018, z1 + D, MAT.white); box(x1, y0 + H - 0.018, z1, x1 + W, y0 + H, z1 + D, MAT.white); box(x1, y0, z1, x1 + W, y0 + H, z1 + 0.006, MAT.white);
+  box(x1 + 0.018, y0 + 1.66, z1, x1 + W - 0.018, y0 + 1.678, z1 + D - 0.02, MAT.white);
+  cyl(x1 + W / 2, y0 + 1.58, z1 + 0.29, 0.012, W - 0.04, MAT.chrome, null, 'x', 12);
+  [0.09, 0.19, 0.29, 0.39].forEach(function(t, i){ coat(null, x1 + t * W / 0.48, y0 + 1.58, z1 + 0.29, i % 2 ? 0.8 : 1.0, 'x', ci + i); });
+  box(x1 + 0.03, y0 + 0.22, z1 + 0.04, x1 + W - 0.03, y0 + 0.236, z1 + D - 0.04, MAT.white); shoes(null, x1 + W / 2, y0 + 0.236, z1 + 0.29, 0, ci);
+  shelfBoxes(null, x1 + 0.03, x1 + W - 0.03, y0 + 1.678, z1 + 0.02, z1 + D - 0.04, 30 + ci);
+  box(x1 + 0.002, y0 + 0.005, z1 + D, x1 + W - 0.002, y0 + H - 0.005, z1 + D + 0.02, S.open ? MAT.ghost : fin, null, !S.open);
+  if (!S.open) {
+    var f = 0.065, zf = z1 + D + 0.02;   // shaker frame strips glued on, so the door reads as a cabinet
+    box(x1 + 0.002, y0 + 0.005, zf, x1 + 0.002 + f, y0 + H - 0.005, zf + 0.008, fin); box(x1 + W - 0.002 - f, y0 + 0.005, zf, x1 + W - 0.002, y0 + H - 0.005, zf + 0.008, fin);
+    box(x1 + 0.002, y0 + 0.005, zf, x1 + W - 0.002, y0 + 0.005 + f, zf + 0.008, fin); box(x1 + 0.002, y0 + H - 0.005 - f, zf, x1 + W - 0.002, y0 + H - 0.005, zf + 0.008, fin);
+    box(x1 + 0.002, y0 + 1.05 - f / 2, zf, x1 + W - 0.002, y0 + 1.05 + f / 2, zf + 0.008, fin);
+    var kx = knobLeft ? x1 + 0.034 : x1 + W - 0.034, kb = add(new T.SphereGeometry(0.019, 14, 10), MAT.oak); kb.position.set(kx, y0 + 0.92, zf + 0.03);
+    cyl(kx, y0 + 0.92, zf + 0.016, 0.007, 0.016, MAT.oak, null, 'z', 8);
+  }
+}
+
 /* ---------- Rooms beyond the hall ---------- */
 function buildWC(){
   beginObj('Toilet');
@@ -2327,8 +2365,45 @@ function buildAfter(){
   objWrap('Doormat', function(){ plane(3.55, 5.12, 4.25, 5.72, 0.006, MAT.coir, 0.6); });
   cyl(4.62, 0.012, 5.62, 0.035, 0.02, MAT.white);
   objWrap('Under-stair shoe unit', underStairUnit);
-  label('HALL', 5.85, 0.2, 4.6, 'room', sc === 'D' ? '≈ 14.5 m² · ≈ 12.3 m² clear' : sc === 'A' ? '≈ 14.5 m² · ≈ 11 m² clear' : sc === 'B' ? '≈ 14.5 m² · ≈ 10.8 m² clear' : '≈ 14.5 m² · ≈ 10.5 m² clear');
+  label('HALL', 5.85, 0.2, 4.6, 'room', sc === 'E' ? '≈ 14.5 m² · ≈ 11.3 m² clear' : sc === 'D' ? '≈ 14.5 m² · ≈ 12.3 m² clear' : sc === 'A' ? '≈ 14.5 m² · ≈ 11 m² clear' : sc === 'B' ? '≈ 14.5 m² · ≈ 10.8 m² clear' : '≈ 14.5 m² · ≈ 10.5 m² clear');
   label('3.40 m', 5.40, 0.03, 5.62, 'dim'); label('3.27 m', 7.12, 0.03, 4.2, 'dim');
+  if (sc === 'E') {
+    var finE = S.front === 'curtain' ? DOORFIN.sage : (DOORFIN[S.front] || DOORFIN.sage);
+    objWrap('Cupboard (left)', function(){ hallCupboard(4.95, 0.50, false, finE, 0); });
+    objWrap('Cupboard (right)', function(){ hallCupboard(6.83, 0.50, true, finE, 4); });
+    var nx1 = 5.45, nx2 = 6.83, nz = 2.53;
+    objWrap('Bench nook', function(){
+      box(nx1, 0.15, nz, nx2, 1.85, nz + 0.012, finE);                                        // painted back panel
+      box(nx1, 1.85, nz, nx2, 1.875, nz + 0.05, MAT.oak);                                     // cap rail
+      box(nx1 + 0.01, 0.43, nz + 0.012, nx2 - 0.01, 0.47, nz + 0.42, MAT.oak);                // wall-hung bench
+      rbox(nx1 + 0.05, 0.47, nz + 0.05, nx1 + 0.78, 0.52, nz + 0.40, MAT.cushion, 0.025);
+      box(nx1 + 0.01, 0.17, nz + 0.012, nx2 - 0.01, 0.19, nz + 0.34, MAT.oak);                // wall-hung shoe shelf
+      [5.63, 5.92, 6.22, 6.55].forEach(function(x, i){ shoes(null, x, 0.19, nz + 0.18, 0, i + 1); });
+      label('Bench nook', 6.14, 1.05, 2.95, 'dim', 'wall-hung bench, shoe shelf, 5 hooks');
+    });
+    objWrap('Hooks + coats', function(){
+      [5.66, 5.90, 6.14, 6.38, 6.62].forEach(function(x, i){ cyl(x, 1.62, nz + 0.045, 0.008, 0.06, MAT.brass, null, 'z', 8); var kb = add(new T.SphereGeometry(0.013, 10, 8), MAT.brass); kb.position.set(x, 1.63, nz + 0.078); if (i === 0 || i === 3) coat(null, x, 1.62, nz + 0.14, 0.85, 'z', i + 2); });
+    });
+    objWrap('Shelf + lamp', function(){
+      box(nx1 + 0.01, 1.98, nz + 0.012, nx2 - 0.01, 2.005, nz + 0.27, MAT.oak);
+      [nx1 + 0.15, nx2 - 0.15].forEach(function(x){ box(x - 0.01, 1.90, nz + 0.012, x + 0.01, 1.98, nz + 0.2, MAT.iron); });
+      box(5.60, 2.005, nz + 0.04, 5.92, 2.16, nz + 0.25, MAT.basket); box(5.98, 2.005, nz + 0.04, 6.28, 2.14, nz + 0.25, MAT.basket);
+      cyl(6.60, 2.06, nz + 0.14, 0.05, 0.11, MAT.ceramic); var shd = add(new T.CylinderGeometry(0.07, 0.11, 0.13, 20, 1, true), MAT.shade); shd.position.set(6.60, 2.18, nz + 0.14); shd.castShadow = false;
+      var ld = box(nx1 + 0.05, 1.975, nz + 0.2, nx2 - 0.05, 1.98, nz + 0.23, MAT.diffuser, null, false); ld.castShadow = false;
+    });
+    objWrap('Rug', function(){ var rg = add(new T.PlaneGeometry(1.6, 2.3), kilimMat(), null, false, true); rg.rotation.x = -Math.PI / 2; rg.position.set(6.05, 0.006, 4.30); });
+    objWrap('Round mirror', function(){
+      var mr = add(new T.CylinderGeometry(0.33, 0.33, 0.02, 40), MAT.mirror, null, false); mr.rotation.z = Math.PI / 2; mr.position.set(7.31, 1.50, 4.20); MIRRORS.push(mr);
+      var rim = add(new T.TorusGeometry(0.335, 0.012, 8, 48), MAT.brass); rim.rotation.y = Math.PI / 2; rim.position.set(7.305, 1.50, 4.20);
+    });
+    objWrap('Console shelf', function(){
+      box(7.10, 0.86, 3.75, 7.33, 0.89, 4.65, MAT.oak); [3.82, 4.58].forEach(function(z){ box(7.29, 0.72, z - 0.01, 7.33, 0.86, z + 0.01, MAT.iron); });
+      cyl(7.20, 0.905, 3.98, 0.08, 0.03, MAT.ceramic); plant(7.20, 0.89, 4.45, 0.7, MAT.terracotta, true);
+    });
+    label('Hall cabinet', 6.14, 2.42, 2.95, '', '2 cupboards 50 cm + bench nook 1.38 m');
+    label('Round mirror + console', 7.15, 1.95, 4.2);
+    label('Rug 160 × 230', 6.05, 0.05, 5.1, 'dim');
+  }
   if (sc === 'A') {
     objWrap('Wardrobe', function(){ builtInWardrobe(4.95, 2.53, 0, 2.38); label('Built-in wardrobe', 6.14, 2.42, 3.2, '', '2.38 × 0.60 m · doors 2.28 m'); });
     box(4.95, 2.30, 3.11, 7.33, WALL_H, 3.13, MAT.plaster); box(4.95, 2.30, 2.53, 7.33, 2.32, 3.13, MAT.plaster);
@@ -3111,7 +3186,7 @@ window.addEventListener('keydown', function(e){
   if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].indexOf(e.code) >= 0) {
     keys[e.code] = true; if (e.code.indexOf('Arrow') === 0) e.preventDefault();
   }
-  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey && S.level !== 'first') { setScene(S.scene === 'before' ? (S.lastAfter || 'A') : 'before'); }
+  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey && S.level !== 'first') { setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
 });
 window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 window.addEventListener('blur', function(){ keys = {}; padHeld = null; });
@@ -3214,7 +3289,9 @@ canvas.addEventListener('pointerleave', function(){ if (pickEl) pickEl.style.dis
 var INFO = {
   before: {h: 'Before: as photographed', rows: [['Office', '7.8 m², plasterboard wall'], ['Corridor', '0.92 m wide'], ['Coats', 'on the partition'], ['Shoes', 'racks under the stairs'], ['Sockets', 'at 25 cm'], ['Machines', 'on the floor']],
     note: 'Clutter left out. The yellow wall is the one that comes out. The dark posts by the stairs carry the stairwell beam, so they stay.'},
-  A: {h: 'After: Option A (recommended)', rows: [['Hall', '≈ 14.5 m², ≈ 11 m² clear'], ['Wardrobe', '2.38 × 0.60, doors 2.28'], ['Bench', '1.20 m + 5 hooks'], ['Under stairs', 'shoe unit 0.90 m'], ['Sockets', 'at 1.10 m'], ['Wardrobe cost', '225 € curtain · 450 € doors'], ['Bench + shoe unit', '≈ 65 € + ≈ 60 €']],
+  E: {h: 'After: Option E (recommended)', rows: [['Hall', '≈ 14.5 m², ≈ 11.3 m² clear'], ['Cupboards', '2 × 50 cm, doors 1.95 m, on 15 cm legs'], ['Bench nook', '1.38 m: bench, shoe shelf, 5 hooks, lamp'], ['Shoes', 'cupboard floors, bench shelf, under the stairs'], ['Extras', 'rug, round mirror, console shelf'], ['Cost', '≈ 420 € + ≈ 90 € for the extras']],
+    note: 'An entrance hall rather than a bedroom wardrobe: painted doors with wooden knobs, an open bench nook with a lamp, and a rug. Pick the door colour under Wardrobe front.'},
+  A: {h: 'After: Option A', rows: [['Hall', '≈ 14.5 m², ≈ 11 m² clear'], ['Wardrobe', '2.38 × 0.60, doors 2.28'], ['Bench', '1.20 m + 5 hooks'], ['Under stairs', 'shoe unit 0.90 m'], ['Sockets', 'at 1.10 m'], ['Wardrobe cost', '225 € curtain · 450 € doors'], ['Bench + shoe unit', '≈ 65 € + ≈ 60 €']],
     note: 'The bench moved to the stone wall because the radiator sits under the window. A fascia board under the beam gives the sliding doors a straight head.'},
   B: {h: 'After: Option B', rows: [['Hall', '≈ 14.5 m², ≈ 10.8 m² clear'], ['Wardrobe', '2.50 × 0.60 on stone wall'], ['Bench', '1.20 m + hooks, back wall'], ['Wardrobe cost', '≈ 260 € curtain · 690 € PAX']],
     note: 'Leave a 3 cm air gap behind the wardrobe and vents at top and bottom: this wall is cold.'},
@@ -3243,7 +3320,7 @@ function syncUI(){
   pressed('#scenes', 'scene', S.scene); pressed('#views', 'view', S.view); pressed('#fronts', 'front', S.front);
   pressed('#floors', 'floor', S.floor); pressed('#paints', 'paint', S.paint);
   [['t-ceiling', 'ceiling'], ['t-cut', 'cut'], ['t-labels', 'labels'], ['t-lamps', 'lamps'], ['t-flood', 'flood'], ['t-build', 'build'], ['t-open', 'open'], ['t-hq', 'hq']].forEach(function(p){ $('#' + p[0]).checked = !!S[p[1]]; });
-  $('#sec-front').style.display = (S.level !== 'first' && (S.scene === 'A' || S.scene === 'B' || S.scene === 'C')) ? '' : 'none';
+  $('#sec-front').style.display = (S.level !== 'first' && (S.scene === 'A' || S.scene === 'B' || S.scene === 'C' || S.scene === 'E')) ? '' : 'none';
   $('#floors').style.display = S.level === 'first' ? 'none' : '';
   $('#t-open').parentNode.style.opacity = (S.level === 'first' || S.scene === 'before' || S.scene === 'D') ? 0.45 : 1;
 }
