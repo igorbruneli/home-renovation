@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ground Floor Hall Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: a drawing set. Each section is a numbered sheet (A = architecture, S = structure, E = electrics, F = flood,
+   Q = quantities, G = general) under a sticky title block that carries the live budget against the 1,800 € payout.
+   Plans use the French drawing convention: yellow = to demolish, red = to build. Accent = the green of BA13 hydro board. */
+:root{
+  --paper:#F2F5F3; --sheet:#FFFFFF; --ink:#1B2A2E; --ink-2:#4B5B5F; --ink-3:#77878A; --rule:#C9D3D0; --rule-2:#E3E9E7;
+  --hydro:#2C7A57; --hydro-ink:#1F5E42; --hydro-pale:#DCEEE3;
+  --water:#2560A6; --water-pale:#DCE7F4;
+  --demo:#D9A800; --demo-pale:#FBF0C4;
+  --new:#C4321D; --new-pale:#F8DED8;
+  --warn:#A86300; --warn-pale:#FBEBD2; --bad:#B3261E; --bad-pale:#F7DCDA;
+  --wall:#7E8A87; --stone-bg:#D5DCDA; --stone-line:#8E9B98;
+  --f-display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --s-1:.8125rem; --s0:1rem; --s1:1.1875rem; --s2:1.5rem; --s3:2rem; --s4:2.75rem;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --ink-3:#7C8C8A; --rule:#2E3D40; --rule-2:#223033;
+    --hydro:#62C092; --hydro-ink:#8AD6AF; --hydro-pale:#1C3A2C;
+    --water:#78AEEB; --water-pale:#1A2C42;
+    --demo:#F0C92E; --demo-pale:#3B3314;
+    --new:#FF7A63; --new-pale:#47231D;
+    --warn:#F2A846; --warn-pale:#3C2B12; --bad:#FF7B70; --bad-pale:#45201D;
+    --wall:#788683; --stone-bg:#2A3639; --stone-line:#55646A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --ink-3:#7C8C8A; --rule:#2E3D40; --rule-2:#223033;
+  --hydro:#62C092; --hydro-ink:#8AD6AF; --hydro-pale:#1C3A2C;
+  --water:#78AEEB; --water-pale:#1A2C42;
+  --demo:#F0C92E; --demo-pale:#3B3314;
+  --new:#FF7A63; --new-pale:#47231D;
+  --warn:#F2A846; --warn-pale:#3C2B12; --bad:#FF7B70; --bad-pale:#45201D;
+  --wall:#788683; --stone-bg:#2A3639; --stone-line:#55646A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-padding-top:150px}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:var(--s0); line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:30; background:var(--sheet)}
+a{color:var(--hydro-ink); text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--water); outline-offset:2px}
+.wrap{max-width:1120px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-display); font-stretch:87%; line-height:1.15; text-wrap:balance; margin:0}
+h1{font-size:var(--s4); font-weight:750; letter-spacing:-.01em}
+h2{font-size:var(--s3); font-weight:700}
+h3{font-size:var(--s1); font-weight:700; margin-top:.25rem}
+h4{font-size:var(--s0); font-weight:700}
+p{margin:0}
+.prose{max-width:68ch; display:grid; gap:.8rem}
+.mono,.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+.label{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.08em; font-size:var(--s-1); font-weight:650; color:var(--ink-2)}
+.muted{color:var(--ink-2)}
+.small{font-size:var(--s-1)}
+ul.tight,ol.tight{margin:0; padding-left:1.2rem; display:grid; gap:.35rem}
+
+/* ---------- Title block (sticky) ---------- */
+.cartouche{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--sheet); border-bottom:1px solid var(--rule)}
+.cartouche .row{display:flex; align-items:center; gap:1rem 1.5rem; flex-wrap:wrap; padding-block:.6rem}
+.brand{display:grid; gap:0; min-width:0}
+.brand b{font-family:var(--f-display); font-stretch:82%; font-size:1.125rem; font-weight:750; letter-spacing:.01em}
+.brand span{font-size:var(--s-1); color:var(--ink-2)}
+.meter{flex:1 1 280px; min-width:0; display:grid; gap:.3rem}
+.meter-top{display:flex; justify-content:space-between; gap:.75rem; font-family:var(--f-mono); font-size:.875rem; font-variant-numeric:tabular-nums; flex-wrap:wrap}
+.meter-top strong{font-weight:600}
+.bar{position:relative; height:10px; background:var(--rule-2); border:1px solid var(--rule); overflow:hidden}
+.bar i{position:absolute; inset:0 auto 0 0; background:var(--hydro); width:0; transition:width .25s ease}
+.bar[data-state="tight"] i{background:var(--warn)}
+.bar[data-state="over"] i{background:var(--bad)}
+.state-pill{display:inline-block; padding:.05rem .45rem; font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.06em; font-size:.75rem; font-weight:700; border:1px solid currentColor}
+.state-pill[data-state="ok"]{color:var(--hydro-ink); background:var(--hydro-pale)}
+.state-pill[data-state="tight"]{color:var(--warn); background:var(--warn-pale)}
+.state-pill[data-state="over"]{color:var(--bad); background:var(--bad-pale)}
+.btn{font:inherit; font-family:var(--f-display); font-stretch:85%; font-weight:650; font-size:.9rem; letter-spacing:.02em; cursor:pointer;
+  border:1px solid var(--ink); background:var(--sheet); color:var(--ink); padding:.42rem .8rem; border-radius:2px}
+.btn:hover{background:var(--rule-2)}
+.btn.primary{background:var(--ink); color:var(--sheet)}
+.btn.primary:hover{opacity:.9}
+.sheetnav{display:flex; gap:.25rem; overflow-x:auto; padding-bottom:.5rem; scrollbar-width:thin}
+.sheetnav a{flex:0 0 auto; text-decoration:none; color:var(--ink-2); font-size:.8125rem; padding:.2rem .5rem; border:1px solid transparent; white-space:nowrap}
+.sheetnav a b{font-family:var(--f-mono); font-weight:600; color:var(--ink); margin-right:.3rem}
+.sheetnav a:hover{border-color:var(--rule); color:var(--ink)}
+
+/* ---------- Sheets ---------- */
+.sheet{padding-block:3rem 1rem}
+.sheet-head{display:grid; grid-template-columns:auto 1fr; gap:.25rem 1rem; align-items:baseline; border-top:2px solid var(--ink); padding-top:.75rem; margin-bottom:1.5rem}
+.sheet-code{font-family:var(--f-mono); font-weight:600; font-size:var(--s1); color:var(--ink); border:1.5px solid var(--ink); padding:.05rem .45rem; align-self:center}
+.sheet-head .sub{grid-column:2; color:var(--ink-2); max-width:70ch}
+.stack{display:grid; gap:1.5rem; align-content:start}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem 2rem; align-items:start}
+.two > *{min-width:0}
+
+/* Hero */
+.hero{padding-block:2.25rem 1rem; display:grid; gap:1.25rem}
+.hero .eyebrow{display:flex; gap:.5rem 1rem; flex-wrap:wrap}
+.hero p.lede{font-size:var(--s1); max-width:62ch; color:var(--ink)}
+.figures{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); border:1px solid var(--rule); background:var(--sheet)}
+.figures > div{padding:.9rem 1rem; border-right:1px solid var(--rule); display:grid; gap:.15rem}
+.figures > div:last-child{border-right:0}
+.figures .big{font-family:var(--f-mono); font-size:1.75rem; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.1}
+.figures .big.good{color:var(--hydro-ink)}
+@media (max-width:640px){.figures > div{border-right:0; border-bottom:1px solid var(--rule)} .figures > div:last-child{border-bottom:0}}
+
+/* Title-block facts table */
+.facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); border-top:1px solid var(--rule); border-left:1px solid var(--rule); background:var(--sheet)}
+.facts > div{border-right:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:.6rem .75rem; display:grid; gap:.1rem; min-width:0}
+.facts dt{margin:0}
+.facts dd{margin:0; font-size:.95rem}
+.facts .flag{color:var(--warn); font-weight:700}
+.facts .ok{color:var(--hydro-ink); font-weight:700}
+
+/* Notes */
+.note{background:var(--sheet); border:1px solid var(--rule); padding:.85rem 1rem; display:grid; gap:.4rem; max-width:80ch; align-content:start}
+.note > .label{color:var(--ink)}
+.note.stop{background:var(--bad-pale); border-color:var(--bad)}
+.note.stop > .label{color:var(--bad)}
+.note.flood{background:var(--water-pale); border-color:var(--water)}
+.note.flood > .label{color:var(--water)}
+.note.tip{background:var(--hydro-pale); border-color:var(--hydro)}
+.note.tip > .label{color:var(--hydro-ink)}
+.note.warn{background:var(--warn-pale); border-color:var(--warn)}
+.note.warn > .label{color:var(--warn)}
+
+/* Plans */
+.planbox{background:var(--sheet); border:1px solid var(--rule); overflow-x:auto}
+.planbox > svg,.planbox > [data-plan] > svg{display:block; width:100%; min-width:560px; height:auto}
+.legend svg{flex:0 0 auto; width:18px; height:18px; color:var(--water)}
+.legend{display:flex; flex-wrap:wrap; gap:.4rem 1.1rem; font-size:var(--s-1); color:var(--ink-2); padding:.6rem .8rem; border-top:1px solid var(--rule)}
+.legend span{display:inline-flex; align-items:center; gap:.4rem}
+.sw{display:inline-block; width:18px; height:10px; border:1px solid var(--ink-2)}
+.sw.stone{background:repeating-linear-gradient(45deg,var(--stone-bg) 0 3px,var(--stone-line) 3px 4px)}
+.sw.wall{background:var(--wall)}
+.sw.demo{background:repeating-linear-gradient(45deg,var(--demo-pale) 0 3px,var(--demo) 3px 5px)}
+.sw.new{background:var(--new)}
+.sw.hall{background:var(--hydro-pale)}
+.sw.ward{background:var(--hydro-pale); border-color:var(--hydro)}
+.sw.water{background:var(--water-pale); border-color:var(--water)}
+svg text{font-family:var(--f-body)}
+.p-stone{fill:url(#stoneHatch)}
+.p-wall{fill:var(--wall)}
+.p-demo{fill:url(#demoHatch); stroke:var(--demo); stroke-width:2}
+.p-new{fill:var(--new)}
+.p-hall{fill:var(--hydro-pale)}
+.p-floor{fill:var(--sheet)}
+.p-line{stroke:var(--ink); stroke-width:2; fill:none}
+.p-thin{stroke:var(--ink-2); stroke-width:1.3; fill:none}
+.p-dash{stroke:var(--ink-3); stroke-width:1.5; fill:none; stroke-dasharray:8 6}
+.p-swing{stroke:var(--ink-2); stroke-width:1.3; fill:none; stroke-dasharray:5 4}
+.p-glass{stroke:var(--water); stroke-width:2.5}
+.p-furn{fill:var(--sheet); stroke:var(--ink); stroke-width:2}
+.p-furn-dash{fill:var(--sheet); stroke:var(--ink); stroke-width:2; stroke-dasharray:7 5}
+.p-ward{fill:var(--hydro-pale); stroke:var(--hydro); stroke-width:3}
+.p-rail{stroke:var(--hydro); stroke-width:2; stroke-dasharray:14 5 3 5; fill:none}
+.p-dim{stroke:var(--ink-2); stroke-width:1.2; fill:none}
+.p-tx{fill:var(--ink)}
+.p-tx2{fill:var(--ink-2)}
+.p-txw{fill:var(--hydro-ink)}
+.p-txr{fill:var(--new)}
+.p-txd{fill:var(--ink); }
+.p-txb{fill:var(--water)}
+.p-room{font-family:var(--f-display); font-stretch:82%; font-weight:700; font-size:22px; letter-spacing:.06em; fill:var(--ink)}
+.p-area{font-family:var(--f-mono); font-size:16px; fill:var(--ink-2)}
+.p-small{font-size:14px; fill:var(--ink-2)}
+.p-dimt{font-family:var(--f-mono); font-size:16px; fill:var(--ink-2)}
+.p-elec{stroke:var(--water); stroke-width:2.2; fill:var(--sheet)}
+.p-elec-l{stroke:var(--water); stroke-width:1.4; fill:none; stroke-dasharray:6 5}
+.p-x{stroke:var(--demo); stroke-width:3}
+.p-wet{fill:var(--water-pale); opacity:.75}
+.p-waterline{stroke:var(--water); stroke-width:2; stroke-dasharray:10 6}
+.p-board1{fill:var(--hydro-pale); stroke:var(--hydro); stroke-width:2}
+.p-board2{fill:var(--sheet); stroke:var(--hydro); stroke-width:2}
+.p-tile{fill:var(--ink-2)}
+.p-skirt{fill:var(--ink-3); stroke:var(--ink-2)}
+.p-concrete{fill:url(#concHatch)}
+
+/* Option tabs */
+.tabs{display:flex; flex-wrap:wrap; gap:.5rem}
+.tab{font:inherit; cursor:pointer; text-align:left; background:var(--sheet); color:var(--ink); border:1px solid var(--rule); padding:.6rem .8rem; display:grid; gap:.1rem; min-width:150px; flex:1 1 150px; border-radius:2px}
+.tab .t-code{font-family:var(--f-mono); font-weight:600; font-size:.85rem; color:var(--ink-2)}
+.tab .t-name{font-family:var(--f-display); font-stretch:85%; font-weight:700; font-size:1.02rem}
+.tab .t-meta{font-size:.8rem; color:var(--ink-2)}
+.tab:hover{border-color:var(--ink-2)}
+.tab[aria-selected="true"]{border:2px solid var(--ink); padding:calc(.6rem - 1px) calc(.8rem - 1px); background:var(--paper)}
+.rec{display:inline-block; font-family:var(--f-display); font-stretch:80%; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--hydro-ink); background:var(--hydro-pale); border:1px solid var(--hydro); padding:0 .35rem; vertical-align:middle}
+.opt-panel{display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:1.5rem; align-items:start}
+.opt-panel.is-hidden{display:none}
+@media (max-width:860px){.opt-panel{grid-template-columns:1fr}}
+.opt-side{display:grid; gap:1rem}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:.35rem 1rem; margin:0; font-size:.95rem}
+.kv dt{color:var(--ink-2)}
+.kv dd{margin:0; font-family:var(--f-mono); font-variant-numeric:tabular-nums; font-size:.9rem}
+.pc{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+@media (max-width:520px){.pc{grid-template-columns:1fr}}
+.pc ul{margin:0; padding-left:1.1rem; display:grid; gap:.3rem; font-size:.95rem}
+.pc h4{margin-bottom:.35rem}
+.pc .pro h4{color:var(--hydro-ink)}
+.pc .con h4{color:var(--warn)}
+
+/* Checks list (structure) */
+.checks{counter-reset:chk; display:grid; gap:0; border-top:1px solid var(--rule); max-width:90ch}
+.checks li{list-style:none; display:grid; grid-template-columns:2.2rem 1fr; gap:.2rem .6rem; padding:.75rem 0; border-bottom:1px solid var(--rule)}
+.checks li::before{counter-increment:chk; content:counter(chk); font-family:var(--f-mono); font-weight:600; font-size:1rem; color:var(--ink); border:1.5px solid var(--ink); width:1.8rem; height:1.8rem; display:grid; place-items:center; grid-row:span 2}
+.checks li b{font-family:var(--f-display); font-stretch:88%; font-size:1.02rem}
+.checks li span{color:var(--ink-2); font-size:.95rem}
+ol.checks{padding:0; margin:0}
+
+/* Steps (work sequence) */
+.phase{display:grid; gap:.25rem; margin-top:1.5rem}
+.phase:first-of-type{margin-top:0}
+.phase-head{display:flex; gap:.4rem 1rem; align-items:baseline; flex-wrap:wrap; border-bottom:1px solid var(--ink); padding-bottom:.3rem}
+.phase-head h3{margin:0}
+.steps{list-style:none; padding:0; margin:0; display:grid}
+.step{display:grid; grid-template-columns:1.6rem 1fr auto; gap:.2rem .75rem; padding:.7rem 0; border-bottom:1px solid var(--rule-2); align-items:start}
+.step input{width:1.15rem; height:1.15rem; margin:.2rem 0 0; accent-color:var(--hydro)}
+.step .s-body{display:grid; gap:.2rem; min-width:0}
+.step .s-title{font-weight:700}
+.step .s-text{color:var(--ink-2); font-size:.95rem}
+.step .s-tags{display:flex; gap:.3rem; flex-wrap:wrap; justify-content:flex-end}
+.step.done .s-title{text-decoration:line-through; text-decoration-color:var(--hydro); color:var(--ink-2)}
+.tag{font-family:var(--f-display); font-stretch:80%; font-size:.72rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; padding:.05rem .4rem; border:1px solid var(--rule); color:var(--ink-2); white-space:nowrap}
+.tag.diy{color:var(--hydro-ink); border-color:var(--hydro); background:var(--hydro-pale)}
+.tag.pro{color:var(--warn); border-color:var(--warn); background:var(--warn-pale)}
+.tag.ext{color:var(--water); border-color:var(--water); background:var(--water-pale)}
+.tag.time{font-family:var(--f-mono); text-transform:none; letter-spacing:0; font-weight:500}
+@media (max-width:600px){.step{grid-template-columns:1.6rem 1fr} .step .s-tags{grid-column:2; justify-content:flex-start}}
+.progress{display:flex; align-items:center; gap:.75rem; flex-wrap:wrap}
+.progress .bar{flex:1 1 200px; max-width:420px}
+
+/* Tables */
+.tablebox{overflow-x:auto; border:1px solid var(--rule); background:var(--sheet)}
+table{border-collapse:collapse; width:100%; font-size:.93rem}
+th,td{text-align:left; vertical-align:top; padding:.55rem .7rem; border-bottom:1px solid var(--rule-2)}
+th{font-family:var(--f-display); font-stretch:82%; text-transform:uppercase; letter-spacing:.06em; font-size:.78rem; color:var(--ink-2); font-weight:700; border-bottom:1px solid var(--rule); background:var(--paper)}
+td.n{font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+.yes{color:var(--hydro-ink); font-weight:700}
+.prof{color:var(--warn); font-weight:700}
+table.wide{min-width:760px}
+
+/* Budget */
+.presets{display:flex; flex-wrap:wrap; gap:.5rem; align-items:center}
+.budget-top{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.5rem}
+@media (max-width:800px){.budget-top{grid-template-columns:1fr}}
+.sum{background:var(--sheet); border:1px solid var(--rule); padding:1rem; display:grid; gap:.75rem}
+.sum .total{font-family:var(--f-mono); font-size:2rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
+.sum .total small{font-size:1rem; color:var(--ink-2); font-weight:400}
+.catbars{display:grid; gap:.35rem}
+.catbar{display:grid; grid-template-columns:minmax(0,11rem) minmax(60px,1fr) 4.5rem; gap:.6rem; align-items:center; font-size:.85rem}
+.catbar .cb-track{height:8px; background:var(--rule-2); position:relative}
+.catbar .cb-track i{position:absolute; inset:0 auto 0 0; background:var(--ink-2)}
+.catbar .num{text-align:right}
+.cat{margin-top:1.25rem; border:1px solid var(--rule); background:var(--sheet)}
+.cat-head{display:flex; justify-content:space-between; align-items:baseline; gap:1rem; padding:.6rem .8rem; background:var(--paper); border-bottom:1px solid var(--rule); flex-wrap:wrap}
+.cat-head h3{margin:0; font-size:1.05rem}
+.cat-head .num{font-weight:600}
+.cat-note{padding:.5rem .8rem; font-size:.85rem; color:var(--ink-2); border-bottom:1px solid var(--rule-2)}
+.item{display:grid; grid-template-columns:1.6rem minmax(0,1fr) 9.5rem 4.4rem 6.2rem 5.6rem 2.4rem; gap:.4rem .6rem; align-items:center; padding:.55rem .8rem; border-bottom:1px solid var(--rule-2)}
+.item:last-child{border-bottom:0}
+.item.head{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.06em; font-size:.72rem; color:var(--ink-3); font-weight:700; padding-block:.35rem}
+.item .i-check{width:1.15rem; height:1.15rem; margin:0; accent-color:var(--hydro)}
+.item .i-name{font-weight:700; font-size:.95rem}
+.item .i-detail{display:block; font-weight:400; color:var(--ink-2); font-size:.84rem}
+.item .i-store{font-size:.82rem; color:var(--ink-2)}
+.item input[type="number"]{width:100%; font:inherit; font-family:var(--f-mono); font-size:.88rem; padding:.25rem .35rem; border:1px solid var(--rule); background:var(--paper); color:var(--ink); border-radius:2px; text-align:right}
+.item .i-total{font-family:var(--f-mono); font-variant-numeric:tabular-nums; text-align:right; font-weight:600}
+.item.off .i-total{color:var(--ink-3); font-weight:400; text-decoration:line-through}
+.item.off .i-name{color:var(--ink-2)}
+.item .i-bought{font:inherit; font-size:.8rem; cursor:pointer; width:2.2rem; height:1.8rem; border:1px solid var(--rule); background:var(--paper); color:var(--ink-3); border-radius:2px}
+.item .i-bought[aria-pressed="true"]{background:var(--hydro); border-color:var(--hydro); color:var(--sheet)}
+.grp{font-family:var(--f-display); font-stretch:80%; font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; color:var(--water); border:1px solid var(--water); padding:0 .3rem; margin-left:.35rem; vertical-align:1px}
+.flagt{font-family:var(--f-display); font-stretch:80%; font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; color:var(--warn); border:1px solid var(--warn); padding:0 .3rem; margin-left:.35rem; vertical-align:1px}
+@media (max-width:760px){
+  .item{grid-template-columns:1.6rem minmax(0,1fr) 4.2rem 5.8rem; grid-template-areas:"c n n n" ". s s s" ". q p t" ". b b b"}
+  .item.head{display:none}
+  .item .i-check{grid-area:c} .item .i-namewrap{grid-area:n} .item .i-store{grid-area:s}
+  .item .i-qty{grid-area:q} .item .i-price{grid-area:p} .item .i-total{grid-area:t}
+  .item .i-bought{grid-area:b; width:auto; padding:0 .6rem; justify-self:start}
+  .item .i-bought::after{content:" bought"}
+}
+
+/* Gantt */
+.gantt{min-width:760px; display:grid; grid-template-columns:15rem repeat(15,minmax(0,1fr)); font-size:.82rem; position:relative}
+.gantt .gh{position:relative; z-index:3; background:var(--sheet); font-family:var(--f-mono); font-size:.72rem; color:var(--ink-2); padding:.35rem .2rem; border-bottom:1px solid var(--rule); border-left:1px solid var(--rule-2); text-align:center; line-height:1.2}
+.gantt .gh.first{border-left:0; text-align:left; font-family:var(--f-display); font-stretch:82%; text-transform:uppercase; letter-spacing:.06em; font-weight:700}
+.gantt .gl{padding:.4rem .5rem .4rem 0; border-bottom:1px solid var(--rule-2); min-width:0}
+.gantt .gc{border-bottom:1px solid var(--rule-2); border-left:1px solid var(--rule-2); position:relative}
+.gantt .gb{align-self:center; height:16px; margin:0 2px; background:var(--ink-2); position:relative; z-index:1}
+.gantt .gb.diy{background:var(--hydro)}
+.gantt .gb.pro{background:var(--warn)}
+.gantt .gb.ext{background:repeating-linear-gradient(135deg,var(--water) 0 6px,var(--water-pale) 6px 10px); border:1px solid var(--water)}
+.gantt .gb.wait{background:repeating-linear-gradient(90deg,var(--ink-3) 0 4px,transparent 4px 8px); height:6px}
+.gantt .gb.off{background:var(--rule)}
+.gantt .gb.par{background:transparent; border:2px dashed var(--water); height:14px}
+.today{position:absolute; top:0; bottom:0; width:2px; background:var(--new); z-index:2}
+.today span{position:absolute; top:-1.35rem; left:-1.2rem; font-family:var(--f-mono); font-size:.7rem; color:var(--new); white-space:nowrap}
+
+/* Elevation */
+.planbox.elev > svg{min-width:0}
+@media (max-width:600px){.planbox.elev > svg{min-width:600px}}
+.elev-wide{max-width:820px}
+
+/* Flood day card */
+.floodcard{border:2px solid var(--water); background:var(--sheet); padding:1rem 1.1rem; display:grid; gap:.6rem; max-width:80ch; align-content:start}
+.floodcard ol{margin:0; padding-left:1.3rem; display:grid; gap:.35rem}
+
+footer{padding-block:2.5rem 3rem; color:var(--ink-2); font-size:.85rem}
+.sources{display:grid; gap:.3rem; padding-left:1.1rem; margin:0}
+
+@media (max-width:640px){
+  .brand span,#printBtn{display:none}
+  .cartouche .row{padding-block:.45rem; gap:.35rem}
+  html{scroll-padding-top:120px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; scroll-behavior:auto!important}}
+
+/* ---------- Print ---------- */
+@media print{
+  :root,:root[data-theme="dark"]{
+    --paper:#FFFFFF; --sheet:#FFFFFF; --ink:#111; --ink-2:#444; --ink-3:#777; --rule:#BBB; --rule-2:#DDD;
+    --hydro:#2C7A57; --hydro-ink:#1F5E42; --hydro-pale:#E2F1E7; --water:#2560A6; --water-pale:#E1EBF6;
+    --demo:#C99A00; --demo-pale:#FBF0C4; --new:#C4321D; --warn:#A86300; --warn-pale:#FBEBD2; --bad:#B3261E; --bad-pale:#F7DCDA;
+    --wall:#7E8A87; --stone-bg:#D5DCDA; --stone-line:#8E9B98; color-scheme:light;
+  }
+  @page{size:A4; margin:12mm}
+  html{font-size:10.5pt}
+  body{background:#fff}
+  body::before{display:none}
+  .cartouche{position:static; border-bottom:2px solid #111}
+  .sheetnav,.noprint,.btn,.presets,.i-bought{display:none!important}
+  .opt-panel.is-hidden{display:grid}
+  .opt-panel{grid-template-columns:1fr 1fr; break-inside:avoid; border-top:1px solid #bbb; padding-top:.8rem; margin-top:.8rem}
+  .tabs{display:none}
+  .sheet{padding-block:1.2rem .4rem}
+  .sheet.pb{break-before:page}
+  .planbox > svg,.planbox > [data-plan] > svg,.planbox.elev > svg{min-width:0!important}
+  .planbox,.tablebox{overflow:visible}
+  .gantt{min-width:0}
+  table.wide{min-width:0}
+  .item{grid-template-columns:1.4rem minmax(0,1fr) 8rem 3.4rem 5rem 5rem; break-inside:avoid}
+  .item input[type="number"]{border:0; background:transparent; padding:0}
+  .note,.floodcard,.step,.checks li,.cat-head,.catbar{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+  a{color:inherit; text-decoration:none}
+}
+</style>
+</head>
+<body>
+
+<header class="cartouche">
+  <div class="wrap">
+    <div class="row">
+      <div class="brand">
+        <b>MAISON · REZ-DE-CHAUSSÉE</b>
+        <span>Saint-Julien-en-Genevois (74) · plan issued 4 Nov 2026</span>
+      </div>
+      <div class="meter" aria-live="polite">
+        <div class="meter-top">
+          <span><strong id="mTotal">0 €</strong> of 1,800 € payout</span>
+          <span><span id="mLeft">1,800 € left</span> <span class="state-pill" id="mState" data-state="ok">fits</span></span>
+        </div>
+        <div class="bar" id="mBar" data-state="ok"><i></i></div>
+      </div>
+      <button class="btn primary noprint" type="button" id="printBtn">Print / save PDF</button>
+    </div>
+    <nav class="sheetnav" aria-label="Sheets">
+      <a href="#g01"><b>G-01</b>Overview</a>
+      <a href="#a01"><b>A-01</b>Layouts</a>
+      <a href="#s01"><b>S-01</b>Load-bearing?</a>
+      <a href="#c01"><b>C-01</b>Work sequence</a>
+      <a href="#e01"><b>E-01</b>Electrics</a>
+      <a href="#a02"><b>A-02</b>Wardrobe</a>
+      <a href="#f01"><b>F-01</b>Flood resilience</a>
+      <a href="#q01"><b>Q-01</b>Materials &amp; budget</a>
+      <a href="#g02"><b>G-02</b>DIY or pro</a>
+      <a href="#g03"><b>G-03</b>Calendar</a>
+      <a href="#g04"><b>G-04</b>Permits &amp; rules</a>
+      <a href="#g05"><b>G-05</b>Sources</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= G-01 ================= -->
+<section class="hero" id="g01">
+  <div class="eyebrow"><span class="label">Sheet G-01 · Overview</span><span class="label">Scale: schematic, ±10 cm</span></div>
+  <h1>One 14.5 m² entrance hall where the office and corridor used to be</h1>
+  <p class="lede">Take out the plasterboard office wall, rebuild the flood-damaged walls in moisture-resistant board, and add a coat wardrobe. The work starts after Bouchet BTP's drainage works this November, and it has to fit inside Suravenir's 1,800 € cash payout.</p>
+  <div class="figures">
+    <div><span class="label">Insurance payout</span><span class="big">1,800 €</span><span class="small muted">auto-réparation, Suravenir</span></div>
+    <div><span class="label">This plan, as selected</span><span class="big good" id="figTotal">0 €</span><span class="small muted" id="figLeft">updates with the checklist (Q-01)</span></div>
+    <div><span class="label">Contractor quote you turned down</span><span class="big">3,993 €</span><span class="small muted">3,630 € HT + 10% VAT, drywall only</span></div>
+  </div>
+</section>
+
+<section class="sheet" style="padding-top:1.5rem">
+  <div class="two">
+    <div class="stack">
+      <h2 style="font-size:1.5rem">What your property file tells us</h2>
+      <p class="muted" style="max-width:62ch">Taken from the sale agreement and its 2024 diagnostics (EASYDIAGS, 26 June 2024; risk statement, 13 Nov 2024). These facts drive several choices below.</p>
+      <dl class="facts">
+        <div><dt class="label">Built</dt><dd>Before 1949</dd></div>
+        <div><dt class="label">Outer walls</dt><dd>50 cm stone (pierre de taille et moellons), uninsulated lining</dd></div>
+        <div><dt class="label">Ground floor slab</dt><dd>Concrete on ground, uninsulated. <span class="ok">Good for floods</span></dd></div>
+        <div><dt class="label">Ceiling height</dt><dd>2.50 m</dd></div>
+        <div><dt class="label">Flood plan (PPRN)</dt><dd>Approved 2020: not in an exposed zone. Revision prescribed 6 Sep 2023 for the whole commune. <span class="flag">Watch</span></dd></div>
+        <div><dt class="label">Flood disasters declared</dt><dd>6 Sep 2008 and 9 Jun 2024 (inondations, coulées de boue)</dd></div>
+        <div><dt class="label">Asbestos / lead</dt><dd>None found in 2024 (listed materials; paint reads 0 mg/cm²). <span class="ok">Safe to demolish</span></dd></div>
+        <div><dt class="label">Electrics (2024)</dt><dd>No anomalies; whole house behind at least one 30 mA RCD</dd></div>
+        <div><dt class="label">Gas boiler</dt><dd>De Dietrich, <b>in the garage</b>. Check how high it sits</dd></div>
+        <div><dt class="label">Notary description</dt><dd>Lists a <i>cellier</i> (store room) on the ground floor, not an office. The office was probably fitted out later</dd></div>
+      </dl>
+    </div>
+    <div class="stack">
+      <h2 style="font-size:1.5rem">Existing ground floor</h2>
+      <div class="planbox">
+        <div data-plan="existing" role="img" aria-label="Existing ground floor plan with the office partition marked for demolition"></div>
+        <div class="legend">
+          <span><i class="sw stone"></i>stone wall, 50 cm</span>
+          <span><i class="sw wall"></i>existing partition</span>
+          <span><i class="sw demo"></i>to demolish (French convention: yellow)</span>
+        </div>
+      </div>
+      <p class="small muted">Room areas are the surveyor's figures. Dimensions are worked back from those areas and the 2024 sketch, so treat them as ±10 cm and measure before you buy. The 6.74 m² entrance includes the stair footprint: its Carrez area is 5.13 m². Once merged you get about <b>13 m² of open floor</b>, and the stairs take the rest.</p>
+    </div>
+  </div>
+
+  <div class="stack" style="margin-top:2rem">
+    <h2 style="font-size:1.5rem">The plan in six decisions</h2>
+    <ol class="tight" style="max-width:80ch">
+      <li><b>Layout A (recommended):</b> the wardrobe goes on the back wall you share with the buanderie, and a bench goes under the window. It's an inside wall, so there's no cold-wall mould behind the coats. Three other layouts are on A-01.</li>
+      <li><b>Strip out now, rebuild after the drainage.</b> Wet board and insulation come out this month so the walls can dry. Nothing new goes up until the pipe is fixed and moisture readings match a dry wall.</li>
+      <li><b>Lay the green BA13 hydro board horizontally, with the first course 1.20 m high and a 1 cm gap at the floor.</b> After a flood up to 50 cm you replace one strip, not whole walls.</li>
+      <li><b>Hire an electrician for half a day</b> (about 380 €). They confirm the removed circuits are safe, run the new drops from the ceiling, and put the ground floor on its own 30 mA RCD so you can switch it off during a flood. You do the rest yourselves.</li>
+      <li><b>Keep the existing floor if it's sound</b> and fill the strip where the wall stood (about 40 €). Retile the hall in porcelain only if the floor is damaged or mismatched (about 410 €).</li>
+      <li><b>Ask Bouchet BTP to fit a backflow valve while the trench is open.</b> Your flood came from a blocked drain, and this is the cheapest moment to stop it happening again.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= A-01 ================= -->
+<section class="sheet pb" id="a01">
+  <div class="sheet-head">
+    <span class="sheet-code">A-01</span><h2>Layout options for the merged hall</h2>
+    <p class="sub">Four ways to use the roughly 3.40 × 3.27 m space plus the corridor. Click an option to see its plan. The button under each one loads its wardrobe into the budget on Q-01.</p>
+  </div>
+  <div class="tabs noprint" role="tablist" aria-label="Layout options">
+    <button class="tab" role="tab" id="tab-A" aria-controls="opt-A" aria-selected="true" data-opt="A"><span class="t-code">Option A <span class="rec">Recommended</span></span><span class="t-name">Storage wall at the back</span><span class="t-meta">2.38 m built-in · ≈11 m² clear</span></button>
+    <button class="tab" role="tab" id="tab-B" aria-controls="opt-B" aria-selected="false" data-opt="B"><span class="t-code">Option B</span><span class="t-name">Long side wardrobe</span><span class="t-meta">2.50 m on the stone wall · ≈10.8 m² clear</span></button>
+    <button class="tab" role="tab" id="tab-C" aria-controls="opt-C" aria-selected="false" data-opt="C"><span class="t-code">Option C</span><span class="t-name">Hall + work corner</span><span class="t-meta">1.50 m PAX + desk · ≈10.5 m² clear</span></button>
+    <button class="tab" role="tab" id="tab-D" aria-controls="opt-D" aria-selected="false" data-opt="D"><span class="t-code">Option D</span><span class="t-name">Open mudroom</span><span class="t-meta">hooks + bench · ≈12.3 m² clear</span></button>
+  </div>
+
+  <div class="stack" style="margin-top:1rem">
+    <!-- A -->
+    <div class="opt-panel" id="opt-A" role="tabpanel" aria-labelledby="tab-A">
+      <div class="planbox">
+        <div data-plan="A" role="img" aria-label="Option A plan: built-in wardrobe on the back wall, bench under the window"></div>
+        <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>wardrobe</span><span><i class="sw new"></i>to build (red)</span></div>
+      </div>
+      <div class="opt-side">
+        <h3>Option A · Storage wall at the back <span class="rec">Recommended</span></h3>
+        <p>The wardrobe fills the old office's back wall, the one shared with the buanderie, from floor to ceiling. A bench with shoe space sits under the window, with hooks and a mirror on the stone wall. From the front door you look into one clear, bright room.</p>
+        <dl class="kv">
+          <dt>Wardrobe</dt><dd>2.38 × 0.60 × 2.50 m, built-in niche</dd>
+          <dt>Side cheek</dt><dd>keep the top 60 cm of the old partition frame, re-board it</dd>
+          <dt>Clear floor</dt><dd>≈ 11 m²</dd>
+          <dt>Wardrobe cost</dt><dd>225 € (curtain) to 450 € (3 sliding doors)</dd>
+        </dl>
+        <div class="pc">
+          <div class="pro"><h4>For</h4><ul><li>Inside wall, so no condensation behind the coats</li><li>The window stays free and the hall stays bright</li><li>Reuses part of the old wall as the niche cheek</li><li>Nothing sticks out into the walkway</li></ul></div>
+          <div class="con"><h4>Against</h4><ul><li>About 3 m from the front door (3–4 steps)</li><li>Rules out a future door from the hall into the buanderie on that wall</li></ul></div>
+        </div>
+        <button class="btn noprint" type="button" data-apply="A">Use Option A in the budget</button>
+      </div>
+    </div>
+    <!-- B -->
+    <div class="opt-panel is-hidden" id="opt-B" role="tabpanel" aria-labelledby="tab-B">
+      <div class="planbox">
+        <div data-plan="B" role="img" aria-label="Option B plan: long wardrobe on the right-hand stone wall, bench on the back wall"></div>
+        <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>wardrobe</span><span><i class="sw new"></i>to build (red)</span></div>
+      </div>
+      <div class="opt-side">
+        <h3>Option B · Long side wardrobe</h3>
+        <p>A 2.50 m wardrobe runs along the right-hand stone wall, closed at the window end by a short stud return. A bench with hooks above goes on the back wall for jackets you wear every day.</p>
+        <dl class="kv">
+          <dt>Wardrobe</dt><dd>2.50 × 0.60 × 2.50 m</dd>
+          <dt>New wall</dt><dd>60 cm stud return at the window end</dd>
+          <dt>Clear floor</dt><dd>≈ 10.8 m² (hall narrows to 2.80 m)</dd>
+          <dt>Wardrobe cost</dt><dd>≈ 260 € (curtain niche) to 690 € (PAX 250 cm)</dd>
+        </dl>
+        <div class="pc">
+          <div class="pro"><h4>For</h4><ul><li>The most storage: room for the vacuum, ironing board and overflow from the buanderie</li><li>Bench and hooks catch the daily jackets</li></ul></div>
+          <div class="con"><h4>Against</h4><ul><li>It's a 50 cm stone outside wall or the party wall, so it's colder. Leave a 3 cm air gap and vents top and bottom</li><li>If it's the party wall, screw into the lining only and cut no chases</li><li>Over budget if you choose PAX</li></ul></div>
+        </div>
+        <button class="btn noprint" type="button" data-apply="B">Use Option B in the budget</button>
+      </div>
+    </div>
+    <!-- C -->
+    <div class="opt-panel is-hidden" id="opt-C" role="tabpanel" aria-labelledby="tab-C">
+      <div class="planbox">
+        <div data-plan="C" role="img" aria-label="Option C plan: PAX wardrobe on the back wall, desk under the window"></div>
+        <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>wardrobe</span></div>
+      </div>
+      <div class="opt-side">
+        <h3>Option C · Hall + work corner</h3>
+        <p>This keeps somewhere to work now the office has gone. A 120 × 60 cm desk sits under the window, a freestanding 1.50 m PAX stands on the back wall, and a shallow shoe cabinet goes by the corridor.</p>
+        <dl class="kv">
+          <dt>Wardrobe</dt><dd>PAX 150 × 58 × 236 cm (100 + 50)</dd>
+          <dt>Desk</dt><dd>120 × 60 cm, daylight from the front</dd>
+          <dt>Clear floor</dt><dd>≈ 10.5 m²</dd>
+          <dt>Cost</dt><dd>≈ 430 € PAX + 85 € desk</dd>
+        </dl>
+        <div class="pc">
+          <div class="pro"><h4>For</h4><ul><li>You keep a desk with daylight</li><li>No building work for the wardrobe, and everything can move later</li></ul></div>
+          <div class="con"><h4>Against</h4><ul><li>The desk sits in the entrance: draughts when the door opens, cold by the window in winter</li><li>Least storage of the four</li><li>Doesn't feel like a big hall any more</li></ul></div>
+        </div>
+        <button class="btn noprint" type="button" data-apply="C">Use Option C in the budget</button>
+      </div>
+    </div>
+    <!-- D -->
+    <div class="opt-panel is-hidden" id="opt-D" role="tabpanel" aria-labelledby="tab-D">
+      <div class="planbox">
+        <div data-plan="D" role="img" aria-label="Option D plan: open hook rail and wall-hung bench on the back wall"></div>
+        <div class="legend"><span><i class="sw hall"></i>new hall</span><span><i class="sw ward"></i>wall-hung storage</span></div>
+      </div>
+      <div class="opt-side">
+        <h3>Option D · Open mudroom (budget)</h3>
+        <p>No wardrobe. A long hook rail and a wall-hung bench go on the back wall, with a wall-hung shoe cabinet by the window. Nothing stands on the floor, so there's nothing to swell if water gets in.</p>
+        <dl class="kv">
+          <dt>Storage</dt><dd>2.0 m hook rail, 1.60 m bench, shoe cabinet</dd>
+          <dt>Clear floor</dt><dd>≈ 12.3 m²</dd>
+          <dt>Cost</dt><dd>≈ 150 €</dd>
+        </dl>
+        <div class="pc">
+          <div class="pro"><h4>For</h4><ul><li>Cheapest and quickest</li><li>The most open floor, and the easiest to clean after a flood</li><li>Frees about 300 € for the backflow valve</li></ul></div>
+          <div class="con"><h4>Against</h4><ul><li>Coats are always on show and collect dust</li><li>Nowhere for seasonal things</li></ul></div>
+        </div>
+        <button class="btn noprint" type="button" data-apply="D">Use Option D in the budget</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="note tip" style="margin-top:1.5rem">
+    <span class="label">Other ideas, not drawn</span>
+    <ul class="tight">
+      <li><b>Under the stairs.</b> Knock on the side of the stairs. If it sounds hollow, a small door gives a cupboard for shoes or the vacuum. Old stairs are sometimes solid masonry, so check before you plan around it.</li>
+      <li><b>Doormat well.</b> A recessed coir mat in an aluminium frame inside the front door traps water and grit. It means cutting into the slab, so do it only if you retile.</li>
+      <li><b>Mirror door.</b> In Option A, making one sliding door a mirror gives you a full-length mirror and lights up the hall at no extra space.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= S-01 ================= -->
+<section class="sheet" id="s01">
+  <div class="sheet-head">
+    <span class="sheet-code">S-01</span><h2>Is the office wall load-bearing?</h2>
+    <p class="sub">Almost certainly not. Spend an hour proving it before the first board comes off.</p>
+  </div>
+  <div class="two">
+    <div class="stack">
+      <div class="note tip"><span class="label">Likely verdict: not load-bearing</span>
+        <p>Plasterboard on metal studs (a <i>cloison de distribution</i>) is not designed to carry anything. In this house the structure is the 50 cm stone outer walls and the party wall, and the floors span between them. The notary's description lists a <i>cellier</i> rather than an office, which suggests the office walls went in later. Old houses still hide surprises, though: a timber post inside a lining, or a beam end resting on a partition. The checks below rule those out.</p>
+      </div>
+      <h3>Eight checks, about an hour</h3>
+      <ol class="checks">
+        <li><b>Knock along the wall.</b><span>Hollow everywhere, with solid spots every 40–60 cm (the studs), means plasterboard on a frame. A dull, solid sound everywhere means masonry: stop and look further.</span></li>
+        <li><b>Measure the thickness at the door frame.</b><span>About 72 mm (13 + 48 + 13) or 98 mm means a standard partition. 15 cm or more could be brick or block.</span></li>
+        <li><b>Find the studs.</b><span>A magnet finds the screws, which sit about every 30 cm vertically. A stud finder also works.</span></li>
+        <li><b>Look inside.</b><span>Switch the circuit off, unscrew a socket or switch and shine a torch into the box hole. You should see metal C-studs and an empty cavity. A 10 × 10 cm hole at 1 m height is fine too, since the wall is coming out anyway.</span></li>
+        <li><b>Check the top.</b><span>Is there a beam (poutre) running across above the wall? Does the ceiling run continuously over it? A boxed-in beam shows as a bulkhead.</span></li>
+        <li><b>Look at what is directly above on the 1st floor.</b><span>The kitchen (22.6 m²) and living room (20 m²) are large open rooms. If no wall stands on this line upstairs and the floor doesn't sag there, the partition carries no floor load.</span></li>
+        <li><b>Check the joist direction.</b><span>The garage ceiling often shows the floor structure. Joists running parallel to the partition can't rest on it. Joists running across it still won't rest on a plasterboard wall, but look for a post.</span></li>
+        <li><b>Remove boards from one side first.</b><span>Take one face off, look at the bare frame, then take the second face off. Remove the studs last.</span></li>
+      </ol>
+    </div>
+    <div class="stack">
+      <div class="note stop"><span class="label">Stop and call a structural engineer if you see</span>
+        <ul class="tight">
+          <li>a timber or steel post, or a doubled or boxed stud, inside the frame</li>
+          <li>a beam end, lintel or trimmer (chevêtre) resting on the wall</li>
+          <li>brick, block or carreau de plâtre instead of a hollow frame</li>
+          <li>new cracks upstairs, sticking doors or a ceiling that drops as you work</li>
+        </ul>
+        <p class="small">A bureau d'études structure or an architect charges about 300–600 € for a site visit and written note. Prop the ceiling with acrow props (étais, about 10 € per day to hire) while you wait.</p>
+      </div>
+      <div class="note warn"><span class="label">The party wall is a separate matter</span>
+        <p>The right-hand 50 cm stone wall on the plan may be the wall you share with the neighbours (mur mitoyen). You can line it and screw furniture to it. Cutting chases or recesses into it needs their agreement (Code civil, art. 662).</p>
+      </div>
+      <div class="note"><span class="label">Asbestos and lead</span>
+        <p>The 2024 reports found no asbestos in the listed materials and no lead in the wall and ceiling paint (every reading was 0). A modern plasterboard partition can't contain asbestos anyway. Wear an FFP3 mask all the same, because gypsum dust irritates the lungs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= C-01 ================= -->
+<section class="sheet" id="c01">
+  <div class="sheet-head">
+    <span class="sheet-code">C-01</span><h2>Work sequence, step by step</h2>
+    <p class="sub">Do these in order. Tick each step as you finish it; this browser remembers your ticks. Times are for two people.</p>
+  </div>
+  <div class="progress noprint" style="margin-bottom:1rem"><span class="label">Progress</span><div class="bar" id="stepBar"><i></i></div><span class="mono small" id="stepCount">0 / 0</span></div>
+  <div id="steps"></div>
+</section>
+
+<!-- ================= E-01 ================= -->
+<section class="sheet" id="e01">
+  <div class="sheet-head">
+    <span class="sheet-code">E-01</span><h2>Electrics: what goes, what's new</h2>
+    <p class="sub">Electrical plan for Layout A, using French plan symbols. Every socket and switch sits at 1.10 m, with cables dropping from the ceiling.</p>
+  </div>
+  <div class="two">
+    <div class="planbox">
+      <div data-plan="elec" role="img" aria-label="Electrical plan for option A: two ceiling lights, two switches, two sockets at 1.10 metres"></div>
+      <div class="legend">
+        <span><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true"><circle r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M-5.6-5.6L5.6 5.6M5.6-5.6L-5.6 5.6" stroke="currentColor" stroke-width="2"/></svg>ceiling light (DCL)</span>
+        <span><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true"><circle r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 -3L9 -9" stroke="currentColor" stroke-width="2"/></svg>switch</span>
+        <span><svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true"><path d="M-7 0A7 7 0 0 1 7 0Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M0 0V8" stroke="currentColor" stroke-width="2"/></svg>socket 16 A</span>
+        <span><i class="sw" style="background:var(--demo)"></i>device on removed wall</span>
+      </div>
+    </div>
+    <div class="stack">
+      <h3>Taking out the old devices</h3>
+      <ol class="tight">
+        <li>Switch off the breaker(s), then test <b>every</b> conductor with a VAT voltage tester. A screwdriver tester isn't proof.</li>
+        <li>Photograph each box before you disconnect it. A partition can carry a cable on to another room, such as the buanderie, so trace where each one goes.</li>
+        <li>Cap each live-side cable with a Wago connector inside an accessible junction box, or pull it back to the ceiling. Never bury a junction in a wall or leave it at floor level.</li>
+        <li>Look for anything else in the wall: a radiator pipe, a thermostat cable, the doorbell, TV coax or RJ45.</li>
+      </ol>
+      <h3>The new hall</h3>
+      <ul class="tight">
+        <li><b>Lights:</b> two ceiling points on DCL boxes, one in the old corridor and one reusing the office point. Wire them on two-way switches or push buttons with a télérupteur.</li>
+        <li><b>Switches:</b> one by the front door on the latch side, and one by the buanderie door. Both at 1.10 m.</li>
+        <li><b>Sockets:</b> two 2P+T 16 A sockets at 1.10 m, one by the wardrobe for the vacuum and one by the bench for charging.</li>
+        <li><b>Cable sizes:</b> 1.5 mm² on a 16 A breaker for lighting and 2.5 mm² on a 20 A breaker for sockets, in ICTA conduit inside the board. The electrician matches them to your existing circuits.</li>
+        <li><b>Panel:</b> put every ground-floor circuit behind its own 30 mA RCD (interrupteur différentiel 40 A) and label it "RDC". In a flood you switch off the ground floor and keep power upstairs.</li>
+      </ul>
+      <div class="note"><span class="label">What the rules say</span>
+        <p>Under NF C 15-100, socket centres sit between 5 cm and 1.30 m above the finished floor. The 1.30 m limit comes from the accessibility rules for new homes, and 1.10 m fits inside it. DIY electrical work on your own home is legal, but it must meet NF C 15-100, and your insurer can refuse a fire claim caused by faulty work. A partial modification like this doesn't need a Consuel certificate; that applies to new or fully rewired installations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= A-02 ================= -->
+<section class="sheet" id="a02">
+  <div class="sheet-head">
+    <span class="sheet-code">A-02</span><h2>Wardrobe design and sizes</h2>
+    <p class="sub">Coats need 55–60 cm of depth. Allow 25–30 cm of rail per person per season; long coats hang about 1.40–1.50 m and jackets about 1.00 m.</p>
+  </div>
+  <div class="stack">
+      <div class="planbox elev elev-wide">
+        <svg viewBox="0 0 720 366" role="img" aria-label="Front elevation of the 2.38 metre built-in wardrobe with three bays">
+          <defs>
+            <pattern id="concHatchW" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" style="fill:var(--stone-bg)"/><line x1="0" y1="0" x2="0" y2="10" style="stroke:var(--stone-line)" stroke-width="1.5"/></pattern>
+          </defs>
+          <!-- floor and ceiling -->
+          <rect x="40" y="318" width="640" height="14" fill="url(#concHatchW)"/>
+          <line x1="40" y1="318" x2="680" y2="318" class="p-line"/>
+          <line x1="40" y1="40" x2="680" y2="40" class="p-line"/>
+          <text x="44" y="32" class="p-small">ceiling 2.50 m</text>
+          <!-- niche: scale 1.112 px/cm, x0 = 128 for 238 cm => 265 px wide -->
+          <rect x="128" y="40" width="465" height="278" class="p-floor" style="stroke:var(--ink);stroke-width:2"/>
+          <!-- cheeks -->
+          <rect x="116" y="40" width="12" height="278" class="p-new"/>
+          <rect x="593" y="40" width="14" height="278" fill="url(#concHatchW)" style="stroke:var(--ink-2)"/>
+          <!-- bays: 3 equal, 155 px each (~80 cm at 1.94 px/cm horizontally) -->
+          <line x1="283" y1="73" x2="283" y2="318" class="p-thin"/>
+          <line x1="438" y1="73" x2="438" y2="318" class="p-thin"/>
+          <!-- top shelf at 2.10 m: y = 318 - 210*1.112 = 84.5 -->
+          <rect x="128" y="81" width="465" height="5" class="p-tile"/>
+          <text x="360" y="66" text-anchor="middle" class="p-small">top shelf 2.10 m · suitcases, winter boxes</text>
+          <!-- bay 1 long coats: rail at 1.80 -->
+          <line x1="138" y1="118" x2="273" y2="118" style="stroke:var(--hydro);stroke-width:4"/>
+          <path d="M150 118 l0 6 l-10 10 h30 z M185 118 l0 6 l-10 10 h30 z M220 118 l0 6 l-10 10 h30 z" class="p-thin"/>
+          <rect x="146" y="134" width="22" height="150" class="p-board2"/><rect x="181" y="134" width="22" height="140" class="p-board2"/><rect x="216" y="134" width="22" height="155" class="p-board2"/>
+          <text x="205" y="306" text-anchor="middle" class="p-small">long coats</text>
+          <!-- bay 2 double rail at 2.00 / 1.05 -->
+          <line x1="293" y1="96" x2="428" y2="96" style="stroke:var(--hydro);stroke-width:4"/>
+          <line x1="293" y1="201" x2="428" y2="201" style="stroke:var(--hydro);stroke-width:4"/>
+          <rect x="305" y="104" width="22" height="80" class="p-board2"/><rect x="340" y="104" width="22" height="75" class="p-board2"/><rect x="375" y="104" width="22" height="82" class="p-board2"/>
+          <rect x="305" y="209" width="22" height="72" class="p-board2"/><rect x="340" y="209" width="22" height="66" class="p-board2"/>
+          <text x="360" y="306" text-anchor="middle" class="p-small">jackets · kids</text>
+          <!-- bay 3 shelves -->
+          <g class="p-tile"><rect x="438" y="128" width="155" height="4"/><rect x="438" y="168" width="155" height="4"/><rect x="438" y="208" width="155" height="4"/><rect x="438" y="248" width="155" height="4"/></g>
+          <g class="p-thin"><rect x="452" y="140" width="56" height="26"/><rect x="520" y="140" width="56" height="26"/><rect x="452" y="180" width="56" height="26"/><rect x="520" y="180" width="56" height="26"/></g>
+          <text x="515" y="226" text-anchor="middle" class="p-small">bags · hats · gloves</text>
+          <!-- open shoe zone 0-20 cm -->
+          <rect x="446" y="292" width="140" height="14" style="fill:none;stroke:var(--water);stroke-width:2;stroke-dasharray:4 3"/>
+          <text x="515" y="286" text-anchor="middle" class="p-small" style="fill:var(--water)">shoes on a metal rack</text>
+          <!-- dims left -->
+          <g class="p-dim"><line x1="90" y1="40" x2="90" y2="318"/><line x1="84" y1="40" x2="96" y2="40"/><line x1="84" y1="318" x2="96" y2="318"/>
+            <line x1="84" y1="118" x2="96" y2="118"/><line x1="84" y1="201" x2="96" y2="201"/></g>
+          <text x="80" y="122" text-anchor="end" class="p-dimt">1.80</text>
+          <text x="80" y="205" text-anchor="end" class="p-dimt">1.05</text>
+          <text x="80" y="322" text-anchor="end" class="p-dimt">0</text>
+          <text x="80" y="88" text-anchor="end" class="p-dimt">2.10</text>
+          <!-- width dim -->
+          <g class="p-dim"><line x1="128" y1="352" x2="593" y2="352"/><line x1="128" y1="346" x2="128" y2="358"/><line x1="593" y1="346" x2="593" y2="358"/><line x1="283" y1="348" x2="283" y2="356"/><line x1="438" y1="348" x2="438" y2="356"/></g>
+          <text x="205" y="346" text-anchor="middle" class="p-dimt">0.80</text>
+          <text x="360" y="346" text-anchor="middle" class="p-dimt">0.80</text>
+          <text x="515" y="346" text-anchor="middle" class="p-dimt">0.78</text>
+          <text x="662" y="200" class="p-dimt" text-anchor="middle">2.38 m</text>
+          <text x="662" y="220" class="p-small" text-anchor="middle">× 0.60 deep</text>
+        </svg>
+        <div class="legend"><span><i class="sw new"></i>cheek, re-boarded</span><span><i class="sw stone"></i>stone wall</span><span><i class="sw water"></i>open, washable floor zone</span></div>
+      </div>
+      <p class="small muted">Elevation of the built-in wardrobe in Option A, drawn with doors removed. In Option B the same three-bay logic stretches to 2.50 m (3 × 83 cm).</p>
+    <div class="two">
+      <div class="stack">
+      <h3>Route 1 · Built-in niche, wall-hung metal interior <span class="rec">Recommended</span></h3>
+      <p>Build the niche (A: 238 × 60 cm; B: 250 × 60 cm) floor to ceiling and tile its floor along with the hall. Hang the inside on a <b>wall-mounted rail system</b> such as IKEA BOAXEL or Leroy Merlin Spaceo crémaillères: vertical tracks screwed to the wall carry the shelves and rails. Nothing chipboard touches the floor, so a flood leaves the interior intact and you mop underneath.</p>
+      <ul class="tight">
+        <li><b>Front, choice 1:</b> three sliding doors of about 80 cm on an aluminium track, one of them a mirror. Size the doors with the store's calculator once the niche is built. About 280 € for doors and track.</li>
+        <li><b>Front, choice 2:</b> a ceiling track and a heavy washable curtain, about 50 €. You can add doors later without changing anything else.</li>
+        <li>Total ≈ 450 € with doors, ≈ 225 € with the curtain.</li>
+      </ul>
+      </div>
+      <div class="stack">
+      <h3>Route 2 · IKEA PAX</h3>
+      <ul class="tight">
+        <li><b>Height:</b> 236 cm frames need about 243 cm to tip upright. Your 250 cm ceiling allows that, but only with the frame sitting on the floor.</li>
+        <li><b>Flood-smart version:</b> use 201 cm frames on a 15 cm base of galvanised legs, and use the leftover 30 cm above for an open shelf.</li>
+        <li><b>Sizes:</b> Option A uses 100 + 100 frames (200 cm) plus a 38 cm filler or open shelf column. Option B uses 100 + 100 + 50 (250 cm). Option C uses 100 + 50 (150 cm).</li>
+        <li><b>150 cm example:</b> frames ≈ 195 €, three FORSAND doors ≈ 135 €, hinges ≈ 30 €, KOMPLEMENT rails, shelves and two pull-out shoe shelves ≈ 70 €. About <b>430 €</b>. Check current prices on ikea.com/fr; the Vernier store across the border charges Swiss prices.</li>
+        <li><b>Drawback:</b> chipboard swells once wet. A flood ruins the bottom panel unless the frame is raised.</li>
+      </ul>
+      <h3>Route 3 · Open coat wall</h3>
+      <p>A hook rail at 1.70 m (adults) and 1.10 m (children), a wall-hung bench at 45 cm and a wall-hung shoe cabinet. About 150 €. It's the most flood-proof and the least tidy.</p>
+      <div class="note"><span class="label">Fixing to old walls</span>
+        <p>Anchor every tall unit to the wall. Into the stone, use 8 mm plugs in the mortar joints or chemical anchors. Into BA13, use metal hollow-wall anchors (chevilles Molly) or screw into the studs. On a cold outside wall, leave a 3 cm air gap behind the unit.</p>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= F-01 ================= -->
+<section class="sheet" id="f01">
+  <div class="sheet-head">
+    <span class="sheet-code">F-01</span><h2>Flood resilience</h2>
+    <p class="sub">Keep water out where you can (barrier, backflow valve). Where you can't, build so the walls dry fast and only cheap parts need replacing.</p>
+  </div>
+  <div class="stack">
+      <div class="planbox elev elev-wide">
+        <svg viewBox="0 0 720 360" role="img" aria-label="Wall section showing board courses, flood line at 50 centimetres and socket height at 1.10 metres">
+          <defs>
+            <pattern id="concHatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" style="fill:var(--stone-bg)"/><line x1="0" y1="0" x2="0" y2="10" style="stroke:var(--stone-line)" stroke-width="1.5"/></pattern>
+          </defs>
+          <!-- scale: 1 cm = 1.1 px vertical; floor y=310, ceiling y=35 -->
+          <rect x="60" y="255" width="380" height="55" class="p-wet"/>
+          <rect x="60" y="314" width="380" height="30" class="p-concrete"/>
+          <rect x="60" y="310" width="380" height="4" class="p-tile"/>
+          <line x1="60" y1="35" x2="440" y2="35" class="p-line"/>
+          <!-- board courses -->
+          <rect x="110" y="35" width="300" height="141" class="p-board2"/>
+          <rect x="110" y="176" width="300" height="133" class="p-board1"/>
+          <line x1="110" y1="176" x2="410" y2="176" style="stroke:var(--hydro);stroke-width:3;stroke-dasharray:10 5"/>
+          <!-- skirting 10 cm -->
+          <rect x="110" y="298" width="300" height="12" class="p-skirt"/>
+          <!-- water line 50 cm: y = 310 - 55 = 255 -->
+          <line x1="60" y1="255" x2="440" y2="255" class="p-waterline"/>
+          <!-- socket & switch at 110: y = 310 - 121 = 189 -->
+          <line x1="170" y1="35" x2="170" y2="181" class="p-elec-l"/>
+          <rect x="161" y="181" width="18" height="18" class="p-elec"/><circle cx="167" cy="190" r="1.8" style="fill:var(--water)"/><circle cx="173" cy="190" r="1.8" style="fill:var(--water)"/>
+          <line x1="350" y1="35" x2="350" y2="181" class="p-elec-l"/>
+          <rect x="342" y="181" width="16" height="18" class="p-elec"/><line x1="350" y1="185" x2="350" y2="195" style="stroke:var(--water);stroke-width:2"/>
+          <!-- height ticks -->
+          <g class="p-dim"><line x1="40" y1="35" x2="40" y2="310"/>
+            <line x1="34" y1="310" x2="46" y2="310"/><line x1="34" y1="298" x2="46" y2="298"/><line x1="34" y1="255" x2="46" y2="255"/><line x1="34" y1="189" x2="46" y2="189"/><line x1="34" y1="176" x2="46" y2="176"/><line x1="34" y1="35" x2="46" y2="35"/></g>
+          <g class="p-dimt" text-anchor="end" style="font-size:13px">
+            <text x="30" y="314">0</text><text x="30" y="300">10</text><text x="30" y="259">50</text><text x="30" y="198">110</text><text x="30" y="178">120</text><text x="30" y="39">250</text></g>
+          <!-- labels -->
+          <g class="p-thin"><line x1="410" y1="100" x2="455" y2="100"/><line x1="410" y1="176" x2="455" y2="150"/><line x1="358" y1="190" x2="455" y2="198"/><line x1="440" y1="255" x2="455" y2="246"/><line x1="410" y1="304" x2="455" y2="288"/><line x1="410" y1="309" x2="455" y2="318"/><line x1="440" y1="330" x2="455" y2="342"/></g>
+          <g style="font-size:13px" class="p-tx">
+            <text x="460" y="96">2nd course: BA13 hydro</text><text x="460" y="112" class="p-small" style="font-size:12px">(standard BA13 is fine above 1.20 m)</text>
+            <text x="460" y="146">Joint at 1.20 m: after a flood,</text><text x="460" y="162">replace only the course below</text>
+            <text x="460" y="196">Sockets and switches at 1.10 m,</text><text x="460" y="212">cables dropping from the ceiling</text>
+            <text x="460" y="244" class="p-txb">Flood barrier height: 50 cm</text>
+            <text x="460" y="286">Tile skirting 10 cm, sealed to</text><text x="460" y="302">the floor with flexible mastic</text>
+            <text x="460" y="322">1 cm gap: board never touches floor</text>
+            <text x="460" y="346">Porcelain on C2 adhesive, bare slab</text>
+          </g>
+        </svg>
+        <div class="legend"><span><i class="sw" style="background:var(--hydro-pale);border-color:var(--hydro)"></i>BA13 hydro, 1st course</span><span><i class="sw water"></i>water up to the barrier height</span><span><i class="sw stone"></i>concrete slab</span></div>
+      </div>
+      <div class="tablebox">
+        <table class="wide">
+          <thead><tr><th>Element</th><th>Choose</th><th>Avoid</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><b>Walls</b></td><td>BA13 hydro (H1, green face), laid horizontally and screwed. Upgrade for the most exposed walls: cement board (e.g. Aquapanel) for the first course</td><td>Standard BA13 at the bottom; boards glued to stone with plaster dabs</td><td>H1 board resists damp but not a soaking. Laid horizontally, you only replace the bottom 1.20 m strip. Cement board survives immersion and costs about 3–4× more.</td></tr>
+            <tr><td><b>Base of the wall</b></td><td>1 cm gap above the floor; tile or PVC skirting</td><td>MDF or wooden skirting; board resting on the slab</td><td>Gypsum wicks water upwards. The gap breaks that path.</td></tr>
+            <tr><td><b>Insulation</b></td><td>None below 1.20 m in the hall, or XPS (closed-cell)</td><td>Mineral wool low down</td><td>Wet mineral wool stays wet, goes mouldy and has to be replaced.</td></tr>
+            <tr><td><b>Stone walls</b></td><td>Leave them breathable; lime render if you leave the base bare</td><td>Cement render, waterproof paint, plastic membranes</td><td>Sealed stone traps moisture and the base never dries.</td></tr>
+            <tr><td><b>Floor</b></td><td>Porcelain tile on C2 cement adhesive, cement or epoxy grout, on the uninsulated slab</td><td>Laminate, parquet, carpet, click vinyl</td><td>Tile and concrete come through a flood with a clean. Click floors trap water underneath.</td></tr>
+            <tr><td><b>Electrics</b></td><td>Sockets at 1.10 m, cables from above, ground floor on its own 30 mA RCD</td><td>Junction boxes or cables low in the walls</td><td>You can cut power to the wet floor only, and nothing live sits in the water.</td></tr>
+            <tr><td><b>Wardrobe</b></td><td>Wall-hung metal interior; aluminium door track; PAX only if raised</td><td>Chipboard standing on the floor</td><td>Chipboard swells permanently after a few hours in water.</td></tr>
+            <tr><td><b>Doors</b></td><td>If the WC or buanderie doors need replacing: solid, PVC or aluminium</td><td>Hollow honeycomb doors</td><td>Honeycomb doors delaminate when wet.</td></tr>
+            <tr><td><b>Appliances</b></td><td>Washer and dryer on a 40 cm base; fridge socket high</td><td>Machines on the floor</td><td>A 40 cm base also saves your back.</td></tr>
+            <tr><td><b>Drains</b></td><td>Backflow valve (clapet anti-retour, EN 13564) with an inspection chamber</td><td>Nothing on the branch</td><td>Your flood came from a blocked drain. A valve stops sewage backing up into the WC and buanderie.</td></tr>
+            <tr><td><b>Doorways</b></td><td>Removable 50 cm barrier (batardeau) at the front door; flood sacks until you have one</td><td>Barriers taller than about 60 cm on old walls</td><td>Above that height, water pressure can damage the walls. It's safer to let deeper water in.</td></tr>
+            <tr><td><b>Early warning</b></td><td>Battery water sensor on the floor, ideally with a phone alert</td><td>Finding out the next morning</td><td>It costs about 20 €.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    <div class="two">
+      <div class="floodcard">
+        <span class="label" style="color:var(--water)">Flood-day checklist · print it and stick it inside the wardrobe door</span>
+        <ol>
+          <li>Fit the front-door barrier. Store it in the hall wardrobe so it's within reach.</li>
+          <li>Switch off the <b>RDC</b> RCD in the panel. Upstairs keeps its power.</li>
+          <li>Lift shoes, bags and boxes off the floor. The washer and dryer are already raised.</li>
+          <li>Garage: move the car if it's safe. If water reaches the boiler, shut the gas at the meter.</li>
+          <li>Afterwards, take photos before you clean, then ventilate. Report a water claim to Suravenir within 5 working days. If a natural disaster (CatNat) is declared, you have 30 days from the decree's publication.</li>
+          <li>Don't switch the RDC back on until an electrician has checked any socket or box the water reached.</li>
+        </ol>
+      </div>
+      <div class="note flood"><span class="label">Beyond the hall: the boiler</span>
+        <p>The 2024 gas report puts the De Dietrich boiler in the garage. Check that its burner, electronics and electrical supply are above 50 cm. If it stands on the floor, plan to raise it when it's next replaced. The same report found no maintenance certificate. A yearly service is a legal requirement and costs about 120–180 €, outside this budget.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Q-01 ================= -->
+<section class="sheet pb" id="q01">
+  <div class="sheet-head">
+    <span class="sheet-code">Q-01</span><h2>Materials checklist and budget</h2>
+    <p class="sub">Tick the items you'll buy. You can change quantities and prices, and the total in the title block updates as you go. Prices include VAT, are estimates from November 2026, and should be checked in store.</p>
+  </div>
+  <div class="budget-top">
+    <div class="sum">
+      <span class="label">Selected total</span>
+      <span class="total" id="sumTotal">0 € <small>/ 1,800 €</small></span>
+      <div class="bar" id="sumBar" data-state="ok"><i></i></div>
+      <p id="sumMsg" class="small"></p>
+      <div class="catbars" id="catBars"></div>
+    </div>
+    <div class="stack">
+      <div class="presets">
+        <span class="label">Scenarios</span>
+        <button class="btn" type="button" data-preset="rec">Recommended</button>
+        <button class="btn" type="button" data-preset="low">Lowest cost</button>
+        <button class="btn" type="button" data-preset="up">Comfort upgrade</button>
+      </div>
+      <ul class="tight small muted">
+        <li><b>Recommended</b> (≈ 1,640 €): Layout A with the curtain-front niche, electrician for the panel, existing floor kept, buanderie and WC walls repaired too. It leaves about 160 € (9%) as contingency.</li>
+        <li><b>Lowest cost</b> (≈ 1,190 €): open coat wall and no electrician. You'd only swap devices on existing circuits yourselves, with no panel work.</li>
+        <li><b>Comfort upgrade</b> (≈ 2,780 €): sliding doors, full retile, cement board at the base, dehumidifier, raised machines. It shows what the payout <i>doesn't</i> cover.</li>
+        <li>Items marked <span class="grp" style="margin:0">choose one</span> are alternatives: ticking one unticks the others.</li>
+        <li>The backflow valve and the flood barrier start unticked. They're the most useful flood measures, but they cost more than is left. Ask about Fonds Barnier aid first (G-04) and about who pays for drain work (Bouchet BTP).</li>
+      </ul>
+    </div>
+  </div>
+  <div id="budget"></div>
+</section>
+
+<!-- ================= G-02 ================= -->
+<section class="sheet" id="g02">
+  <div class="sheet-head">
+    <span class="sheet-code">G-02</span><h2>What you can do yourselves, and what to hire out</h2>
+    <p class="sub">You plus a handy friend can do about 85% of the hours. Hire out the panel work, anything on the gas or sewer, and any structural doubt.</p>
+  </div>
+  <div class="tablebox">
+    <table class="wide">
+      <thead><tr><th>Job</th><th>Who</th><th>Difficulty</th><th>Notes</th><th>If hired (TTC)</th></tr></thead>
+      <tbody>
+        <tr><td>Structural checks (S-01)</td><td class="yes">You</td><td>Easy</td><td>An engineer only if you hit a red flag</td><td class="n">300–600 €</td></tr>
+        <tr><td>Make devices safe, remove sockets and switches</td><td class="yes">You</td><td>Easy</td><td>Breaker off, VAT test, cap with Wago connectors</td><td class="n">in electrician visit</td></tr>
+        <tr><td>Demolish the partition, strip wet board</td><td class="yes">You</td><td>Easy</td><td>FFP3 mask; sort waste for the déchetterie</td><td class="n">400–700 €</td></tr>
+        <tr><td>New circuits, 30 mA RCD in the panel, testing</td><td class="prof">Electrician</td><td>Pro</td><td>NF C 15-100 compliance protects your insurance cover</td><td class="n">≈ 380 €</td></tr>
+        <tr><td>Metal framing, BA13 hydro boarding</td><td class="yes">You</td><td>Medium</td><td>Two people make handling 2.50 m boards much easier</td><td class="n">35–50 €/m²</td></tr>
+        <tr><td>Taping and jointing, ceiling patch</td><td class="yes">You</td><td>Medium</td><td>The step that shows: three thin coats, patience, a good light</td><td class="n">15–25 €/m²</td></tr>
+        <tr><td>Painting</td><td class="yes">You</td><td>Easy</td><td>Primer first on all new board</td><td class="n">20–30 €/m²</td></tr>
+        <tr><td>Floor strip repair</td><td class="yes">You</td><td>Easy</td><td>Tile inlay or divider profile</td><td class="n">100–200 €</td></tr>
+        <tr><td>Full retile, 60 × 60 porcelain</td><td>You or a tiler</td><td>Hard</td><td>Large tiles need a dead-flat floor and a levelling-clip system</td><td class="n">40–60 €/m² labour</td></tr>
+        <tr><td>Wardrobe (niche or PAX)</td><td class="yes">You</td><td>Medium</td><td>Anchor every tall unit to the wall</td><td class="n">—</td></tr>
+        <tr><td>Backflow valve on the sewer branch</td><td class="prof">Bouchet BTP or plumber</td><td>Pro</td><td>Cheapest while the trench is open</td><td class="n">≈ 280 € in trench</td></tr>
+        <tr><td>Flood barrier (batardeau)</td><td>Supplier, or you for removable kits</td><td>Medium</td><td>Buy a tested product. Apply for aid <i>before</i> you buy</td><td class="n">400–900 €</td></tr>
+        <tr><td>Gas boiler (service, raising it)</td><td class="prof">Gas engineer</td><td>Pro only</td><td>Never DIY on gas</td><td class="n">120–180 € service</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note tip" style="margin-top:1rem"><span class="label">VAT tip</span>
+    <p>Materials you buy yourself carry 20% VAT. When a professional supplies <i>and</i> fits in a home more than two years old, their materials and labour carry 10% VAT. For the electrician or the backflow valve, let them supply the parts.</p>
+  </div>
+</section>
+
+<!-- ================= G-03 ================= -->
+<section class="sheet" id="g03">
+  <div class="sheet-head">
+    <span class="sheet-code">G-03</span><h2>Calendar, November 2026 to February 2027</h2>
+    <p class="sub">About 8 weekends of work spread over 14 weeks, because the walls must dry. If the walls are still wet in mid-December, push the rebuild to late January. The dates move; the order doesn't.</p>
+  </div>
+  <div class="tablebox" style="padding:1.6rem .8rem .6rem">
+    <div class="gantt" id="gantt"></div>
+  </div>
+  <div class="legend" style="border:0; padding-left:0">
+    <span><i class="sw" style="background:var(--hydro)"></i>you</span>
+    <span><i class="sw" style="background:var(--warn)"></i>professional</span>
+    <span><i class="sw" style="background:repeating-linear-gradient(135deg,var(--water) 0 4px,var(--water-pale) 4px 7px)"></i>external (Bouchet BTP)</span>
+    <span><i class="sw" style="background:repeating-linear-gradient(90deg,var(--ink-3) 0 3px,transparent 3px 6px)"></i>waiting / drying</span>
+    <span><i class="sw" style="background:var(--rule)"></i>holiday buffer</span>
+    <span><i class="sw" style="border:2px dashed var(--water)"></i>runs in parallel</span>
+    <span><i class="sw" style="background:var(--new);width:3px"></i>today, 4 Nov</span>
+  </div>
+</section>
+
+<!-- ================= G-04 ================= -->
+<section class="sheet" id="g04">
+  <div class="sheet-head">
+    <span class="sheet-code">G-04</span><h2>Permits and rules in France</h2>
+    <p class="sub">The hall itself needs no permit. The flood measures and the insurance paperwork are where the rules come in.</p>
+  </div>
+  <div class="two">
+    <div class="stack">
+      <div class="note tip"><span class="label">No planning permission for the hall</span>
+        <p>Removing a non-load-bearing interior partition in a house doesn't change the façade, the use or the floor area. It needs no déclaration préalable and no permis de construire. If a professional takes out the partition, they may ask for a <i>repérage amiante avant travaux</i> (pre-works asbestos survey) because the house predates 1997. Show them the 2024 report; a targeted survey costs about 150–300 € if they insist.</p>
+      </div>
+      <div class="note warn"><span class="label">Façade work: check first</span>
+        <p>Anything fixed permanently to the outside, such as barrier frames screwed to the façade or a new window, may need a déclaration préalable. Near a listed monument, the Architecte des Bâtiments de France must also approve it. Ask the Saint-Julien service urbanisme before drilling the façade. Fully removable barriers need nothing.</p>
+      </div>
+      <div class="note flood"><span class="label">Flood-risk plan (PPRN)</span>
+        <p>Your November 2024 risk statement says the approved PPRN (15 June 2020) <b>doesn't place the house in an exposed zone</b>. A revision was prescribed on 6 Sep 2023 and covers the whole commune until its study area is set. It imposes no works yet, but new rules may follow. Recent disasters: floods and mudslides on 6 Sep 2008 and 9 Jun 2024. Check the commune's page on Géorisques or ask the DDT 74 once a year.</p>
+      </div>
+      <div class="note"><span class="label">Fonds Barnier aid</span>
+        <p>The FPRNM ("Fonds Barnier") can pay up to 80% of flood-proofing works for homeowners, such as barriers or raised equipment. The works must be required by an approved PPR, or identified by a vulnerability survey in an area with a PAPI (flood prevention programme). Your house isn't in an exposed zone of the approved plan, so eligibility depends on a PAPI and a survey. Ask the DDT 74 or the mairie <b>before</b> you buy a barrier, because aid usually can't be granted after the purchase.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="note"><span class="label">Insurance (auto-réparation)</span>
+        <ul class="tight">
+          <li>You're free to do the work yourself with the 1,800 €. Keep every receipt and the before-and-after photos. If you claim again later, the insurer can reduce the payout for damage that was never repaired.</li>
+          <li>Keep Bouchet BTP's invoice or report. It proves the cause was fixed, which matters for future claims and for a future sale, when you'll disclose this claim.</li>
+          <li>Water claim: report it within 5 working days. CatNat claim: within 30 days of the decree's publication.</li>
+        </ul>
+      </div>
+      <div class="note"><span class="label">Electrics</span>
+        <p>NF C 15-100 applies to the new work. DIY is legal; panel work by an electrician is the safe choice. A partial change needs no Consuel. Keep the 2024 electrical report with your papers.</p>
+      </div>
+      <div class="note"><span class="label">Party wall</span>
+        <p>Lining or fixing to a mur mitoyen is fine. Chases, recesses or anything built into it need the neighbours' agreement (Code civil, art. 662).</p>
+      </div>
+      <div class="note"><span class="label">Waste, noise, safety</span>
+        <ul class="tight">
+          <li>Plasterboard goes in the <i>plâtre</i> skip at a Communauté de Communes du Genevois déchetterie, free with a residents' badge. Never put it in household bins.</li>
+          <li>Noisy DIY hours are set by Haute-Savoie prefectoral order and the mairie: normal daytime on weekdays, shorter hours on Saturdays, very limited on Sundays. Check before a Sunday session and warn the neighbours.</li>
+          <li>Every home must have at least one smoke alarm (NF EN 14604). Refit it if it comes down during the work.</li>
+          <li>The gas boiler must be serviced every year.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= G-05 ================= -->
+<section class="sheet" id="g05">
+  <div class="sheet-head">
+    <span class="sheet-code">G-05</span><h2>Sources and assumptions</h2>
+    <p class="sub">What's checked, what's estimated, and where the numbers came from.</p>
+  </div>
+  <div class="two">
+    <div class="stack">
+      <h3>Assumptions</h3>
+      <ul class="tight">
+        <li>Dimensions are worked back from the surveyor's areas (Garage 16.2, Buanderie 7.15, Bureau 7.8, Entrée 6.74 / Carrez 5.13, WC 2.27 m²) and the 2024 sketch, which isn't to scale. Treat them as ±10 cm.</li>
+        <li>The office walls are plasterboard on metal studs, as you describe them. S-01 confirms this.</li>
+        <li>Water damage is assumed to reach no higher than the 1.20 m first course. If stains go higher, add boards (about 20 € each).</li>
+        <li>Prices include VAT, observed or estimated in November 2026. Brico Dépôt and Castorama prices come from product pages. IKEA, Leroy Merlin and labour prices are estimates; check them before you buy.</li>
+        <li>Radiator position, floor type and existing device positions weren't in the file. Check them in step 4 of C-01.</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <h3>Sources</h3>
+      <ul class="sources small">
+        <li>Your sale agreement and its annexes (promesse de vente): Carrez survey, DPE, gas, electrical, asbestos and lead reports (EASYDIAGS, June 2024); risk statement (Media Immo, 13 Nov 2024).</li>
+        <li><a href="https://www.bricodepot.fr/p/3334160158651/plaque-de-platre-ba-13-hydrofuge-l-2-50-x-l-1-20-m-x-ep-13-mm" target="_blank" rel="noopener">Brico Dépôt: BA13 hydrofuge 2.50 × 1.20 m</a></li>
+        <li><a href="https://www.castorama.fr/plaque-de-platre-hydrofuge-ba13-nf-pladur-250-x-120-cm-ep-13-mm-vendue-a-la-plaque-/8435028308333_CAFR.prd" target="_blank" rel="noopener">Castorama: Pladur BA13 hydrofuge</a></li>
+        <li><a href="https://www.bricodepot.fr/p/3760424120087/rail-r48-3-m-nf-1" target="_blank" rel="noopener">Brico Dépôt: rail R48 3 m</a> · <a href="https://www.bricodepot.fr/p/3700387903013/montant-m48-3-m-nf" target="_blank" rel="noopener">montant M48 3 m</a></li>
+        <li><a href="https://www.bricodepot.fr/p/6192600402699/carrelage-sol-interieur-gres-cerame-poli-supremo-blanc-60-x-60-cm" target="_blank" rel="noopener">Brico Dépôt: porcelain 60 × 60 (15.90 €/m²)</a></li>
+        <li><a href="https://www.manomano.fr/p/clapet-anti-retour-a-ressort-avec-insert-en-pvc-114-78485935" target="_blank" rel="noopener">ManoMano: PVC backflow valves</a> · <a href="https://www.hellopro.fr/clapet-anti-retour-100-1001794-8802205-produit.html" target="_blank" rel="noopener">Hellopro: Ø100 valve</a></li>
+        <li><a href="https://conseils.hellopro.fr/combien-coute-une-barriere-anti-inondation-4618.html" target="_blank" rel="noopener">Hellopro: flood barrier price ranges</a></li>
+        <li><a href="https://www.legrand.fr/questions-frequentes/a-quelle-hauteur-reglementaire-faut-il-placer-une-prise-de-courant" target="_blank" rel="noopener">Legrand: socket heights under NF C 15-100</a></li>
+        <li><a href="https://les-aides.fr/aide/cUNPGYwYjCTB4y8/ddtm/etudes-et-travaux-de-reduction-de-la-vulnerabilite-face-aux-innondations.html" target="_blank" rel="noopener">les-aides.fr: Fonds Barnier, works to reduce flood vulnerability</a> · <a href="https://www.ecologie.gouv.fr/politiques-publiques/financement-prevention-risques-naturels-hydrauliques" target="_blank" rel="noopener">Ministry: funding for flood prevention</a></li>
+        <li><a href="https://aida.ineris.fr/reglementation/decret-ndeg-2026-47-020226-modifiant-larticle-561-12-11-code-lenvironnement" target="_blank" rel="noopener">Décret 2026-47 (Fonds Barnier application rules)</a></li>
+        <li><a href="https://www.georisques.gouv.fr/DICRIM/74243" target="_blank" rel="noopener">Géorisques: Saint-Julien-en-Genevois</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <p>Plan prepared for the ground floor of the house in Saint-Julien-en-Genevois. It's a planning aid, not an engineer's or electrician's certificate. Your checklist ticks, quantities and prices are saved in this browser only.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var BUDGET = 1800;
+var STORE_KEY = "grandeRueHallPlan.v1";
+function load(){ try{ var s = localStorage.getItem(STORE_KEY); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+function eur(n, dec){ var v = Math.round(n * (dec ? 100 : 1)) / (dec ? 100 : 1);
+  return v.toLocaleString("en-US", {minimumFractionDigits: dec ? 2 : 0, maximumFractionDigits: dec ? 2 : 0}) + " €"; }
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+/* ---------------- Plans ---------------- */
+function door(hx,hy,ex,ey,ox,oy){
+  var r = Math.hypot(ex-hx, ey-hy);
+  var cross = (ox-hx)*(ey-hy) - (oy-hy)*(ex-hx);
+  var sweep = cross > 0 ? 1 : 0;
+  return '<line x1="'+hx+'" y1="'+hy+'" x2="'+ox+'" y2="'+oy+'" class="p-line"/>' +
+         '<path d="M'+ox+' '+oy+' A'+r+' '+r+' 0 0 '+sweep+' '+ex+' '+ey+'" class="p-swing"/>';
+}
+function rect(x,y,w,h,cls,extra){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" class="'+cls+'"'+(extra||'')+'/>'; }
+function text(x,y,s,cls,extra){ return '<text x="'+x+'" y="'+y+'" class="'+cls+'" text-anchor="middle"'+(extra||'')+'>'+s+'</text>'; }
+function dimH(x1,x2,y,label,ext){ var o = '<g class="p-dim"><line x1="'+x1+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'"/>' +
+    '<line x1="'+(x1-6)+'" y1="'+(y+6)+'" x2="'+(x1+6)+'" y2="'+(y-6)+'"/><line x1="'+(x2-6)+'" y1="'+(y+6)+'" x2="'+(x2+6)+'" y2="'+(y-6)+'"/>';
+  if(ext){ o += '<line x1="'+x1+'" y1="'+ext+'" x2="'+x1+'" y2="'+(y+8)+'"/><line x1="'+x2+'" y1="'+ext+'" x2="'+x2+'" y2="'+(y+8)+'"/>'; }
+  return o + '</g>' + text((x1+x2)/2, y-8, label, 'p-dimt'); }
+function dimV(y1,y2,x,label,ext){ var o = '<g class="p-dim"><line x1="'+x+'" y1="'+y1+'" x2="'+x+'" y2="'+y2+'"/>' +
+    '<line x1="'+(x-6)+'" y1="'+(y1+6)+'" x2="'+(x+6)+'" y2="'+(y1-6)+'"/><line x1="'+(x-6)+'" y1="'+(y2+6)+'" x2="'+(x+6)+'" y2="'+(y2-6)+'"/>';
+  if(ext){ o += '<line x1="'+ext+'" y1="'+y1+'" x2="'+(x+8)+'" y2="'+y1+'"/><line x1="'+ext+'" y1="'+y2+'" x2="'+(x+8)+'" y2="'+y2+'"/>'; }
+  var cy = (y1+y2)/2;
+  return o + '</g><text x="'+(x+10)+'" y="'+cy+'" class="p-dimt" transform="rotate(-90 '+(x+10)+' '+cy+')" text-anchor="middle" dy="12">'+label+'</text>'; }
+function wardrobe(x,y,w,h,horizontal){
+  var o = rect(x,y,w,h,'p-ward');
+  if(horizontal){ var ry = y + h/2; o += '<line x1="'+(x+8)+'" y1="'+ry+'" x2="'+(x+w-8)+'" y2="'+ry+'" class="p-rail"/>';
+    for(var i=x+20;i<x+w-10;i+=22){ o += '<line x1="'+i+'" y1="'+(ry-16)+'" x2="'+i+'" y2="'+(ry+16)+'" style="stroke:var(--hydro);stroke-width:1.2"/>'; } }
+  else { var rx = x + w/2; o += '<line x1="'+rx+'" y1="'+(y+8)+'" x2="'+rx+'" y2="'+(y+h-8)+'" class="p-rail"/>';
+    for(var j=y+20;j<y+h-10;j+=22){ o += '<line x1="'+(rx-16)+'" y1="'+j+'" x2="'+(rx+16)+'" y2="'+j+'" style="stroke:var(--hydro);stroke-width:1.2"/>'; } }
+  return o;
+}
+function lightPt(x,y){ return '<g><circle cx="'+x+'" cy="'+y+'" r="15" class="p-elec"/><path d="M'+(x-10.6)+' '+(y-10.6)+'L'+(x+10.6)+' '+(y+10.6)+'M'+(x+10.6)+' '+(y-10.6)+'L'+(x-10.6)+' '+(y+10.6)+'" style="stroke:var(--water);stroke-width:2.2"/></g>'; }
+function switchPt(x,y,dx,dy){ return '<g><circle cx="'+x+'" cy="'+y+'" r="7" class="p-elec"/><line x1="'+(x+dx*5)+'" y1="'+(y+dy*5)+'" x2="'+(x+dx*17)+'" y2="'+(y+dy*17)+'" style="stroke:var(--water);stroke-width:2.2"/></g>'; }
+function socketPt(x,y,dir){ // dir: 'up' means wall below, opening facing up (into room above)
+  var p;
+  if(dir==='up') p = 'M'+(x-11)+' '+y+' A11 11 0 0 1 '+(x+11)+' '+y+' Z';
+  else if(dir==='left') p = 'M'+x+' '+(y-11)+' A11 11 0 0 0 '+x+' '+(y+11)+' Z';
+  return '<g><path d="'+p+'" class="p-elec"/>'+(dir==='up' ? '<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+8)+'" style="stroke:var(--water);stroke-width:2.2"/>' : '<line x1="'+x+'" y1="'+y+'" x2="'+(x+8)+'" y2="'+y+'" style="stroke:var(--water);stroke-width:2.2"/>')+'</g>';
+}
+
+function planSVG(mode){
+  var uid = "p" + mode;
+  var o = '<svg viewBox="-110 -95 990 815" xmlns="http://www.w3.org/2000/svg">';
+  o += '<defs><pattern id="stoneHatch'+uid+'" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" style="fill:var(--stone-bg)"/><line x1="0" y1="0" x2="0" y2="12" style="stroke:var(--stone-line)" stroke-width="2"/></pattern>' +
+       '<pattern id="demoHatch'+uid+'" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" style="fill:var(--demo-pale)"/><line x1="0" y1="0" x2="0" y2="8" style="stroke:var(--demo)" stroke-width="3"/></pattern></defs>';
+  var stone = ' style="fill:url(#stoneHatch'+uid+')"';
+  // floor
+  o += rect(0,0,733,580,'p-floor');
+  var isNew = mode !== 'existing';
+  if(isNew){ o += '<path d="M393 158 H485 V253 H733 V580 H300 V480 H393 Z" class="p-hall"/>'; }
+  // garage up-and-over door (dashed, open position)
+  o += '<path d="M30 580 L30 380 L250 380 L250 580 M30 380 L140 580 L250 380" class="p-dash"/>';
+  // stairs
+  o += rect(300,262,85,218,'p-thin');
+  for(var i=1;i<12;i++){ var ty = 262 + i*18.17; o += '<line x1="300" y1="'+ty.toFixed(1)+'" x2="385" y2="'+ty.toFixed(1)+'" class="p-thin"/>'; }
+  o += '<circle cx="342" cy="468" r="4" style="fill:var(--water)"/><line x1="342" y1="468" x2="342" y2="290" style="stroke:var(--water);stroke-width:2"/><path d="M332 296 L342 276 L352 296 Z" style="fill:var(--water)"/>';
+  o += '<text x="359" y="474" class="p-small" style="font-size:13px">UP</text>';
+  // outer stone walls
+  o += rect(-50,-50,833,50,'p-stone',stone) + rect(-50,0,50,580,'p-stone',stone) + rect(733,0,50,580,'p-stone',stone);
+  o += rect(-50,580,80,50,'p-stone',stone) + rect(250,580,90,50,'p-stone',stone) + rect(430,580,115,50,'p-stone',stone) + rect(660,580,123,50,'p-stone',stone);
+  // window
+  o += '<line x1="545" y1="580" x2="660" y2="580" class="p-thin"/><line x1="545" y1="630" x2="660" y2="630" class="p-thin"/>' +
+       '<line x1="545" y1="601" x2="660" y2="601" class="p-glass"/><line x1="545" y1="609" x2="660" y2="609" class="p-glass"/>';
+  // garage door line
+  o += '<line x1="30" y1="605" x2="250" y2="605" class="p-dash"/>';
+  // internal existing walls
+  o += rect(280,0,20,580,'p-wall');
+  o += rect(385,0,8,180,'p-wall') + rect(385,250,8,12,'p-wall');
+  o += rect(300,254,85,8,'p-wall');
+  o += rect(393,150,10,8,'p-wall') + rect(473,150,12,8,'p-wall');
+  o += rect(485,150,10,103,'p-wall');
+  o += rect(485,245,248,8,'p-wall');
+  // doors
+  o += door(340,580,430,580,340,490);        // front door
+  o += door(389,250,389,180,319,250);        // WC
+  o += door(403,154,473,154,403,84);         // buanderie
+  // labels common
+  o += text(140,250,'GARAGE','p-room') + text(140,278,'16.2 m²','p-area') + text(140,306,'gas boiler (2024 report)','p-small');
+  o += text(342,112,'WC','p-room','') + text(342,138,'2.27','p-area');
+  o += text(600,70,'BUANDERIE','p-room') + text(600,96,'7.15 m² · washer, dryer, fridge','p-small');
+  o += text(140,668,'garage door','p-small') + text(385,668,'front door','p-small') + text(602,668,'window','p-small');
+
+  if(mode === 'existing'){
+    var demo = ' style="fill:url(#demoHatch'+uid+')"';
+    o += rect(485,253,10,202,'p-demo',demo) + rect(485,528,10,52,'p-demo',demo);
+    o += door(490,528,490,455,563,528);
+    o += text(614,400,'BUREAU','p-room') + text(614,426,'7.8 m²','p-area');
+    o += '<text x="439" y="390" class="p-room" text-anchor="middle" transform="rotate(-90 439 390)">ENTRÉE</text>';
+    o += '<text x="466" y="390" class="p-area" text-anchor="middle" transform="rotate(-90 466 390)">6.74 m² incl. stairs</text>';
+    o += dimH(393,485,215,'0.92');
+    o += dimH(495,733,700,'2.38',635) + dimV(253,580,830,'3.27',783);
+    o += '<text x="614" y="500" class="p-small" text-anchor="middle" style="fill:var(--ink)">partition + door</text><text x="614" y="518" class="p-small" text-anchor="middle" style="fill:var(--ink)">to remove (yellow)</text>';
+    o += '<line x1="560" y1="495" x2="498" y2="470" class="p-thin"/>';
+  } else {
+    o += dimH(393,733,700,'3.40',635) + dimV(253,580,830,'3.27',783);
+  }
+
+  if(mode === 'A' || mode === 'elec'){
+    o += rect(485,253,10,60,'p-new');
+    o += wardrobe(495,253,238,60,true);
+    o += '<line x1="495" y1="311" x2="733" y2="311" style="stroke:var(--hydro);stroke-width:2"/><line x1="495" y1="316" x2="733" y2="316" style="stroke:var(--hydro);stroke-width:2"/>';
+    if(mode==='A'){
+      o += text(614,345,'built-in wardrobe 2.38 × 0.60','p-small',' style="fill:var(--hydro-ink);font-weight:700"');
+      o += rect(553,538,110,40,'p-furn') + text(608,532,'bench + shoes','p-small');
+      o += '<line x1="729" y1="405" x2="729" y2="505" style="stroke:var(--ink);stroke-width:5"/>' + '<text x="720" y="392" class="p-small" text-anchor="end">hooks + mirror</text>';
+      o += text(585,445,'HALL','p-room') + text(585,471,'≈ 14.5 m² incl. stairs','p-area') + text(585,495,'≈ 11 m² clear floor','p-small');
+      o += '<text x="490" y="290" class="p-small" text-anchor="end" style="fill:var(--new);font-weight:700">cheek</text>';
+    }
+  }
+  if(mode === 'B'){
+    o += rect(673,503,60,8,'p-new');
+    o += wardrobe(673,253,60,250,false);
+    o += '<line x1="671" y1="253" x2="671" y2="503" style="stroke:var(--hydro);stroke-width:2"/><line x1="666" y1="253" x2="666" y2="503" style="stroke:var(--hydro);stroke-width:2"/>';
+    o += '<text x="652" y="378" class="p-small" text-anchor="middle" transform="rotate(-90 652 378)" style="fill:var(--hydro-ink);font-weight:700">wardrobe 2.50 × 0.60</text>';
+    o += rect(515,253,140,40,'p-furn') + text(585,315,'bench + hooks','p-small');
+    o += '<text x="700" y="535" class="p-small" text-anchor="middle" style="fill:var(--new);font-weight:700">return</text>';
+    o += text(525,430,'HALL','p-room') + text(525,456,'≈ 14.5 m² incl. stairs','p-area') + text(525,480,'≈ 10.8 m² clear floor','p-small');
+  }
+  if(mode === 'C'){
+    o += wardrobe(583,253,150,58,true);
+    o += '<path d="M583 311 A50 50 0 0 0 633 361 M683 311 A50 50 0 0 1 633 361 M683 311 A50 50 0 0 0 733 361" class="p-swing"/>';
+    o += text(658,385,'PAX 150 × 58','p-small',' style="fill:var(--hydro-ink);font-weight:700"');
+    o += rect(495,253,80,30,'p-furn') + text(535,302,'shoes','p-small');
+    o += rect(543,518,120,60,'p-furn') + '<circle cx="603" cy="488" r="22" class="p-furn"/>' + text(603,553,'desk 120 × 60','p-small');
+    o += text(520,420,'HALL','p-room') + text(520,446,'≈ 14.5 m² incl. stairs','p-area') + text(520,470,'≈ 10.5 m² clear floor','p-small');
+  }
+  if(mode === 'D'){
+    o += rect(535,253,160,40,'p-furn-dash') + text(615,310,'wall-hung bench','p-small');
+    o += '<line x1="515" y1="258" x2="715" y2="258" style="stroke:var(--hydro);stroke-width:4"/>';
+    for(var k=525;k<=705;k+=20){ o += '<circle cx="'+k+'" cy="258" r="4" style="fill:var(--hydro)"/>'; }
+    o += text(615,333,'hook rail 2.0 m','p-small',' style="fill:var(--hydro-ink);font-weight:700"');
+    o += rect(703,430,30,100,'p-furn-dash') + '<text x="725" y="418" class="p-small" text-anchor="end">shoe cabinet</text>';
+    o += text(545,440,'HALL','p-room') + text(545,466,'≈ 14.5 m² incl. stairs','p-area') + text(545,490,'≈ 12.3 m² clear floor','p-small');
+  }
+  if(mode === 'elec'){
+    // removed devices
+    o += '<g class="p-x"><path d="M482 400 l16 16 M498 400 l-16 16"/><path d="M482 540 l16 16 M498 540 l-16 16"/></g>';
+    o += '<text x="506" y="396" class="p-small" style="fill:var(--ink)">old devices: remove</text><text x="506" y="413" class="p-small" style="fill:var(--ink)">and make safe</text>';
+    // lights
+    o += lightPt(439,345) + lightPt(614,445);
+    // switches
+    o += switchPt(452,569,1,-1) + switchPt(476,200,-1,-1);
+    // sockets
+    o += socketPt(724,370,'left') + socketPt(520,571,'up');
+    // control lines
+    o += '<path d="M452 562 Q445 450 439 360" class="p-elec-l"/><path d="M470 196 Q450 260 445 331" class="p-elec-l"/><path d="M453 345 Q530 360 600 440" class="p-elec-l"/>';
+    o += '<text x="618" y="487" class="p-small" text-anchor="middle" style="fill:var(--water);font-weight:700">all devices at h = 1.10 m</text>';
+    o += '<text x="618" y="505" class="p-small" text-anchor="middle" style="fill:var(--water)">cables drop from the ceiling</text>';
+    o += '<text x="618" y="525" class="p-small" text-anchor="middle">panel: RDC circuits on own 30 mA RCD</text>';
+  }
+  o += '</svg>';
+  return o;
+}
+document.querySelectorAll("[data-plan]").forEach(function(el){
+  var svg = planSVG(el.getAttribute("data-plan"));
+  // make pattern ids unique per instance but class rules reference generic ids, so rewrite fills inline
+  el.innerHTML = svg;
+});
+
+/* ---------------- Layout tabs ---------------- */
+var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+function showOpt(id){
+  tabs.forEach(function(t){ var on = t.getAttribute("data-opt") === id; t.setAttribute("aria-selected", on ? "true" : "false"); t.tabIndex = on ? 0 : -1; });
+  ["A","B","C","D"].forEach(function(k){ document.getElementById("opt-"+k).classList.toggle("is-hidden", k !== id); });
+  state.layout = id; save();
+}
+tabs.forEach(function(t, idx){
+  t.addEventListener("click", function(){ showOpt(t.getAttribute("data-opt")); });
+  t.addEventListener("keydown", function(e){
+    if(e.key === "ArrowRight" || e.key === "ArrowLeft"){ e.preventDefault(); var n = tabs[(idx + (e.key==="ArrowRight"?1:tabs.length-1)) % tabs.length]; n.focus(); n.click(); }
+  });
+});
+
+/* ---------------- Budget data ---------------- */
+var CATS = [
+  {id:"prep", name:"Strip-out, safety and drying", note:"The déchetterie is free with a residents' badge."},
+  {id:"walls", name:"Walls in the hall", note:"8 boards cover the 1.20 m course on about 13 m of wall, the niche cheek and 15% waste. Add boards if stains reach higher."},
+  {id:"floor", name:"Floor and skirting", note:"Repair the strip if the existing floor is sound. Retile only if it's damaged or mismatched."},
+  {id:"paint", name:"Ceiling and paint", note:"Repaint the whole ceiling, because patches always show."},
+  {id:"elec", name:"Electrics", note:"Material for 3 sockets, 2 switches and 1 new ceiling point. The electrician does the panel work."},
+  {id:"ward", name:"Wardrobe and furniture", note:"Pick one wardrobe route. The bench and desk are extras."},
+  {id:"flood", name:"Flood protection", note:"The valve and the barrier start unticked. They matter most, but the payout doesn't stretch to them."},
+  {id:"wc", name:"Buanderie and WC walls (if damaged)", note:"Lower 1.20 m course in both rooms, plus repainting."}
+];
+var ITEMS = [
+  {id:"p1",cat:"prep",name:"FFP3 masks, pack of 5",store:"Brico Dépôt",qty:1,price:14,p:["rec","low","up"]},
+  {id:"p2",cat:"prep",name:"Safety glasses + cut-resistant gloves",store:"Castorama",qty:1,price:15,p:["rec","low","up"]},
+  {id:"p3",cat:"prep",name:"Floor protection, dust sheeting, tape",detail:"cardboard roll for the stairs, plastic over doorways",store:"Leroy Merlin",qty:1,price:25,p:["rec","low","up"]},
+  {id:"p4",cat:"prep",name:"Rubble bags (sacs à gravats), pack of 10",store:"Brico Dépôt",qty:2,price:8,p:["rec","low","up"]},
+  {id:"p5",cat:"prep",name:"Moisture meter (humidimètre)",detail:"tells you when the walls are dry enough to close",store:"Leroy Merlin",qty:1,price:25,p:["rec","low","up"]},
+  {id:"p6",cat:"prep",name:"Anti-mould treatment, 1 L",store:"Castorama",qty:2,price:9,p:["rec","low","up"]},
+  {id:"p7",cat:"prep",name:"Dehumidifier 20 L/day",detail:"or borrow or rent one",store:"Castorama",qty:1,price:159,p:["up"]},
+  {id:"p8",cat:"prep",name:"Déchetterie drop-off",detail:"plasterboard in the plâtre skip",store:"CC du Genevois",qty:1,price:0,p:["rec","low","up"]},
+
+  {id:"w1",cat:"walls",name:"BA13 hydro H1, 2.50 × 1.20 m",detail:"green face, NF; Castorama 20.90 €",store:"Brico Dépôt",qty:8,price:20.10,p:["rec","low","up"]},
+  {id:"w2",cat:"walls",name:"Metal studs M48, rails R48, furrings (3 m)",detail:"for the cheek, rusted bottom rails, stone-wall furring",store:"Brico Dépôt",qty:1,price:45,p:["rec","low","up"]},
+  {id:"w3",cat:"walls",name:"Screws TTPC 25 (1000), TRPF 13, frame anchors",store:"Brico Dépôt",qty:1,price:26,p:["rec","low","up"]},
+  {id:"w4",cat:"walls",name:"Paper joint tape 150 m + metal corner tape",store:"Castorama",qty:1,price:15,p:["rec","low","up"]},
+  {id:"w5",cat:"walls",name:"Joint compound (enduit à joint) 25 kg",store:"Brico Dépôt",qty:1,price:22,p:["rec","low","up"]},
+  {id:"w6",cat:"walls",name:"Upgrade: cement board for the bottom course",detail:"about 7 boards (1.20 × 0.90) on the 2 most exposed walls, plus screws and tape",store:"Leroy Merlin",qty:1,price:220,p:["up"]},
+  {id:"w7",cat:"walls",name:"Lime render for a bare stone base",detail:"NHL 3.5 × 2 + sand, if you leave the stone exposed",store:"Leroy Merlin",qty:1,price:45,p:[]},
+
+  {id:"f1",cat:"floor",group:"floor",name:"Repair the strip where the wall stood",detail:"matching or contrasting tile inlay, C2 adhesive, grout, or a flat divider profile",store:"Brico Dépôt",qty:1,price:40,p:["rec","low"]},
+  {id:"f2",cat:"floor",group:"floor",name:"Retile the whole hall, porcelain 60 × 60",detail:"11 boxes × 1.44 m² at 15.90 €/m², 4 × C2 adhesive, grout, levelling clips, breaker hire for 1 day",store:"Brico Dépôt",qty:1,price:410,p:["up"]},
+  {id:"f3",cat:"floor",name:"Skirting 8–10 cm, 14 m",detail:"cut from spare tiles, or PVC; adhesive + mastic",store:"Brico Dépôt",qty:1,price:45,p:["rec","low","up"]},
+
+  {id:"c1",cat:"paint",name:"Primer for plasterboard (sous-couche) 10 L",store:"Brico Dépôt",qty:1,price:35,p:["rec","low","up"]},
+  {id:"c2",cat:"paint",name:"Washable wall paint, velours 10 L",store:"Leroy Merlin",qty:1,price:65,p:["rec","low","up"]},
+  {id:"c3",cat:"paint",name:"Ceiling paint, white matt 5 L",store:"Castorama",qty:1,price:25,p:["rec","low","up"]},
+  {id:"c4",cat:"paint",name:"Rollers, tray, brushes, masking tape, sanding pads",store:"Brico Dépôt",qty:1,price:32,p:["rec","low","up"]},
+  {id:"c5",cat:"paint",name:"Acrylic mastic for corners",store:"Castorama",qty:2,price:4,p:["rec","low","up"]},
+
+  {id:"e1",cat:"elec",name:"VAT voltage tester",detail:"NF EN 61243-3, not a screwdriver tester",store:"Leroy Merlin",qty:1,price:22,p:["rec","low","up"]},
+  {id:"e2",cat:"elec",name:"3 sockets 2P+T 16 A + 2 switches",detail:"e.g. Legrand Mosaic or Schneider Odace",store:"Leroy Merlin",qty:1,price:34,p:["rec","low","up"]},
+  {id:"e3",cat:"elec",name:"Boxes, DCL point, pre-wired conduit, Wago",detail:"6 plasterboard boxes, ICTA 3G2.5 + 3G1.5 (25 m each)",store:"Castorama",qty:1,price:78,p:["rec","low","up"]},
+  {id:"e4",cat:"elec",name:"Electrician, half a day",detail:"checks the removed circuits, new drops, own 30 mA RCD for the ground floor, test",store:"local electrician",qty:1,price:380,p:["rec","up"],flag:"pro"},
+  {id:"e5",cat:"elec",name:"Ceiling lights, simple LED",store:"Leroy Merlin",qty:2,price:22,p:["up"]},
+  {id:"e6",cat:"elec",name:"Smoke alarm NF EN 14604",detail:"if this floor has none",store:"Castorama",qty:1,price:15,p:[]},
+
+  {id:"r1",cat:"ward",group:"ward",name:"Built-in niche, 3 sliding doors (1 mirror)",detail:"doors + track ≈ 280 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"Leroy Merlin + IKEA",qty:1,price:450,p:["up"]},
+  {id:"r2",cat:"ward",group:"ward",name:"Built-in niche, curtain front",detail:"ceiling track + curtain ≈ 55 €, wall-hung metal interior ≈ 150 €, cheek ≈ 20 €",store:"IKEA + Brico Dépôt",qty:1,price:225,p:["rec"]},
+  {id:"r3",cat:"ward",group:"ward",name:"IKEA PAX 150 cm (100 + 50, 236 high)",detail:"3 FORSAND doors, hinges, rails, shelves, 2 pull-out shoe shelves",store:"IKEA",qty:1,price:430,p:[]},
+  {id:"r4",cat:"ward",group:"ward",name:"IKEA PAX 250 cm for Option B",detail:"100 + 100 + 50, 5 doors, interior",store:"IKEA",qty:1,price:690,p:[]},
+  {id:"r5",cat:"ward",group:"ward",name:"Open coat wall",detail:"hook rail, wall-hung bench, wall-hung shoe cabinet",store:"IKEA",qty:1,price:150,p:["low"]},
+  {id:"r6",cat:"ward",name:"Wall-hung bench with shoe shelf, 120 cm",store:"IKEA",qty:1,price:65,p:[]},
+  {id:"r7",cat:"ward",name:"Compact desk 120 × 60 + wall shelf",detail:"Option C",store:"IKEA",qty:1,price:85,p:[]},
+
+  {id:"x1",cat:"flood",name:"Water sensor with alarm",store:"Leroy Merlin",qty:1,price:20,p:["rec","low","up"]},
+  {id:"x2",cat:"flood",name:"Raised base for washer + dryer",store:"Leroy Merlin",qty:1,price:45,p:["up"]},
+  {id:"x3",cat:"flood",name:"Absorbent flood sacks, pack of 10",detail:"stopgap until you have a barrier",store:"Castorama",qty:1,price:75,p:["up"]},
+  {id:"x4",cat:"flood",name:"Backflow valve EN 13564, fitted in the trench",detail:"ask Bouchet BTP during the November works; check who pays",store:"Bouchet BTP / plumber",qty:1,price:280,p:[],flag:"strongly advised"},
+  {id:"x5",cat:"flood",name:"Removable 50 cm front-door barrier",detail:"tested kit; apply for Fonds Barnier aid first",store:"specialist supplier",qty:1,price:750,p:[],flag:"aid first"},
+
+  {id:"b1",cat:"wc",name:"BA13 hydro H1, 2.50 × 1.20 m",detail:"1.20 m course in the buanderie and WC",store:"Brico Dépôt",qty:7,price:20.10,p:["rec","low","up"]},
+  {id:"b2",cat:"wc",name:"Extra compound, tape, screws",store:"Brico Dépôt",qty:1,price:25,p:["rec","low","up"]},
+  {id:"b3",cat:"wc",name:"Paint for damp rooms, 10 L",store:"Leroy Merlin",qty:1,price:55,p:["rec","low","up"]},
+  {id:"b4",cat:"wc",name:"Skirting 10 m + mastic",store:"Brico Dépôt",qty:1,price:30,p:["rec","low","up"]}
+];
+var LAYOUT_APPLY = { A:{ward:"r2", on:["r6"], off:["r7"]}, B:{ward:"r2", on:["r6"], off:["r7"]}, C:{ward:"r3", on:["r7"], off:["r6"]}, D:{ward:"r5", on:[], off:["r6","r7"]} };
+
+var saved = load();
+var state = saved && saved.v === 1 ? saved : null;
+function presetState(name){
+  var s = {v:1, on:{}, qty:{}, price:{}, bought:{}, steps:{}, layout:"A"};
+  ITEMS.forEach(function(it){ s.on[it.id] = it.p.indexOf(name) >= 0; });
+  return s;
+}
+if(!state){ state = presetState("rec"); }
+["on","qty","price","bought","steps"].forEach(function(k){ if(!state[k]) state[k] = {}; });
+
+function q(it){ var v = state.qty[it.id]; return (v === undefined || v === null || isNaN(v)) ? it.qty : v; }
+function pr(it){ var v = state.price[it.id]; return (v === undefined || v === null || isNaN(v)) ? it.price : v; }
+
+function renderBudget(){
+  var host = document.getElementById("budget");
+  var html = "";
+  CATS.forEach(function(c){
+    html += '<div class="cat" data-cat="'+c.id+'"><div class="cat-head"><h3>'+esc(c.name)+'</h3><span class="num" data-catsum="'+c.id+'">0 €</span></div>';
+    if(c.note) html += '<div class="cat-note">'+esc(c.note)+'</div>';
+    html += '<div class="item head" aria-hidden="true"><span></span><span>Item</span><span>Store</span><span style="text-align:right">Qty</span><span style="text-align:right">Unit €</span><span style="text-align:right">Total</span><span></span></div>';
+    ITEMS.filter(function(it){ return it.cat === c.id; }).forEach(function(it){
+      var on = !!state.on[it.id];
+      html += '<div class="item'+(on?'':' off')+'" data-item="'+it.id+'">' +
+        '<input class="i-check" type="checkbox" id="chk-'+it.id+'" '+(on?'checked':'')+' aria-label="Include '+esc(it.name)+'">' +
+        '<label class="i-namewrap" for="chk-'+it.id+'"><span class="i-name">'+esc(it.name)+(it.group?'<span class="grp">choose one</span>':'')+(it.flag?'<span class="flagt">'+esc(it.flag)+'</span>':'')+'</span>'+(it.detail?'<span class="i-detail">'+esc(it.detail)+'</span>':'')+'</label>' +
+        '<span class="i-store">'+esc(it.store)+'</span>' +
+        '<input class="i-qty" type="number" min="0" step="1" id="qty-'+it.id+'" value="'+q(it)+'" aria-label="Quantity, '+esc(it.name)+'">' +
+        '<input class="i-price" type="number" min="0" step="0.01" id="price-'+it.id+'" value="'+pr(it)+'" aria-label="Unit price in euros, '+esc(it.name)+'">' +
+        '<span class="i-total" data-total="'+it.id+'">0 €</span>' +
+        '<button class="i-bought" type="button" aria-pressed="'+(state.bought[it.id]?'true':'false')+'" title="Mark as bought" aria-label="Mark '+esc(it.name)+' as bought">✓</button>' +
+        '</div>';
+    });
+    html += '</div>';
+  });
+  host.innerHTML = html;
+}
+
+function update(){
+  var total = 0, catTotals = {};
+  CATS.forEach(function(c){ catTotals[c.id] = 0; });
+  ITEMS.forEach(function(it){
+    var line = q(it) * pr(it);
+    var row = document.querySelector('[data-item="'+it.id+'"]');
+    if(row){ row.classList.toggle("off", !state.on[it.id]); row.querySelector('[data-total]').textContent = eur(line); }
+    if(state.on[it.id]){ total += line; catTotals[it.cat] += line; }
+  });
+  CATS.forEach(function(c){ var el = document.querySelector('[data-catsum="'+c.id+'"]'); if(el) el.textContent = eur(catTotals[c.id]); });
+  total = Math.round(total);
+  var left = BUDGET - total;
+  var st = total > BUDGET ? "over" : (total > BUDGET * 0.92 ? "tight" : "ok");
+  var pct = Math.min(100, total / BUDGET * 100);
+  document.getElementById("mTotal").textContent = eur(total);
+  document.getElementById("mLeft").textContent = left >= 0 ? eur(left) + " left" : eur(-left) + " over";
+  var pill = document.getElementById("mState"); pill.dataset.state = st; pill.textContent = st === "ok" ? "fits" : (st === "tight" ? "tight" : "over budget");
+  ["mBar","sumBar"].forEach(function(id){ var b = document.getElementById(id); b.dataset.state = st; b.querySelector("i").style.width = pct + "%"; });
+  document.getElementById("sumTotal").innerHTML = eur(total) + ' <small>/ 1,800 €</small>';
+  var msg;
+  if(st === "over") msg = "Over the payout by " + eur(-left) + ". Untick extras, switch to a cheaper wardrobe route, or fund the difference yourself.";
+  else if(st === "tight") msg = eur(left) + " left. That's under the 10% contingency (180 €) worth keeping for surprises such as extra boards, a rusted rail or a second electrician visit.";
+  else msg = eur(left) + " left, which covers a 10% contingency (180 €)" + (left >= 180 ? " with room to spare." : ".");
+  document.getElementById("sumMsg").textContent = msg;
+  var figT = document.getElementById("figTotal"); figT.textContent = eur(total);
+  figT.className = "big" + (st === "ok" ? " good" : "");
+  figT.style.color = st === "over" ? "var(--bad)" : (st === "tight" ? "var(--warn)" : "");
+  document.getElementById("figLeft").textContent = left >= 0 ? eur(left) + " left of the payout" : eur(-left) + " over the payout";
+  // category bars, scaled to the budget
+  var bars = "";
+  CATS.forEach(function(c){
+    var w = Math.min(100, catTotals[c.id] / BUDGET * 100);
+    bars += '<div class="catbar"><span>'+esc(c.name.replace(" (if damaged)",""))+'</span><span class="cb-track"><i style="width:'+w.toFixed(1)+'%"></i></span><span class="num">'+eur(catTotals[c.id])+'</span></div>';
+  });
+  document.getElementById("catBars").innerHTML = bars;
+  save();
+}
+
+function setOn(id, on){
+  var it = ITEMS.filter(function(x){ return x.id === id; })[0];
+  if(on && it && it.group){ ITEMS.forEach(function(o){ if(o.group === it.group && o.id !== id){ state.on[o.id] = false; var c = document.getElementById("chk-"+o.id); if(c) c.checked = false; } }); }
+  state.on[id] = on;
+  var cb = document.getElementById("chk-"+id); if(cb) cb.checked = on;
+}
+
+renderBudget();
+var budgetHost = document.getElementById("budget");
+budgetHost.addEventListener("change", function(e){
+  var t = e.target, row = t.closest("[data-item]"); if(!row) return;
+  var id = row.getAttribute("data-item");
+  if(t.classList.contains("i-check")) setOn(id, t.checked);
+  update();
+});
+budgetHost.addEventListener("input", function(e){
+  var t = e.target, row = t.closest("[data-item]"); if(!row) return;
+  var id = row.getAttribute("data-item"), v = parseFloat(t.value);
+  if(t.classList.contains("i-qty")) state.qty[id] = isNaN(v) ? 0 : Math.max(0, v);
+  if(t.classList.contains("i-price")) state.price[id] = isNaN(v) ? 0 : Math.max(0, v);
+  update();
+});
+budgetHost.addEventListener("click", function(e){
+  var b = e.target.closest(".i-bought"); if(!b) return;
+  var id = b.closest("[data-item]").getAttribute("data-item");
+  state.bought[id] = !state.bought[id]; b.setAttribute("aria-pressed", state.bought[id] ? "true" : "false"); save();
+});
+document.querySelectorAll("[data-preset]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var name = btn.getAttribute("data-preset");
+    ITEMS.forEach(function(it){ state.on[it.id] = it.p.indexOf(name) >= 0; state.qty[it.id] = it.qty; state.price[it.id] = it.price; });
+    renderBudget(); update();
+  });
+});
+document.querySelectorAll("[data-apply]").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    var cfg = LAYOUT_APPLY[btn.getAttribute("data-apply")];
+    setOn(cfg.ward, true);
+    cfg.on.forEach(function(id){ setOn(id, true); });
+    cfg.off.forEach(function(id){ setOn(id, false); });
+    update();
+    btn.textContent = "Added to the budget ✓";
+    setTimeout(function(){ btn.textContent = "Use Option " + btn.getAttribute("data-apply") + " in the budget"; }, 2200);
+  });
+});
+
+/* ---------------- Steps ---------------- */
+var PHASES = [
+  {name:"Phase 0 · Now, before the drainage works", when:"Nov 2026", steps:[
+    {id:"s1",t:"Photograph and document everything",d:"Take dated photos and video of every damaged wall. Measure the height of the water marks, because that tells you how high the water rose. Keep Suravenir's letter for the 1,800 € and every receipt from now on.",tags:["diy"],time:"1 h"},
+    {id:"s2",t:"Call Bouchet BTP",d:"Confirm the dates. Ask whether, with the trench open, they can fit a backflow valve (EN 13564) and an inspection chamber on your branch. Ask for a written report or invoice as proof the cause was fixed.",tags:["diy"],time:"call"},
+    {id:"s3",t:"Do the structural checks on sheet S-01",d:"Knock, measure, look inside a socket box, check upstairs. Stop at any red flag.",tags:["diy"],time:"1 h"},
+    {id:"s4",t:"Measure for real and note what's there",d:"Measure every wall and mark it on a print of A-01. Note the radiator position, every socket and switch on both faces of the office wall, and the floor type (tile? the same on both sides?).",tags:["diy"],time:"1 h"},
+    {id:"s5",t:"Get an electrician's quote and a date",d:"Half a day: check the removed circuits, new drops, an RDC RCD in the panel. Book it for when the walls are open (December).",tags:["pro"],time:"call"}
+  ]},
+  {name:"Phase 1 · Strip-out", when:"weekends of 14 and 21 Nov", steps:[
+    {id:"s6",t:"Protect and make the electrics safe",d:"Cover the stairs and floor and tape plastic over the doorways. Switch off the circuits, test every conductor with the VAT tester, photograph each box, disconnect, cap with Wago connectors and label.",tags:["diy"],time:"2 h"},
+    {id:"s7",t:"Remove the office door, frame and skirting",d:"Unscrew the frame (huisserie) from the studs. Keep the door if it's undamaged; it can go to a reuse point at the déchetterie.",tags:["diy"],time:"1 h"},
+    {id:"s8",t:"Take down the partition",d:"Score the joints, remove one face, inspect the frame (S-01 check 8), then the second face, then cut out the studs and rails. For Option A, keep the top 60 cm of frame as the wardrobe cheek.",tags:["diy"],time:"3 h"},
+    {id:"s9",t:"Cut out the flood-damaged board on the remaining walls",d:"Cut horizontally at 1.20 m, or 30 cm above the highest stain if that's higher. Pull out any wet insulation. Do the buanderie and WC at the same time if they're affected.",tags:["diy"],time:"4 h"},
+    {id:"s10",t:"Sort and take away the waste",d:"Plasterboard to the plâtre skip, metal, insulation and wood separately. The déchetterie is free with your badge.",tags:["diy"],time:"2 h"}
+  ]},
+  {name:"Phase 2 · Drainage works and drying", when:"mid Nov to mid Dec", steps:[
+    {id:"s11",t:"Bouchet BTP lays the Ø200 mm drainage pipe",d:"Ask them to show you the connection and any valve before they backfill. Keep their paperwork.",tags:["ext"],time:"TBC"},
+    {id:"s12",t:"Dry and monitor",d:"Heat on and the dehumidifier running; open the windows for 10 minutes twice a day. Brush salt deposits off the stone and treat stains with anti-mould. Take readings every week at the same marked points and compare them with a dry wall upstairs. Rebuild only when they match.",tags:["diy"],time:"2–5 wk"}
+  ]},
+  {name:"Phase 3 · First fix", when:"week of 7 Dec", steps:[
+    {id:"s13",t:"Electrician's first fix",d:"New cables down from the ceiling to boxes at 1.10 m, switches by the front door and the buanderie door, a second ceiling point, and the ground floor on its own 30 mA RCD.",tags:["pro"],time:"½ day"},
+    {id:"s14",t:"Patch the floor and ceiling where the rails were",d:"Fill the fixing holes. If the ceiling has a gap or a step, screw in a strip of BA13 (add a batten if there's nothing to screw into). On old plaster-on-lath ceilings, cut the joint with a knife before you pull the rail, so the plaster doesn't crack.",tags:["diy"],time:"2 h"}
+  ]},
+  {name:"Phase 4 · Walls", when:"weekends of 9 and 16 Jan", steps:[
+    {id:"s15",t:"Repair and add framing",d:"Build the wardrobe cheek (A) or return (B) and replace any rusted bottom rails. Use furrings on the stone walls with an air gap behind.",tags:["diy"],time:"3 h"},
+    {id:"s16",t:"Board with BA13 hydro",d:"Lay it horizontally, first course 1.20 m, with a 1 cm gap at the floor (use an offcut as a spacer). Screws at most 30 cm apart, joints staggered. Never glue the bottom course to the stone with plaster dabs.",tags:["diy"],time:"1½ days"},
+    {id:"s17",t:"Tape and joint",d:"Paper tape and three thin coats (fill, tape, finish), with metal corner tape on outside corners. Feather the ceiling patch 30–40 cm wide. Sand under a raking light.",tags:["diy"],time:"3 evenings"}
+  ]},
+  {name:"Phase 5 · Floor", when:"week of 11 Jan", steps:[
+    {id:"s18",t:"Close the floor join, or retile",d:"Repair the strip with a matching tile, a contrasting inlay or a flat divider profile. If you retile: remove the old covering first, lay porcelain on C2 adhesive with levelling clips and use cement grout. Keep the first stair riser at its current height so the steps stay even.",tags:["diy"],time:"½–3 days"}
+  ]},
+  {name:"Phase 6 · Finish", when:"late Jan to early Feb", steps:[
+    {id:"s19",t:"Prime and paint",d:"Primer on all new board and patches, then two coats of washable paint on the walls. Repaint the whole ceiling.",tags:["diy"],time:"2 days"},
+    {id:"s20",t:"Fit the skirting",d:"Tile or PVC, covering the 1 cm gap, sealed to the floor with flexible mastic.",tags:["diy"],time:"3 h"},
+    {id:"s21",t:"Electrician's second fix",d:"Faceplates and lights on, RCD test button tried, sign-off.",tags:["pro"],time:"2 h"},
+    {id:"s22",t:"Build and fix the wardrobe",d:"Anchor every tall unit to the wall. Put the water sensor on the floor by the door.",tags:["diy"],time:"1 day"},
+    {id:"s23",t:"Close the file",d:"Take final photos and file the receipts and Bouchet BTP's report with your insurance papers. Print the flood-day checklist (F-01) and stick it inside the wardrobe door.",tags:["diy"],time:"1 h"}
+  ]}
+];
+function renderSteps(){
+  var html = "", n = 0;
+  PHASES.forEach(function(ph){
+    html += '<div class="phase"><div class="phase-head"><h3>'+esc(ph.name)+'</h3><span class="label">'+esc(ph.when)+'</span></div><ol class="steps">';
+    ph.steps.forEach(function(s){
+      n++;
+      var done = !!state.steps[s.id];
+      var tags = s.tags.map(function(t){ return '<span class="tag '+t+'">'+(t==="diy"?"You":t==="pro"?"Pro":"External")+'</span>'; }).join("");
+      html += '<li class="step'+(done?' done':'')+'" data-step="'+s.id+'"><input type="checkbox" id="st-'+s.id+'" '+(done?'checked':'')+'>' +
+        '<label class="s-body" for="st-'+s.id+'"><span class="s-title">'+n+'. '+esc(s.t)+'</span><span class="s-text">'+esc(s.d)+'</span></label>' +
+        '<span class="s-tags">'+tags+'<span class="tag time">'+esc(s.time)+'</span></span></li>';
+    });
+    html += '</ol></div>';
+  });
+  document.getElementById("steps").innerHTML = html;
+}
+function updateSteps(){
+  var all = document.querySelectorAll("[data-step]"), done = 0;
+  all.forEach(function(li){ var id = li.getAttribute("data-step"); var d = !!state.steps[id]; li.classList.toggle("done", d); if(d) done++; });
+  document.getElementById("stepCount").textContent = done + " / " + all.length + " steps";
+  document.querySelector("#stepBar i").style.width = (all.length ? done / all.length * 100 : 0) + "%";
+}
+renderSteps(); updateSteps();
+document.getElementById("steps").addEventListener("change", function(e){
+  var li = e.target.closest("[data-step]"); if(!li) return;
+  state.steps[li.getAttribute("data-step")] = e.target.checked; updateSteps(); save();
+});
+
+/* ---------------- Gantt ---------------- */
+var WEEKS = [["W45","2 Nov"],["W46","9 Nov"],["W47","16 Nov"],["W48","23 Nov"],["W49","30 Nov"],["W50","7 Dec"],["W51","14 Dec"],["W52","21 Dec"],["W53","28 Dec"],["W1","4 Jan"],["W2","11 Jan"],["W3","18 Jan"],["W4","25 Jan"],["W5","1 Feb"],["W6","8 Feb"]];
+var TASKS = [
+  ["Photos, checks, measuring, calls",1,2,"diy"],
+  ["Strip-out (2 weekend days)",2,3,"diy"],
+  ["Drainage works, Bouchet BTP (dates TBC)",3,5,"ext"],
+  ["Drying + weekly moisture readings",3,7,"wait"],
+  ["Order materials and wardrobe",5,6,"diy"],
+  ["Electrician first fix + RCD",6,6,"pro"],
+  ["Holiday buffer",8,9,"off"],
+  ["Re-board walls, patch ceiling",10,11,"diy"],
+  ["Floor join (or retile)",11,11,"diy"],
+  ["Jointing, 3 coats + sanding",11,12,"diy"],
+  ["Prime, paint, skirting",12,13,"diy"],
+  ["Electrician second fix",13,13,"pro"],
+  ["Wardrobe, final photos, receipts",14,14,"diy"],
+  ["Spare week",15,15,"off"],
+  ["Barrier: ask about aid, then order and fit",2,15,"par"]
+];
+function renderGantt(){
+  var g = document.getElementById("gantt"), h = '<div class="gh first">Task</div>';
+  WEEKS.forEach(function(w){ h += '<div class="gh">'+w[0]+'<br>'+w[1]+'</div>'; });
+  TASKS.forEach(function(t, r){
+    var row = r + 2;
+    h += '<div class="gl" style="grid-row:'+row+';grid-column:1">'+esc(t[0])+'</div>';
+    for(var c=1;c<=15;c++){ h += '<div class="gc" style="grid-row:'+row+';grid-column:'+(c+1)+'"></div>'; }
+    h += '<div class="gb '+t[3]+'" style="grid-row:'+row+';grid-column:'+(t[1]+1)+' / '+(t[2]+2)+'" title="'+esc(t[0])+'"></div>';
+  });
+  g.innerHTML = h;
+  // today marker: Wed 4 Nov = column 1 + 2/7
+  var mark = document.createElement("div"); mark.className = "today"; mark.innerHTML = '<span>today</span>';
+  g.appendChild(mark);
+  function place(){ var first = g.querySelector(".gh:not(.first)"); if(!first) return;
+    var x = first.offsetLeft + first.offsetWidth * (2.5/7); mark.style.left = x + "px"; }
+  place(); window.addEventListener("resize", place); window.addEventListener("beforeprint", place);
+}
+renderGantt();
+
+/* ---------------- Init ---------------- */
+showOpt(state.layout && /^[ABCD]$/.test(state.layout) ? state.layout : "A");
+update();
+document.getElementById("printBtn").addEventListener("click", function(){ window.print(); });
+})();
+</script>
+</body>
+</html>

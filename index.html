@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home Renovation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout concept: the project register of a drawing set: one row per project, newest first. */
+:root{
+  --paper:#F2F5F3; --sheet:#FFFFFF; --ink:#1B2A2E; --ink-2:#4B5B5F; --rule:#C9D3D0; --hydro:#2C7A57; --hydro-pale:#DCEEE3;
+  --f-display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --rule:#2E3D40; --hydro:#62C092; --hydro-pale:#1C3A2C; color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --rule:#2E3D40; --hydro:#62C092; --hydro-pale:#1C3A2C; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55}
+main{max-width:860px; margin:0 auto; padding-block:max(40px,env(safe-area-inset-top,0px)) 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); display:grid; gap:28px}
+.eyebrow{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.09em; font-size:13px; font-weight:700; color:var(--ink-2)}
+h1{font-family:var(--f-display); font-stretch:85%; font-weight:780; font-size:clamp(2rem,6vw,3rem); line-height:1.05; margin:6px 0 10px; text-wrap:balance}
+p{margin:0; max-width:62ch}
+.projects{display:grid; border-top:2px solid var(--ink)}
+.projects a{display:grid; grid-template-columns:7.5rem 1fr auto; gap:4px 18px; align-items:baseline; padding:18px 4px; border-bottom:1px solid var(--rule); color:inherit; text-decoration:none}
+.projects a:hover .t,.projects a:focus-visible .t{color:var(--hydro); text-decoration:underline; text-underline-offset:3px}
+.projects a:focus-visible{outline:3px solid var(--hydro); outline-offset:2px}
+.when{font-family:var(--f-mono); font-size:.85rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.t{font-family:var(--f-display); font-stretch:86%; font-weight:720; font-size:1.35rem; line-height:1.2}
+.d{grid-column:2; color:var(--ink-2); font-size:.95rem}
+.status{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.07em; font-size:.72rem; font-weight:700; color:var(--hydro); border:1px solid var(--hydro); background:var(--hydro-pale); padding:1px 6px; white-space:nowrap}
+.note{background:var(--sheet); border:1px solid var(--rule); padding:12px 14px; font-size:.9rem; color:var(--ink-2)}
+@media (max-width:560px){.projects a{grid-template-columns:1fr auto} .when{grid-column:1 / -1} .d{grid-column:1 / -1}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Maison · Saint-Julien-en-Genevois</div>
+    <h1>Home renovation</h1>
+    <p>Plans, budgets and 3D models for the work on the house, one project per row.</p>
+  </header>
+  <nav class="projects" aria-label="Projects">
+    <a href="hall/">
+      <span class="when">Nov 26 – Feb 27</span>
+      <span class="t">Ground floor hall</span>
+      <span class="status">Planning</span>
+      <span class="d">Remove the office wall, rebuild the flood-damaged walls in moisture-resistant board, and add a coat wardrobe. Plan, budget against the 1,800 € payout, and a 3D model.</span>
+    </a>
+  </nav>
+  <p class="note">Family pages. Search engines are asked not to index them, but anyone with the link can open them.</p>
+</main>
+</body>
+</html>
