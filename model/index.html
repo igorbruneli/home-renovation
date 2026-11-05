@@ -2341,9 +2341,9 @@ function buildFlood(after){
 /* =====================================================================
    1ST FLOOR (built in a group at y = Y1; local y = 0 is the kitchen floor)
    Kitchen + dining (22.58 m²) over the hall/buanderie, living room (20.04 m²) over the garage,
-   one step down. Stairs stacked above the ground-floor flight; same timber posts.
+   one step up. Stairs stacked above the ground-floor flight; same timber posts.
    ===================================================================== */
-var Y1 = 2.74, EXPLODE = 2.6, F1H = 2.42, F1B = 2.24, LIV = -0.15;
+var Y1 = 2.74, EXPLODE = 2.6, F1H = 2.42, F1B = 2.24, LIV = 0.15;   // living room is one step UP
 
 /* ---------- textures for the 1st floor ---------- */
 var cabTex = (function(){
@@ -2396,8 +2396,8 @@ var posterTex = toTex((function(){
   g.strokeStyle = '#2a1a12'; g.lineWidth = 8; g.strokeRect(0, 0, 128, 160); return c; })(), true);
 var playmatTex = toTex((function(){
   var c = mkCanvas(512, 512), g = c.getContext('2d'), r = rng(31); g.fillStyle = '#f2efe6'; g.fillRect(0, 0, 512, 512);
-  var cols = ['#e3a43c', '#5b8c5a', '#8a8a8a', '#d9644a', '#4a7fa8', '#2b2b2b'];
-  for (var i = 0; i < 46; i++) { g.fillStyle = cols[(r() * cols.length) | 0]; var x = r() * 512, y = r() * 512, s = 14 + r() * 26;
+  var cols = ['#e3a43c', '#9a9a9a', '#8a8a8a', '#d9644a', '#7fa2c0', '#2b2b2b', '#b5b5b5'];
+  for (var i = 0; i < 30; i++) { g.fillStyle = cols[(r() * cols.length) | 0]; var x = r() * 512, y = r() * 512, s = 10 + r() * 18;
     g.beginPath(); g.ellipse(x, y, s, s * 0.6, r() * 3, 0, 6.283); g.fill(); g.beginPath(); g.arc(x + s * 0.9, y - s * 0.4, s * 0.35, 0, 6.283); g.fill(); }
   return c; })(), true);
 var latticeTex = (function(){
@@ -2456,6 +2456,34 @@ MAT.purple = std({color: 0x6b3fa0, roughness: 0.4}); MAT.orange = std({color: 0x
 MAT.cloth = [0x1f2a3a, 0x4c5a3a, 0x222222, 0xe8e6e0].map(function(c){ return std({color: c, roughness: 1}); });
 MAT.magnets = [0xd9534f, 0x3b7dd8, 0xf0ad4e, 0x5cb85c, 0xffffff, 0x9b59b6].map(function(c){ return std({color: c, roughness: 0.6}); });
 MAT.mugs = [0xe9e4da, 0xc0392b, 0x2e86c1, 0xf4d03f, 0x27ae60].map(function(c){ return std({color: c, roughness: 0.3}); });
+
+/* ---------- added after the photo re-check ---------- */
+// 1st-floor tiles: 33 cm, a little lighter and pinker than downstairs, grey-brown grout; tiled skirting
+var tile1Tex = toTex(tileCanvas(8, 128, '#dcc3ab', '#8b7a6c', 15, 0.03), true);   // 8 tiles = 2.64 m
+MAT.tile1 = std({map: tile1Tex, roughness: 0.28, envMapIntensity: 0.75});
+MAT.skirt1 = std({color: 0xd9bfa7, roughness: 0.3, envMapIntensity: 0.6});
+MAT.nosing = std({color: 0x8c6b3c, metalness: 0.65, roughness: 0.35, envMapIntensity: 0.9});
+MAT.sofa = std({color: 0x7f8a82, roughness: 0.95, envMapIntensity: 0.2});
+MAT.sofaDark = std({color: 0x6e7871, roughness: 0.95, envMapIntensity: 0.2});
+MAT.tan = std({color: 0xa8743f, roughness: 0.6});
+MAT.cork = std({color: 0xb98b5c, roughness: 0.9});
+// fridge door: magnets, postcards, kids' drawings and letters (one canvas instead of dozens of boxes)
+var magnetTex = (function(){
+  var c = mkCanvas(256, 576), g = c.getContext('2d'), r = rng(88); g.clearRect(0, 0, 256, 576);
+  var cols = ['#d9534f', '#3b7dd8', '#f0ad4e', '#5cb85c', '#ffffff', '#9b59b6', '#e8d5b0', '#2b2b2b', '#f6e05e', '#e57fa8'];
+  for (var i = 0; i < 64; i++) {
+    var w = 14 + r() * 34, h = 12 + r() * 32, x = r() * (256 - w), y = 60 + r() * (500 - h);
+    g.save(); g.translate(x + w / 2, y + h / 2); g.rotate((r() - 0.5) * 0.35);
+    g.fillStyle = cols[(r() * cols.length) | 0]; g.fillRect(-w / 2, -h / 2, w, h);
+    if (r() < 0.5) { g.fillStyle = 'rgba(255,255,255,0.9)'; g.fillRect(-w / 2 + 2, -h / 2 + 2, w - 4, h - 4); g.fillStyle = cols[(r() * cols.length) | 0]; g.fillRect(-w / 2 + 4, -h / 2 + 4, w - 8, (h - 8) * 0.6); }
+    g.restore();
+  }
+  g.font = 'bold 30px Arial';
+  ['J', 'E', 'S', 'U', 'S'].forEach(function(ch, i){ g.fillStyle = cols[i % cols.length]; g.fillText(ch, 18 + i * 40, 40); });
+  ['A', 'X', 'B', 'I', 'C'].forEach(function(ch, i){ g.fillStyle = cols[(i + 3) % cols.length]; g.fillText(ch, 30 + i * 38, 470); });
+  var t = toTex(c, true); t.wrapS = t.wrapT = T.ClampToEdgeWrapping; return t;
+})();
+MAT.magnets2 = new T.MeshStandardMaterial({map: magnetTex, transparent: true, alphaTest: 0.5, roughness: 0.6});
 
 /* ---------- generic helpers ---------- */
 function frontX(x, z1, z2, y1, y2, mat, p){ return box(x - 0.018, y1, z1 + 0.002, x, y2, z2 - 0.002, mat, p); }   // face toward -x
@@ -2520,10 +2548,11 @@ function frenchWindow(x1, x2, yB, h){
   });
   hangingPlant(x1 + 0.12, rodY - 0.55, 5.78); hangingPlant(x2 - 0.12, rodY - 0.65, 5.78);
 }
-function radiatorZ(x1, x2, y1, y2){ // on the south wall face z = 5.90, facing -z
+function radiatorZ(x1, x2, y1, y2, fl){ // on the south wall face z = 5.90, facing -z; fl = floor level under it
+  if (fl === undefined) fl = LIV;
   var z = 5.835; box(x1, y1, z, x2, y2, 5.885, MAT.gloss);
   for (var x = x1 + 0.02; x < x2 - 0.01; x += 0.045) box(x, y1 + 0.03, z - 0.012, x + 0.022, y2 - 0.03, z, MAT.gloss);
-  [x1 + 0.03, x2 - 0.03].forEach(function(px){ cyl(px, y1 - 0.05, 5.86, 0.011, 0.10, MAT.chrome); cyl(px, (y1 - 0.1 + LIV) / 2 + 0.05, 5.86, 0.012, Math.max(0.05, y1 - 0.1 - LIV), MAT.white); });
+  [x1 + 0.03, x2 - 0.03].forEach(function(px){ cyl(px, y1 - 0.05, 5.86, 0.011, 0.10, MAT.chrome); cyl(px, (y1 - 0.1 + fl) / 2, 5.86, 0.012, Math.max(0.05, y1 - 0.1 - fl), MAT.white); });
 }
 function flightG(o){ // generic straight flight rising toward -z: o.x1,o.x2,o.zb,o.zt,o.n,o.rise,o.yb,o.minY
   var run = (o.zb - o.zt) / o.n, k = o.rise / run, xi1 = o.x1 + 0.03, xi2 = o.x2 - 0.06;
@@ -2551,46 +2580,84 @@ function buildFirst(){
   var H0 = WALL_H; WALL_H = F1H;
   try { buildFirstInner(); } finally { WALL_H = H0; }
 }
+function sofaL(y0){ // grey-sage relax corner sofa (photos 8690–8697): long part on the west wall, return with its back to the north
+  var S1 = MAT.sofa, S2 = MAT.sofaDark, Y = function(v){ return y0 + v; };
+  var xW = -0.07, xF = 0.95, zN = 1.15, zS = 3.78, xE = 1.85, zR = 2.15;
+  rbox(xW, Y(0.07), zN, xF, Y(0.30), zS, S2, 0.03);                 // plinth, long part
+  rbox(xF - 0.02, Y(0.07), zN, xE, Y(0.30), zR, S2, 0.03);          // plinth, return
+  rbox(xW, Y(0.28), zN, xW + 0.24, Y(0.74), zS - 0.18, S1, 0.07);   // back against the west wall
+  rbox(xW, Y(0.28), zN, xE - 0.34, Y(0.74), zN + 0.24, S1, 0.07);   // back of the return (north side)
+  rbox(xE - 0.36, Y(0.28), zN, xE, Y(0.52), zN + 0.26, S1, 0.08);   // low rounded end of that back
+  rbox(xW, Y(0.07), zS - 0.18, xF, Y(0.60), zS, S1, 0.07);          // arm at the south end
+  [[2.16, 2.88], [2.89, 3.59]].forEach(function(c){ rbox(xW + 0.24, Y(0.30), c[0], xF, Y(0.45), c[1], S1, 0.05); });
+  rbox(xW + 0.24, Y(0.30), zN + 0.24, xF, Y(0.45), 2.15, S1, 0.05);  // corner seat
+  rbox(xF + 0.01, Y(0.30), zN + 0.24, 1.40, Y(0.45), zR, S1, 0.05);
+  rbox(1.41, Y(0.30), zN + 0.24, xE, Y(0.45), zR, S1, 0.06);         // chaise end
+  var hr = function(x1, z1, x2, z2){ rbox(x1, Y(0.70), z1, x2, Y(0.97), z2, S1, 0.06); };   // adjustable headrests, raised
+  hr(xW + 0.02, 2.18, xW + 0.22, 2.86); hr(xW + 0.02, 2.91, xW + 0.22, 3.57); hr(xW + 0.02, zN + 0.26, xW + 0.22, 2.12);
+  hr(0.20, zN + 0.02, 0.88, zN + 0.22); hr(0.92, zN + 0.02, 1.47, zN + 0.22);
+  var sled = function(alongX, a, b, c){ var t = 0.02;   // black metal sled legs
+    if (alongX) { box(a, y0, c - t / 2, b, y0 + 0.015, c + t / 2, MAT.black); box(a, y0, c - t / 2, a + t, y0 + 0.08, c + t / 2, MAT.black); box(b - t, y0, c - t / 2, b, y0 + 0.08, c + t / 2, MAT.black); }
+    else { box(c - t / 2, y0, a, c + t / 2, y0 + 0.015, b, MAT.black); box(c - t / 2, y0, a, c + t / 2, y0 + 0.08, a + t, MAT.black); box(c - t / 2, y0, b - t, c + t / 2, y0 + 0.08, b, MAT.black); } };
+  sled(true, xW + 0.1, xF - 0.1, zS - 0.1); sled(false, zN + 0.12, zR - 0.1, xE - 0.12);
+  [[0.0, zN + 0.06], [0.0, 2.9], [0.85, 2.2]].forEach(function(f){ box(f[0], y0, f[1], f[0] + 0.04, y0 + 0.07, f[1] + 0.04, MAT.black); });
+  var p1 = rbox(xW + 0.26, Y(0.45), 3.18, xW + 0.42, Y(0.80), 3.52, MAT.teal, 0.06); p1.rotation.z = -0.25;
+  var p2 = rbox(0.5, Y(0.45), zN + 0.26, 0.92, Y(0.78), zN + 0.42, MAT.teal, 0.06); p2.rotation.x = 0.25;
+  rbox(1.42, Y(0.45), 1.50, 1.80, Y(0.50), 2.08, MAT.cream, 0.02);
+  rbox(0.30, Y(0.45), 2.30, 0.75, Y(0.49), 2.80, MAT.cream, 0.02);
+}
+
 function buildFirstInner(){
-  // walls (stone 0.40 here, thinner than downstairs)
+  var L0 = LIV;   // living-room floor: one step UP from the kitchen (tiled riser + brass nosing, photos 8687, 8689)
   [
-    {x1: -0.5, x2: 7.83, z1: -0.5, z2: -0.35, t: 'stone', outer: 5, yb: -0.24},
-    {x1: -0.5, x2: 7.83, z1: -0.35, z2: -0.10, t: 'stone', yb: -0.24, ops: [{a: 5.10, b: 5.95, y0: 0.95, y1: 2.05}]},
-    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 1.05, b: 2.25, y0: LIV, y1: 2.10}, {a: 5.00, b: 6.20, y0: 0, y1: 2.15}]},
+    {x1: -0.5, x2: 7.83, z1: -0.5, z2: -0.42, t: 'stone', outer: 5, yb: -0.24},
+    {x1: -0.5, x2: 7.83, z1: -0.42, z2: -0.10, t: 'stone', yb: -0.24, ops: [{a: 4.85, b: 5.75, y0: -0.24, y1: 2.20}]},   // shelf niche, floor to beam
+    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: L0 + 2.10}, {a: 5.00, b: 6.20, y0: 0, y1: 2.15}]},
     {x1: -0.5, x2: -0.10, z1: -0.10, z2: 5.90, t: 'stone', outer: 1, yb: -0.24},
     {x1: 7.68, x2: 7.83, z1: -0.10, z2: 5.90, t: 'stone', outer: 0, yb: -0.24},
     {x1: 7.43, x2: 7.68, z1: -0.10, z2: 5.90, t: 'stone', yb: -0.24, ops: [{a: 3.95, b: 4.55, y0: 0.95, y1: 1.75}]},
-    {x1: 2.90, x2: 3.00, z1: -0.10, z2: 5.90, t: 'part', yb: LIV, ops: [{a: 1.55, b: 2.45, y0: 0, y1: 2.0}, {a: 4.45, b: 5.60, y0: 0, y1: 2.05}]}
+    // living room | landing and stairs: plain plastered openings, no doors
+    {x1: 2.88, x2: 3.00, z1: -0.10, z2: 5.90, t: 'part', yb: 0, ops: [{a: 0.48, b: 1.38, y0: 0, y1: L0 + 1.98}, {a: 4.45, b: 5.90, y0: 0, y1: L0 + 1.98}]},
+    // pier in the NW corner of the living room, with the bookshelf recess north of it (photos 8690, 8693)
+    {x1: -0.10, x2: 0.30, z1: 0.50, z2: 0.84, t: 'mas', yb: L0}
   ].forEach(wall);
-  // floors + slab edges round the stairwell
-  [[3.0, -0.1, 7.43, 2.62], [3.85, 2.62, 7.43, 4.46], [3.0, 4.46, 7.43, 5.9]].forEach(function(r){ plane(r[0], r[1], r[2], r[3], 0, MAT.tileEx, 2.64); });
-  plane(-0.1, -0.1, 2.9, 5.9, LIV, MAT.tileEx, 2.64);
+  // floors: 33 cm tiles, the stairwell left open; living room one step up
+  [[3.0, -0.1, 7.43, 2.62], [3.85, 2.62, 7.43, 4.46], [3.0, 4.46, 7.43, 5.9]].forEach(function(r){ plane(r[0], r[1], r[2], r[3], 0, MAT.tile1, 2.64); });
+  plane(4.85, -0.42, 5.75, -0.10, 0, MAT.tile1, 2.64);
+  plane(-0.1, -0.1, 2.88, 5.9, L0, MAT.tile1, 2.64);
+  [[0.48, 1.38], [4.45, 5.90]].forEach(function(o){
+    plane(2.88, o[0], 3.0, o[1], L0, MAT.tile1, 2.64);
+    box(3.0, 0, o[0], 3.012, L0 - 0.006, o[1], MAT.skirt1, null, false);
+    box(2.99, L0 - 0.008, o[0], 3.016, L0 + 0.003, o[1], MAT.nosing, null, false);
+  });
   box(3.0, -0.24, 2.60, 3.85, -0.002, 2.62, MAT.pine); box(3.0, -0.24, 4.46, 3.85, -0.002, 4.48, MAT.plaster); box(3.85, -0.24, 2.62, 3.87, -0.002, 4.46, MAT.plaster);
   if (S.level === 'first') {
-    // looking down the stairwell: top steps of the ground-floor flight + dark shaft
     flightG({x1: 3.0, x2: 3.85, zb: 4.80, zt: 2.62, n: 13, rise: 2.744 / 14, yb: -2.744, minY: -1.35});
     box(2.98, -1.5, 2.62, 3.0, -0.24, 4.46, MAT.plaster, null, false); box(3.85, -1.5, 2.62, 3.87, -0.24, 4.46, MAT.void, null, false);
   }
-  // skirting
-  var sk = MAT.skirtEx;
-  skirtX(-0.10, 3.0, 7.43, 1, sk); skirtZ(7.43, -0.1, 5.9, -1, sk); skirtX(5.90, 3.0, 5.0, -1, sk); skirtX(5.90, 6.2, 7.43, -1, sk); skirtZ(3.0, -0.1, 1.55, 1, sk);
-  [[-0.10, -0.1, 2.9, 1, 'x'], [5.90, -0.1, 1.05, -1, 'x'], [5.90, 2.25, 2.9, -1, 'x']].forEach(function(s){ box(s[1], LIV, s[0], s[2], LIV + 0.08, s[0] + s[3] * 0.009, sk, null, false); });
-  box(-0.10, LIV, -0.1, -0.091, LIV + 0.08, 5.9, sk, null, false);
-  box(2.891, LIV, -0.1, 2.90, LIV + 0.08, 1.55, sk, null, false); box(2.891, LIV, 2.45, 2.90, LIV + 0.08, 4.45, sk, null, false);
+  // tiled skirting
+  var sk = MAT.skirt1;
+  skirtX(-0.10, 3.0, 4.85, 1, sk); skirtX(-0.10, 5.75, 7.43, 1, sk); skirtZ(7.43, -0.1, 5.9, -1, sk); skirtX(5.90, 3.0, 5.0, -1, sk); skirtX(5.90, 6.2, 7.43, -1, sk); skirtZ(3.0, -0.1, 0.48, 1, sk); skirtZ(3.0, 1.38, 2.62, 1, sk);
+  skirtX(-0.42, 4.85, 5.75, 1, sk); skirtZ(4.85, -0.42, -0.10, 1, sk); skirtZ(5.75, -0.42, -0.10, -1, sk);
+  var skL = function(x1, z1, x2, z2){ box(x1, L0, z1, x2, L0 + 0.08, z2, sk, null, false); };
+  skL(-0.1, -0.1, 2.88, -0.091); skL(-0.1, 5.891, 0.02, 5.9); skL(1.90, 5.891, 2.88, 5.9);
+  skL(-0.1, -0.1, -0.091, 0.50); skL(-0.1, 0.84, -0.091, 5.9);
+  skL(2.871, -0.1, 2.88, 0.48); skL(2.871, 1.38, 2.88, 4.45);
+  skL(-0.1, 0.491, 0.30, 0.50); skL(-0.1, 0.84, 0.30, 0.849); skL(0.30, 0.50, 0.309, 0.84);
 
-  // ceiling + beams
+  // ceiling + beams: dark and close (≈ 50 cm) over the kitchen, lighter and wider apart (≈ 72 cm) over the living room
   if (S.ceiling) {
     [[-0.1, -0.1, 7.43, 2.62], [-0.1, 2.62, 3.0, 4.46], [3.85, 2.62, 7.43, 4.46], [-0.1, 4.46, 7.43, 5.9]].forEach(function(r){ var m = plane(r[0], r[1], r[2], r[3], F1H, MAT.ceiling, 1.2, true); m.castShadow = true; });
     for (var z = 0.25; z < 5.9; z += 0.50) { var inW = z + 0.08 > 2.46 && z - 0.08 < 4.62; box(inW ? 3.93 : 3.0, F1B, z - 0.08, 7.43, F1H, z + 0.08, MAT.beam); }
-    for (var z2 = 0.30; z2 < 5.9; z2 += 0.58) box(-0.1, F1B + 0.02, z2 - 0.065, 2.9, F1H, z2 + 0.065, MAT.lbeam);
+    [0.38, 1.10, 1.82, 2.54, 3.26, 3.98, 4.70, 5.42].forEach(function(z2){ box(-0.1, F1B + 0.04, z2 - 0.08, 2.88, F1H, z2 + 0.08, MAT.lbeam); });
+    box(0.06, F1B + 0.04, -0.10, 0.26, F1H, 0.50, MAT.lbeam);   // short beam over the bookshelf recess
     box(3.0, 2.22, 4.46, 3.85, F1H, 4.62, MAT.beam);
-    // track spots
     [[1.75, 4.6, 6.6], [4.75, 4.9, 6.5]].forEach(function(t){ box(t[1], F1B - 0.03, t[0] - 0.015, t[2], F1B, t[0] + 0.015, MAT.black);
       for (var sx = t[1] + 0.25; sx < t[2]; sx += 0.7) { var sp = cyl(sx, F1B - 0.09, t[0], 0.03, 0.1, MAT.black, null, 'y', 14); sp.rotation.z = 0.4; } });
-    // rattan pendant (living room)
-    cyl(1.45, F1H - 0.32, 2.85, 0.004, 0.62, MAT.black, null, 'y', 4);
-    var lamp = add(new T.CylinderGeometry(0.2, 0.23, 0.42, 28, 1, true), MAT.lattice); lamp.position.set(1.45, F1H - 0.84, 2.85); lamp.castShadow = false;
-    var bl = add(new T.SphereGeometry(0.045, 14, 10), MAT.bulb); bl.position.set(1.45, F1H - 0.8, 2.85); bl.castShadow = false;
+    cyl(1.45, F1H - 0.12, 2.85, 0.004, 0.24, MAT.black, null, 'y', 4);
+    var lamp = add(new T.CylinderGeometry(0.2, 0.23, 0.42, 28, 1, true), MAT.lattice); lamp.position.set(1.45, F1H - 0.45, 2.85); lamp.castShadow = false;
+    var lamp2 = add(new T.CylinderGeometry(0.14, 0.16, 0.14, 24, 1, true), MAT.lattice); lamp2.position.set(1.45, F1H - 0.17, 2.85); lamp2.castShadow = false;
+    var bl = add(new T.SphereGeometry(0.045, 14, 10), MAT.bulb); bl.position.set(1.45, F1H - 0.42, 2.85); bl.castShadow = false;
   }
   // posts + trimmer (same as downstairs)
   box(3.85, 0, 2.56, 4.01, F1B, 2.72, MAT.beamV); box(3.85, 0, 4.40, 4.01, F1B, 4.56, MAT.beamV); box(3.85, 2.20, 2.46, 4.01, F1H, 4.62, MAT.beam);
@@ -2606,62 +2673,76 @@ function buildFirstInner(){
   for (var gz = 2.80; gz < 4.38; gz += 0.11) box(3.868, 0.05, gz - 0.015, 3.892, 0.93, gz + 0.015, MAT.pineV);
   [[3.0, 3.35, 0], [3.4, 3.62, 1], [3.7, 4.05, 2], [4.1, 4.3, 3]].forEach(function(c){ var m = MAT.cloth[c[2]];
     box(3.84, 0.42, c[0], 3.855, 0.985, c[1], m); box(3.905, 0.35, c[0], 3.92, 0.985, c[1], m); box(3.84, 0.98, c[0], 3.92, 0.995, c[1], m); });
-  babyGate(3.03, 2.57, 3.80, 2.57, 0); babyGate(2.95, 1.58, 2.95, 2.42, 0);
+  babyGate(3.03, 2.57, 3.80, 2.57, 0); babyGate(3.04, 0.51, 3.04, 1.35, 0);
   label('Upper flight to the 2nd floor', 3.42, 2.05, 3.55, '', 'stacked above the ground-floor flight');
   label('Same timber posts as downstairs', 3.93, 1.5, 4.48);
-  label('Step down 15 cm', 2.95, 0.15, 2.0, 'dim');
+  label('Step up 15 cm', 3.0, 0.22, 0.93, 'dim');
 
-  /* ---- kitchen: run along the east wall ---- */
-  var fx = 6.83, cz = [0.62, 1.22, 1.82, 2.42, 3.05];
-  box(6.78, 0, -0.05, 7.42, 1.86, 0.60, MAT.steel); // fridge
-  box(6.765, 1.12, 0.05, 6.78, 1.82, 0.08, MAT.steel); box(6.765, 0.25, 0.05, 6.78, 1.0, 0.08, MAT.steel); box(6.775, 1.08, -0.04, 6.78, 1.10, 0.59, MAT.dark);
-  var mr = rng(3); for (var mi = 0; mi < 16; mi++) { var my = 0.35 + mr() * 1.4, mz = 0.03 + mr() * 0.48, ms = 0.03 + mr() * 0.05; box(6.772, my, mz, 6.778, my + ms * (mi % 4 ? 1 : 1.8), mz + ms, MAT.magnets[mi % MAT.magnets.length], null, false); }
+
+  /* ---- kitchen run on the east wall (photo 8685): fridge, 4 drawers, oven under a gas hob, 2 doors, blind corner; 6 wall units ---- */
+  var fx = 6.83;
+  rbox(6.76, 0.01, -0.07, 7.40, 1.86, 0.55, MAT.steel, 0.02);                 // freestanding fridge-freezer
+  box(6.755, 0.66, -0.06, 6.762, 0.665, 0.54, MAT.dark, null, false);
+  cyl(6.738, 1.32, -0.02, 0.011, 0.44, MAT.steel); cyl(6.738, 0.40, -0.02, 0.011, 0.32, MAT.steel);
+  var mg = add(new T.PlaneGeometry(0.50, 1.12), MAT.magnets2, null, false, false); mg.rotation.y = -Math.PI / 2; mg.position.set(6.752, 1.26, 0.25);
+  var mr = rng(3); for (var mi = 0; mi < 7; mi++) { var my = 0.25 + mr() * 0.35, mz = 0.05 + mr() * 0.42; box(6.752, my, mz, 6.758, my + 0.05, mz + 0.06, MAT.magnets[mi % MAT.magnets.length], null, false); }
+  box(6.79, 0.0, 0.55, 7.43, 2.15, 0.62, MAT.white);                          // filler panel beside the fridge
   box(6.85, 0, 0.62, 7.43, 0.10, 3.05, MAT.dark); box(fx, 0.10, 0.62, 7.43, 0.86, 3.05, MAT.white);
   box(6.80, 0.86, 0.60, 7.43, 0.90, 3.65, MAT.granite);
-  [0.62, 1.22].forEach(function(a, i){ if (i === 0) { [0.10, 0.36, 0.61].forEach(function(y, k){ frontX(fx, a, a + 0.60, y + 0.01, y + (k === 2 ? 0.24 : 0.25), MAT.cab); cyl(fx - 0.03, y + 0.18, a + 0.30, 0.012, 0.02, MAT.chrome, null, 'x', 12); }); } });
-  frontX(fx, 1.22, 1.82, 0.12, 0.70, MAT.blackGlass); box(fx - 0.04, 0.64, 1.30, fx - 0.02, 0.66, 1.74, MAT.steel); frontX(fx, 1.22, 1.82, 0.71, 0.85, MAT.cab);
-  box(6.95, 0.90, 1.24, 7.38, 0.905, 1.80, MAT.blackGlass);
-  [[7.06, 1.36], [7.06, 1.66], [7.26, 1.36], [7.26, 1.66]].forEach(function(b){ var ring = add(new T.TorusGeometry(0.05, 0.008, 6, 20), MAT.iron); ring.rotation.x = Math.PI / 2; ring.position.set(b[0], 0.925, b[1]); cyl(b[0], 0.912, b[1], 0.03, 0.012, MAT.dark); });
-  [1.82, 2.42].forEach(function(a){ frontX(fx, a, a + 0.30, 0.11, 0.85, MAT.cab); frontX(fx, a + 0.30, a + 0.60, 0.11, 0.85, MAT.cab); cyl(fx - 0.03, 0.75, a + 0.27, 0.01, 0.02, MAT.chrome, null, 'x', 10); cyl(fx - 0.03, 0.75, a + 0.33, 0.01, 0.02, MAT.chrome, null, 'x', 10); });
-  frontX(fx, 2.42, 3.05, 0.11, 0.85, MAT.cab);
-  box(7.415, 0.90, 0.60, 7.43, 1.45, 3.05, MAT.splash, null, false);
+  [0.11, 0.30, 0.49, 0.68].forEach(function(y){ frontX(fx, 0.62, 1.12, y, y + 0.175, MAT.cab); cyl(fx - 0.025, y + 0.088, 0.87, 0.013, 0.025, MAT.chrome, null, 'x', 12); });
+  frontX(fx, 1.12, 1.72, 0.12, 0.70, MAT.blackGlass); box(fx - 0.04, 0.64, 1.18, fx - 0.02, 0.66, 1.66, MAT.steel); frontX(fx, 1.12, 1.72, 0.71, 0.85, MAT.steel);
+  box(6.93, 0.90, 1.14, 7.38, 0.905, 1.70, MAT.steel);
+  [[7.04, 1.27], [7.04, 1.57], [7.26, 1.27], [7.26, 1.57]].forEach(function(b){ var ring = add(new T.TorusGeometry(0.045, 0.008, 6, 20), MAT.iron); ring.rotation.x = Math.PI / 2; ring.position.set(b[0], 0.922, b[1]); cyl(b[0], 0.912, b[1], 0.028, 0.012, MAT.dark); });
+  frontX(fx, 1.72, 2.12, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, 2.06, 0.012, 0.025, MAT.chrome, null, 'x', 12);
+  frontX(fx, 2.12, 2.57, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, 2.18, 0.012, 0.025, MAT.chrome, null, 'x', 12);
+  frontX(fx, 2.57, 3.05, 0.11, 0.85, MAT.white);
+  box(7.415, 0.90, 0.60, 7.43, 1.45, 3.65, MAT.splash, null, false);
   var wx = 7.08;
-  box(wx, 1.45, 0.62, 7.43, 2.15, 3.05, MAT.white);
-  frontX(wx, 0.62, 1.22, 1.46, 2.14, MAT.cab); frontX(wx, 1.22, 1.82, 1.62, 2.14, MAT.cab); frontX(wx, 1.82, 2.42, 1.46, 2.14, MAT.cabGlass); frontX(wx, 2.42, 3.05, 1.46, 2.14, MAT.cab);
-  box(wx - 0.05, 1.45, 1.24, 7.43, 1.62, 1.80, MAT.white); box(wx - 0.05, 1.445, 1.30, 7.38, 1.452, 1.74, MAT.grey);
-  var led = box(wx + 0.02, 1.442, 0.64, wx + 0.05, 1.45, 3.03, MAT.diffuser, null, false); led.castShadow = false;
-  rbox(7.1, 0.90, 2.62, 7.32, 1.18, 2.84, MAT.white, 0.03); cyl(7.2, 1.0, 2.25, 0.07, 0.2, MAT.steel); cyl(7.2, 1.11, 2.25, 0.03, 0.02, MAT.black);
+  box(wx, 1.45, 0.62, 7.43, 2.15, 3.52, MAT.white);
+  [[0.62, 1.07, MAT.cab], [1.72, 2.17, MAT.cabGlass], [2.17, 2.62, MAT.cab], [2.62, 3.07, MAT.cab], [3.07, 3.52, MAT.cab]].forEach(function(c){ frontX(wx, c[0], c[1], 1.46, 2.14, c[2]); });
+  frontX(wx, 1.07, 1.72, 1.66, 2.14, MAT.cab);
+  box(wx - 0.05, 1.45, 1.09, 7.43, 1.62, 1.70, MAT.white); box(wx - 0.05, 1.445, 1.15, 7.38, 1.452, 1.64, MAT.grey);   // slim hood
+  var led = box(wx + 0.02, 1.442, 0.64, wx + 0.05, 1.45, 3.50, MAT.diffuser, null, false); led.castShadow = false;
+  rbox(7.12, 0.90, 2.70, 7.34, 1.18, 2.92, MAT.white, 0.03); cyl(7.2, 1.0, 2.35, 0.07, 0.2, MAT.steel); cyl(7.2, 1.11, 2.35, 0.03, 0.02, MAT.black);
+  cyl(7.25, 1.01, 0.80, 0.06, 0.22, MAT.glass); cyl(7.28, 1.02, 0.97, 0.045, 0.24, MAT.white);
   plane(5.55, 0.75, 6.72, 2.75, 0.004, MAT.jute, 1);
+  label('Fridge', 7.08, 2.0, 0.24);
   /* ---- peninsula ---- */
   box(4.97, 0, 3.09, 6.80, 0.10, 3.63, MAT.dark); box(4.95, 0.10, 3.05, 6.80, 0.86, 3.65, MAT.white);
   box(4.92, 0.86, 3.02, 6.80, 0.90, 3.65, MAT.granite);
   frontZ(3.05, 4.97, 5.57, 0.11, 0.85, MAT.steel); box(5.0, 0.80, 3.02, 5.54, 0.82, 3.03, MAT.dark);
   frontZ(3.05, 5.57, 5.87, 0.11, 0.85, MAT.cab); frontZ(3.05, 5.87, 6.17, 0.11, 0.85, MAT.cab); frontZ(3.05, 6.17, 6.80, 0.11, 0.85, MAT.cab);
   box(5.62, 0.75, 3.10, 6.12, 0.902, 3.50, MAT.steel); box(5.66, 0.76, 3.13, 6.08, 0.905, 3.47, MAT.dark);
-  cyl(5.87, 1.05, 3.56, 0.012, 0.3, MAT.chrome); var sp = add(new T.TorusGeometry(0.1, 0.012, 8, 16, Math.PI), MAT.chrome); sp.position.set(5.87, 1.2, 3.46); sp.rotation.y = Math.PI / 2;
+  cyl(5.87, 1.05, 3.56, 0.012, 0.3, MAT.black); var sp = add(new T.TorusGeometry(0.1, 0.012, 8, 16, Math.PI), MAT.black); sp.position.set(5.87, 1.2, 3.46); sp.rotation.y = Math.PI / 2;
   box(5.0, 0.90, 3.62, 6.80, 1.02, 3.66, MAT.white); box(4.95, 1.02, 3.48, 6.82, 1.05, 3.76, MAT.splash); box(4.93, 1.02, 3.46, 6.84, 1.07, 3.48, MAT.oak); box(4.93, 1.02, 3.76, 6.84, 1.07, 3.78, MAT.oak);
   box(6.80, 0.10, 3.65, 6.82, 1.02, 3.78, MAT.white);
   box(5.25, 0.90, 3.10, 5.55, 1.02, 3.45, MAT.metal); for (var di = 0; di < 5; di++) box(5.28 + di * 0.05, 0.92, 3.15, 5.29 + di * 0.05, 1.1, 3.4, MAT.white);
-  label('Peninsula: sink + dishwasher', 5.9, 1.3, 3.3); label('Fridge', 7.1, 2.0, 0.27);
-  /* ---- north wall: microwave table, wall cabinet, open-shelf niche ---- */
-  var tb = add(new T.CylinderGeometry(0.5, 0.5, 0.025, 40), MAT.white); tb.scale.set(1, 1, 0.55); tb.position.set(4.5, 0.74, 0.20);
-  [[4.15, 0.05], [4.85, 0.05], [4.15, 0.35], [4.85, 0.35]].forEach(function(l){ var lg = cyl(l[0], 0.37, l[1], 0.016, 0.74, MAT.oak); lg.rotation.z = (l[0] < 4.5 ? -1 : 1) * 0.08; });
-  box(4.2, 0.755, -0.05, 4.65, 1.02, 0.30, MAT.white); frontZ(0.30, 4.22, 4.52, 0.78, 1.0, MAT.dark);
-  box(4.25, 1.02, -0.05, 4.70, 1.24, 0.28, MAT.steel); frontZ(0.28, 4.28, 4.58, 1.04, 1.22, MAT.blackGlass);
-  box(4.15, 1.45, -0.1, 4.85, 2.15, 0.25, MAT.white); frontZ(0.27, 4.15, 4.85, 1.46, 2.14, MAT.cab);
-  var st = cyl(4.65, 0.45, 0.85, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.65 + l[0], 0.22, 0.85 + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; });
-  [1.15, 1.48, 1.82].forEach(function(y, i){ box(5.10, y, -0.35, 5.95, y + 0.03, -0.10, MAT.oak);
-    if (i === 2) for (var j = 0; j < 5; j++) { var jar = cyl(5.2 + j * 0.16, y + 0.12, -0.22, 0.05, 0.2, MAT.glass, null, 'y', 16); jar.renderOrder = 2; cyl(5.2 + j * 0.16, y + 0.225, -0.22, 0.052, 0.015, MAT.oak, null, 'y', 16); }
-    if (i === 1) { cyl(5.3, y + 0.08, -0.22, 0.1, 0.13, MAT.redPot, null, 'y', 20); cyl(5.58, y + 0.07, -0.22, 0.09, 0.11, MAT.redPot, null, 'y', 20); cyl(5.82, y + 0.05, -0.22, 0.08, 0.07, MAT.redPot, null, 'y', 20); }
-    if (i === 0) { box(5.15, y + 0.03, -0.30, 5.45, y + 0.15, -0.14, MAT.oak); box(5.55, y + 0.03, -0.30, 5.9, y + 0.12, -0.14, MAT.basket); } });
-  cyl(5.52, 1.40, -0.13, 0.006, 0.8, MAT.chrome, null, 'x', 8); [5.2, 5.35, 5.5, 5.65, 5.8].forEach(function(x, i){ cyl(x, 1.32, -0.13, 0.008, 0.16, i % 2 ? MAT.dark : MAT.oak, null, 'y', 6); });
-  label('Open shelves in the stone-wall niche', 5.52, 2.2, -0.12);
-  device('switch', 3.006, 1.1, 1.30, '+x'); device('switch', 3.006, 1.1, 1.38, '+x'); device('switch', 3.006, 1.1, 1.46, '+x');
-  plane(3.1, 0.6, 3.75, 2.5, 0.004, MAT.jute, 1);
+  label('Peninsula: sink + dishwasher', 5.9, 1.3, 3.3);
+  /* ---- NW corner of the kitchen (photos 8683, 8686, 8687): oval table with microwave + mini oven, blind-corner wall unit ---- */
+  var tb = add(new T.CylinderGeometry(0.42, 0.42, 0.025, 40), MAT.white); tb.scale.set(1, 1, 0.66); tb.position.set(3.50, 0.74, 0.17);
+  [[3.18, 0.02], [3.82, 0.02], [3.18, 0.32], [3.82, 0.32]].forEach(function(l){ var lg = cyl(l[0], 0.37, l[1], 0.016, 0.74, MAT.beech); lg.rotation.z = (l[0] < 3.5 ? -1 : 1) * 0.09; lg.rotation.x = (l[1] < 0.17 ? 1 : -1) * 0.06; });
+  box(3.12, 0.755, -0.07, 3.58, 1.01, 0.26, MAT.white); frontZ(0.27, 3.14, 3.44, 0.78, 0.99, MAT.dark); box(3.47, 0.80, 0.258, 3.55, 0.97, 0.27, MAT.grey);
+  box(3.13, 1.01, -0.07, 3.57, 1.24, 0.24, MAT.steel); frontZ(0.25, 3.16, 3.46, 1.03, 1.22, MAT.blackGlass);
+  box(3.62, 0.755, 0.06, 3.90, 0.87, 0.32, MAT.oak);
+  var col = cyl(3.86, 1.02, -0.085, 0.13, 0.025, MAT.grey, null, 'z', 24);
+  box(3.05, 1.45, -0.10, 3.90, 2.15, 0.25, MAT.white);
+  frontZ(0.27, 3.05, 3.40, 1.46, 2.14, MAT.white); frontZ(0.27, 3.40, 3.89, 1.46, 2.14, MAT.cab); cyl(3.44, 1.52, 0.275, 0.012, 0.02, MAT.chrome, null, 'z', 10);
+  box(3.22, 2.15, -0.05, 3.78, 2.235, 0.20, MAT.white);
+  var st = cyl(4.30, 0.45, 0.80, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.30 + l[0], 0.22, 0.80 + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; });
+  /* ---- shelf niche in the north wall, floor to beam, 3 oak shelves ---- */
+  [0.97, 1.36, 1.78].forEach(function(y, i){ box(4.85, y, -0.42, 5.75, y + 0.03, -0.10, MAT.oak);
+    if (i === 2) for (var j = 0; j < 5; j++) { var jar = cyl(4.98 + j * 0.17, y + 0.13, -0.27, 0.05, 0.22, MAT.glass, null, 'y', 16); jar.renderOrder = 2; cyl(4.98 + j * 0.17, y + 0.245, -0.27, 0.052, 0.015, MAT.oak, null, 'y', 16); }
+    if (i === 1) { cyl(5.05, y + 0.08, -0.27, 0.1, 0.13, MAT.redPot, null, 'y', 20); cyl(5.35, y + 0.07, -0.27, 0.09, 0.11, MAT.redPot, null, 'y', 20); cyl(5.62, y + 0.05, -0.27, 0.08, 0.07, MAT.redPot, null, 'y', 20); }
+    if (i === 0) { box(4.92, y + 0.03, -0.36, 5.12, y + 0.15, -0.16, MAT.basket); box(5.18, y + 0.03, -0.36, 5.48, y + 0.14, -0.18, MAT.oak); box(5.52, y + 0.03, -0.36, 5.70, y + 0.14, -0.16, MAT.basket); cyl(5.30, y + 0.11, -0.25, 0.08, 0.07, MAT.metal); } });
+  cyl(5.30, 1.30, -0.13, 0.006, 0.86, MAT.black, null, 'x', 8); [4.95, 5.1, 5.25, 5.4, 5.55, 5.68].forEach(function(x, i){ cyl(x, 1.22, -0.13, 0.008, 0.16, i % 2 ? MAT.dark : MAT.metal, null, 'y', 6); });
+  label('Shelf niche, floor to beam', 5.30, 2.0, -0.10);
+  // switches: 3-gang on the landing wall by the stair head, 2-gang on the living-room back wall by the doorway
+  [1.04, 1.125, 1.21].forEach(function(y){ device('switch', 3.006, y, 2.30, '+x'); });
+  [L0 + 1.0, L0 + 1.085].forEach(function(y){ device('switch', 2.60, y, -0.094, '+z'); });
+  plane(3.1, 0.55, 3.75, 2.5, 0.004, MAT.jute, 1);
   cat(6.2, 0.005, 1.6, 0.6, MAT.cat1, true);
-
   /* ---- dining ---- */
-  frenchWindow(5.00, 6.20, 0, 2.15); radiatorZ(6.35, 7.05, 0.15, 0.75);
+  frenchWindow(5.00, 6.20, 0, 2.15); radiatorZ(6.35, 7.05, 0.15, 0.75, 0);
   label('French window + balconnet', 5.6, 2.32, 6.0);
   var ct = group(7.15, 0, 5.62, 0); cyl(0, 0.85, 0, 0.035, 1.7, MAT.oak, ct, 'y', 10);
   [[0.12, 1.45, 0.6], [-0.1, 1.6, -0.7], [0.08, 1.25, 2.2], [-0.09, 1.35, 3.6]].forEach(function(b){ var br = cyl(b[0], b[1], 0, 0.014, 0.28, MAT.oak, ct, 'y', 6); br.rotation.z = -b[0] * 4; br.rotation.y = b[2]; });
@@ -2700,61 +2781,68 @@ function buildFirstInner(){
   box(4.02, 0.95, 4.44, 4.05, 1.12, 4.52, MAT.grey); cyl(4.12, 1.05, 4.48, 0.05, 0.22, MAT.purple); cyl(4.12, 0.9, 4.48, 0.055, 0.08, MAT.orange); cyl(4.12, 0.45, 4.48, 0.01, 0.8, MAT.grey);
   label('KITCHEN + DINING', 5.9, 0.15, 2.2, 'room', '22.58 m²');
 
-  /* ---- living room (one step down) ---- */
-  var L0 = LIV;
-  frenchWindow(1.05, 2.25, L0, 2.25); radiatorZ(0.30, 0.90, L0 + 0.15, L0 + 0.75);
-  // L sofa (chaise toward the TV at the north end)
-  var s0 = L0;
-  rbox(-0.04, s0 + 0.08, 1.15, 1.02, s0 + 0.42, 3.78, MAT.sageDark, 0.04); rbox(1.0, s0 + 0.08, 1.15, 1.88, s0 + 0.42, 2.02, MAT.sageDark, 0.04);
-  [[1.18, 2.0], [2.0, 2.82], [2.82, 3.62]].forEach(function(c){ rbox(0.24, s0 + 0.42, c[0] + 0.01, 1.0, s0 + 0.56, c[1] - 0.01, MAT.sage, 0.05); });
-  rbox(1.0, s0 + 0.42, 1.18, 1.86, s0 + 0.56, 1.99, MAT.sage, 0.05);
-  [[1.18, 2.0], [2.0, 2.82], [2.82, 3.62]].forEach(function(c){ var b = rbox(-0.02, s0 + 0.42, c[0] + 0.01, 0.26, s0 + 0.86, c[1] - 0.01, MAT.sage, 0.06); });
-  rbox(-0.04, s0 + 0.08, 3.62, 1.02, s0 + 0.64, 3.80, MAT.sageDark, 0.05);
-  var p1 = rbox(0.24, s0 + 0.56, 3.30, 0.42, s0 + 0.92, 3.58, MAT.teal, 0.06); p1.rotation.x = 0.2; var p2 = rbox(0.24, s0 + 0.56, 1.25, 0.42, s0 + 0.90, 1.55, MAT.teal, 0.06); p2.rotation.x = -0.2;
-  rbox(1.2, s0 + 0.56, 1.3, 1.7, s0 + 0.62, 1.95, MAT.cream, 0.02);
-  [[0.0, 1.2], [0.98, 1.2], [0.0, 3.74], [0.98, 3.74], [1.84, 1.2], [1.84, 1.98]].forEach(function(l){ box(l[0] - 0.012, s0, l[1] - 0.012, l[0] + 0.012, s0 + 0.08, l[1] + 0.012, MAT.black); });
-  plane(0.9, 1.0, 2.75, 4.1, L0 + 0.004, MAT.beigeRug, 1);
-  plane(0.55, 4.35, 1.95, 5.55, L0 + 0.005, MAT.playmat, 1.4);
-  // TV wall
-  box(2.86, L0 + 1.0, 2.15, 2.895, L0 + 1.83, 3.60, MAT.dark); box(2.855, L0 + 1.02, 2.17, 2.858, L0 + 1.81, 3.58, MAT.screen, null, false);
-  box(2.42, L0 + 0.12, 2.0, 2.88, L0 + 0.50, 3.75, MAT.oak); box(2.42, L0 + 0.15, 2.3, 2.44, L0 + 0.40, 3.0, MAT.white);
-  [[2.45, 2.03], [2.85, 2.03], [2.45, 3.72], [2.85, 3.72]].forEach(function(l){ box(l[0] - 0.02, L0, l[1] - 0.02, l[0] + 0.02, L0 + 0.12, l[1] + 0.02, MAT.oak); });
-  rbox(2.6, L0 + 0.50, 2.45, 2.72, L0 + 0.57, 3.3, MAT.black, 0.02);
-  label('TV wall', 2.86, 2.05, 2.9);
-  // piano + chair, speaker
-  box(-0.08, L0, 3.95, 0.30, L0 + 0.70, 5.35, MAT.white); box(0.30, L0 + 0.70, 3.97, 0.44, L0 + 0.74, 5.33, MAT.white);
-  box(0.30, L0 + 0.74, 4.0, 0.44, L0 + 0.745, 5.30, MAT.keys); box(-0.08, L0 + 0.80, 3.95, 0.30, L0 + 0.86, 5.35, MAT.white); box(-0.08, L0 + 0.70, 3.95, 0.30, L0 + 0.80, 3.98, MAT.white); box(-0.08, L0 + 0.70, 5.32, 0.30, L0 + 0.80, 5.35, MAT.white);
-  box(0.10, L0 + 0.86, 4.3, 0.13, L0 + 1.05, 5.0, MAT.white);
-  var cy0 = rbox(-0.02, L0 + 0.86, 3.98, 0.2, L0 + 1.06, 4.18, MAT.black, 0.08);
-  var pc = group(0.72, L0, 4.65, -Math.PI / 2); rbox(-0.2, 0.45, -0.2, 0.2, 0.5, 0.2, MAT.oak, 0.03, pc); rbox(-0.2, 0.5, -0.22, 0.2, 0.8, -0.19, MAT.oak, 0.02, pc);
-  [[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]].forEach(function(l){ cyl(l[0], 0.22, l[1], 0.01, 0.45, MAT.black, pc, 'y', 6); });
-  // cat tree near the wide opening + tabby on top
+  /* ---- living room, one step up ---- */
+  frenchWindow(0.70, 1.90, L0, 2.10); radiatorZ(0.02, 0.62, L0 + 0.15, L0 + 0.75);
+  sofaL(L0);
+  plane(0.95, 2.0, 2.72, 4.15, L0 + 0.004, MAT.beigeRug, 1);
+  plane(0.55, 4.30, 1.95, 5.55, L0 + 0.005, MAT.playmat, 1.4);
+  // wooden toddler stool on the rug
+  cyl(1.72, L0 + 0.27, 3.25, 0.13, 0.035, MAT.oak, null, 'y', 20); [[0.08, 0.05], [-0.08, 0.05], [0, -0.09]].forEach(function(l){ var lg = cyl(1.72 + l[0], L0 + 0.13, 3.25 + l[1], 0.007, 0.26, MAT.black, null, 'y', 6); lg.rotation.z = -l[0] * 1.2; lg.rotation.x = l[1] * 1.2; });
+  // round speaker on a floor pole behind the sofa corner, subwoofer beside it
+  cyl(0.10, L0 + 0.01, 1.00, 0.11, 0.02, MAT.black, null, 'y', 18); cyl(0.10, L0 + 0.52, 1.00, 0.012, 1.02, MAT.black, null, 'y', 8);
+  var spk = add(new T.SphereGeometry(0.1, 18, 12), MAT.black); spk.scale.set(1, 1.15, 0.9); spk.position.set(0.10, L0 + 1.12, 1.00);
+  box(0.24, L0, 0.86, 0.52, L0 + 0.34, 1.12, MAT.dark);
+  // TV wall: 55-inch screen, low oak stand with a white drawer box, soundbar, thermostat
+  box(2.845, L0 + 1.02, 2.25, 2.876, L0 + 1.74, 3.48, MAT.dark); box(2.842, L0 + 1.035, 2.265, 2.845, L0 + 1.725, 3.465, MAT.screen, null, false);
+  box(2.46, L0 + 0.42, 2.07, 2.86, L0 + 0.46, 3.67, MAT.oak); box(2.46, L0 + 0.06, 2.07, 2.86, L0 + 0.10, 3.67, MAT.oak);
+  box(2.46, L0, 2.07, 2.86, L0 + 0.42, 2.11, MAT.oak); box(2.46, L0, 3.63, 2.86, L0 + 0.42, 3.67, MAT.oak);
+  box(2.50, L0 + 0.10, 2.60, 2.84, L0 + 0.32, 3.20, MAT.white); box(2.495, L0 + 0.19, 2.80, 2.50, L0 + 0.22, 3.0, MAT.grey);
+  rbox(2.60, L0 + 0.46, 2.45, 2.70, L0 + 0.53, 3.25, MAT.black, 0.02);
+  box(2.874, L0 + 1.38, 3.62, 2.88, L0 + 1.48, 3.70, MAT.white);
+  label('TV wall', 2.86, L0 + 1.95, 2.86);
+  // white digital piano on the west wall by the window corner, tan bucket chair
+  box(-0.08, L0, 3.97, 0.30, L0 + 0.70, 5.33, MAT.white); box(0.30, L0 + 0.70, 3.99, 0.44, L0 + 0.74, 5.31, MAT.white);
+  box(0.30, L0 + 0.74, 4.02, 0.44, L0 + 0.745, 5.28, MAT.keys); box(-0.08, L0 + 0.80, 3.97, 0.30, L0 + 0.86, 5.33, MAT.white); box(-0.08, L0 + 0.70, 3.97, 0.30, L0 + 0.80, 4.00, MAT.white); box(-0.08, L0 + 0.70, 5.30, 0.30, L0 + 0.80, 5.33, MAT.white);
+  box(0.08, L0 + 0.86, 4.30, 0.11, L0 + 1.05, 5.00, MAT.white);
+  rbox(-0.04, L0 + 0.86, 5.05, 0.18, L0 + 1.02, 5.27, MAT.black, 0.07);
+  plant(0.12, L0 + 0.86, 4.55, 0.8, MAT.potWhite, false);
+  var vs = add(new T.LatheGeometry([new T.Vector2(0.0, 0), new T.Vector2(0.06, 0), new T.Vector2(0.08, 0.1), new T.Vector2(0.07, 0.22), new T.Vector2(0.04, 0.26)], 20), MAT.basket); vs.position.set(0.05, L0 + 0.86, 4.1);
+  var pc = group(0.72, L0, 4.62, -Math.PI / 2);
+  rbox(-0.21, 0.44, -0.2, 0.21, 0.50, 0.2, MAT.tan, 0.04, pc); var bk = rbox(-0.21, 0.50, -0.24, 0.21, 0.80, -0.17, MAT.tan, 0.05, pc); bk.rotation.x = -0.15;
+  [[-0.17, -0.16], [0.17, -0.16], [-0.17, 0.16], [0.17, 0.16]].forEach(function(l){ var lg = cyl(l[0], 0.22, l[1], 0.01, 0.46, MAT.black, pc, 'y', 6); lg.rotation.z = -l[0] * 0.5; lg.rotation.x = l[1] * 0.5; });
+  // frame + wooden sign above the piano
+  box(-0.098, L0 + 1.38, 4.42, -0.09, L0 + 1.62, 4.74, MAT.paint2, null, false); box(-0.098, L0 + 1.30, 4.92, -0.088, L0 + 1.46, 5.12, MAT.oak, null, false);
+  // cat tree by the window + tabby on top
   box(2.32, L0, 5.30, 2.82, L0 + 0.05, 5.85, MAT.oak);
-  [[2.45, 5.45, 1.25], [2.68, 5.70, 0.85]].forEach(function(pst){ var c2 = cyl(pst[0], L0 + pst[2] / 2, pst[1], 0.055, pst[2], MAT.sisal, null, 'y', 14); });
+  [[2.45, 5.45, 1.25], [2.68, 5.70, 0.85]].forEach(function(pst){ cyl(pst[0], L0 + pst[2] / 2, pst[1], 0.055, pst[2], MAT.sisal, null, 'y', 14); });
   [[2.36, 2.78, 5.32, 5.66, 0.55], [2.5, 2.84, 5.5, 5.86, 0.88], [2.3, 2.66, 5.28, 5.62, 1.25]].forEach(function(pl){ var d = add(new T.CylinderGeometry(0.2, 0.2, 0.03, 24), MAT.oak); d.position.set((pl[0] + pl[1]) / 2, L0 + pl[4], (pl[2] + pl[3]) / 2); });
   var bed = add(new T.TorusGeometry(0.16, 0.05, 10, 24), MAT.cream); bed.rotation.x = Math.PI / 2; bed.position.set(2.48, L0 + 1.30, 5.45);
   cat(2.48, L0 + 1.27, 5.45, 2.2, MAT.cat2, false);
-  // rustic bench along the north wall, NW corner: crates + lamp + guitar + speaker
-  box(1.35, L0 + 0.40, -0.05, 2.75, L0 + 0.48, 0.13, MAT.oak); box(1.35, L0 + 0.40, 0.14, 2.75, L0 + 0.48, 0.32, MAT.oak);
-  [[1.45, 0.0], [2.65, 0.0], [1.45, 0.27], [2.65, 0.27]].forEach(function(l){ box(l[0] - 0.015, L0, l[1] - 0.015, l[0] + 0.015, L0 + 0.40, l[1] + 0.015, MAT.black); });
-  box(1.55, L0 + 1.30, -0.098, 2.35, L0 + 1.88, -0.09, MAT.paint1, null, false);
-  [[0.0, 0.4], [0.42, 0.8]].forEach(function(cr, i){ var y0 = L0 + cr[0], y1 = L0 + cr[1];
-    box(-0.06, y0, 0.0, 0.46, y0 + 0.02, 0.32, MAT.oak); box(-0.06, y1 - 0.02, 0.0, 0.46, y1, 0.32, MAT.oak); box(-0.06, y0, 0.0, -0.04, y1, 0.32, MAT.oak); box(0.44, y0, 0.0, 0.46, y1, 0.32, MAT.oak);
-    var r2 = rng(40 + i), bxp = -0.03; while (bxp < 0.40) { var bw = 0.025 + r2() * 0.035, bh = 0.22 + r2() * 0.12; box(bxp, y0 + 0.02, 0.03, bxp + bw, y0 + 0.02 + bh, 0.26, MAT.boxes[(r2() * 5) | 0]); bxp += bw + 0.004; } });
-  var vase = add(new T.LatheGeometry([new T.Vector2(0.0, 0), new T.Vector2(0.07, 0), new T.Vector2(0.10, 0.08), new T.Vector2(0.09, 0.2), new T.Vector2(0.04, 0.28), new T.Vector2(0.03, 0.32)], 24), MAT.ceramic); vase.position.set(0.2, L0 + 0.8, 0.16);
-  var shade = add(new T.CylinderGeometry(0.11, 0.2, 0.24, 24, 1, true), MAT.shade); shade.position.set(0.2, L0 + 1.22, 0.16); shade.castShadow = false;
-  var gt = group(0.62, L0, 0.32, 0.25);
+  // NW corner: crate bookshelf + blue ceramic lamp in the recess, ukulele, guitar on its stand
+  [[0.0, 0.32, 0.0], [0.32, 0.64, 0.03], [0.64, 0.96, -0.02]].forEach(function(cr, i){ var y0 = L0 + cr[0], y1 = L0 + cr[1], o = cr[2];
+    box(-0.08, y0, -0.02 + o, 0.22, y0 + 0.02, 0.44 + o, MAT.oak); box(-0.08, y1 - 0.02, -0.02 + o, 0.22, y1, 0.44 + o, MAT.oak);
+    box(-0.08, y0, -0.02 + o, 0.22, y1, 0.0 + o, MAT.oak); box(-0.08, y0, 0.42 + o, 0.22, y1, 0.44 + o, MAT.oak);
+    var r2 = rng(40 + i), bz = 0.01 + o; while (bz < 0.40 + o) { var bw = 0.025 + r2() * 0.035, bh = 0.2 + r2() * 0.08; box(-0.06, y0 + 0.02, bz, 0.17, y0 + 0.02 + bh, bz + bw, MAT.boxes[(r2() * 5) | 0]); bz += bw + 0.004; } });
+  var vase = add(new T.LatheGeometry([new T.Vector2(0.0, 0), new T.Vector2(0.07, 0), new T.Vector2(0.10, 0.08), new T.Vector2(0.09, 0.2), new T.Vector2(0.04, 0.28), new T.Vector2(0.03, 0.32)], 24), MAT.ceramic); vase.position.set(0.07, L0 + 0.96, 0.22);
+  var shade = add(new T.CylinderGeometry(0.11, 0.2, 0.24, 24, 1, true), MAT.shade); shade.position.set(0.07, L0 + 1.38, 0.22); shade.castShadow = false;
+  var uk = group(0.33, L0 + 0.30, 0.08, 0.3); var ub = add(new T.SphereGeometry(0.09, 16, 10), MAT.oak, uk); ub.scale.set(1, 1.2, 0.3); box(-0.015, 0.1, -0.012, 0.015, 0.42, 0.012, MAT.dark, uk);
+  var gt = group(0.62, L0, 0.20, 0.15);
   var gb = add(new T.SphereGeometry(0.17, 18, 12), MAT.oak, gt); gb.scale.set(1, 1.15, 0.28); gb.position.set(0, 0.32, 0); var gb2 = add(new T.SphereGeometry(0.13, 18, 12), MAT.oak, gt); gb2.scale.set(1, 1.0, 0.28); gb2.position.set(0, 0.56, 0);
   cyl(0, 0.52, 0.05, 0.035, 0.005, MAT.dark, gt, 'z', 16); box(-0.025, 0.66, -0.02, 0.025, 1.08, 0.02, MAT.dark, gt); box(-0.035, 1.08, -0.02, 0.035, 1.2, 0.02, MAT.dark, gt);
   [[-0.1, 0.12], [0.1, 0.12], [0, -0.1]].forEach(function(l){ var lg = cyl(l[0] * 0.8, 0.12, l[1] * 0.8, 0.006, 0.26, MAT.black, gt, 'y', 6); lg.rotation.z = l[0] * 2; lg.rotation.x = -l[1] * 2; });
-  cyl(0.72, L0 + 0.45, 0.75, 0.012, 0.9, MAT.black, null, 'y', 8); cyl(0.72, L0 + 0.01, 0.75, 0.12, 0.02, MAT.black, null, 'y', 16); rbox(0.63, L0 + 0.9, 0.66, 0.81, L0 + 1.12, 0.84, MAT.black, 0.06);
-  label('LIVING ROOM', 1.45, L0 + 0.2, 3.0, 'room', '20.04 m² · one step down');
-  label('French window + balconnet', 1.65, L0 + 2.42, 6.0);
-  label('Rattan pendant', 1.45, 1.1, 2.85);
+  // rustic slab bench along the north wall (two thick planks on black steel legs), two landscapes above it
+  box(1.15, L0 + 0.37, -0.03, 2.82, L0 + 0.47, 0.17, MAT.oak); box(1.15, L0 + 0.37, 0.19, 2.82, L0 + 0.47, 0.39, MAT.oak);
+  [1.30, 2.68].forEach(function(x){ box(x - 0.015, L0, 0.0, x + 0.015, L0 + 0.37, 0.03, MAT.black); box(x - 0.015, L0, 0.33, x + 0.015, L0 + 0.37, 0.36, MAT.black); box(x - 0.015, L0 + 0.34, 0.0, x + 0.015, L0 + 0.37, 0.36, MAT.black); });
+  box(0.95, L0 + 1.28, -0.098, 1.42, L0 + 1.62, -0.09, MAT.paint2, null, false);
+  box(2.02, L0 + 1.30, -0.098, 2.60, L0 + 1.72, -0.09, MAT.paint1, null, false);
+  label('LIVING ROOM', 1.45, L0 + 0.2, 3.0, 'room', '20.04 m² · one step up');
+  label('French window + balconnet', 1.30, L0 + 2.30, 6.0);
+  label('Rattan pendant', 1.45, 1.6, 2.85);
+  label('Bookshelf recess', 0.08, L0 + 1.7, 0.2, 'dim');
 
   /* ---- 1st-floor lights ---- */
   if (S.lamps) {
-    [[5.8, 2.05, 1.8, 1, 1.0], [5.6, 2.05, 4.7, 1, 0.9], [1.45, 1.55, 2.85, 1, 1.0], [3.42, 2.1, 1.3, 0, 0.6], [0.2, L0 + 1.3, 0.3, 0, 0.35]].forEach(function(pt){
+    [[5.8, 2.05, 1.8, 1, 1.0], [5.6, 2.05, 4.7, 1, 0.9], [1.45, 1.95, 2.85, 1, 1.0], [3.42, 2.1, 1.3, 0, 0.6], [0.07, L0 + 1.3, 0.22, 0, 0.35]].forEach(function(pt){
       var Lt = new T.PointLight(0xffd8a8, pt[4], 7.5, 1.7); Lt.position.set(pt[0], pt[1], pt[2]);
       if (S.hq && pt[3]) { Lt.castShadow = true; Lt.shadow.mapSize.set(512, 512); Lt.shadow.bias = -0.003; Lt.shadow.normalBias = 0.02; Lt.shadow.camera.near = 0.05; Lt.shadow.camera.far = 8; }
       ROOT.add(Lt); LAMPS.push(Lt);
@@ -2877,8 +2965,8 @@ var VIEWS_FIRST = {
   arrive: {pos: [3.45, Y1 + 1.62, 1.55], tgt: [6.3, Y1 + 1.1, 3.7], eye: true},
   kitchen: {pos: [4.25, Y1 + 1.62, 2.55], tgt: [7.2, Y1 + 1.15, 0.7], eye: true},
   dining: {pos: [4.3, Y1 + 1.62, 2.95], tgt: [6.4, Y1 + 0.9, 5.7], eye: true},
-  living: {pos: [2.62, Y1 + 1.47, 0.62], tgt: [0.9, Y1 + 0.85, 4.7], eye: true},
-  sofa: {pos: [0.62, Y1 + 1.0, 2.75], tgt: [2.9, Y1 + 1.2, 2.85], eye: true},
+  living: {pos: [2.55, Y1 + 1.75, 1.85], tgt: [0.45, Y1 + 0.85, 5.3], eye: true},
+  sofa: {pos: [0.5, Y1 + 1.15, 3.1], tgt: [2.9, Y1 + 1.2, 2.75], eye: true},
   upstairs: {pos: [3.42, Y1 + 1.62, 5.62], tgt: [3.42, Y1 + 2.05, 3.1], eye: true},
   plan: {pos: [3.7, Y1 + 15.5, 2.92], tgt: [3.7, Y1, 2.9], plan: true}
 };
@@ -2993,8 +3081,8 @@ var INFO = {
   D: {h: 'After: Option D', rows: [['Hall', '≈ 14.5 m², ≈ 12.3 m² clear'], ['Storage', '2.0 m hooks + wall-hung bench'], ['Shoes', 'wall-hung cabinet + under stairs'], ['Cost', '≈ 150 € + ≈ 60 € shoe unit']],
     note: 'Nothing stands on the floor, which makes it the easiest layout to clean after a flood.'}
 };
-INFO.first = {h: '1st floor: as photographed', rows: [['Kitchen + dining', '22.58 m²'], ['Living room', '20.04 m², one step down'], ['Ceiling', '≈ 2.42 m, beams ≈ 18 cm lower'], ['Stairs', '2nd flight stacked above the 1st'], ['Windows', '2 French windows + balconnets']],
-  note: 'Built from your 23 photos, with positions accurate to ±10–20 cm. The kitchen units, both niches, the posts, the stairs and the furniture follow the photos. The 2nd floor and the attic aren\'t modelled yet.'};
+INFO.first = {h: '1st floor: as photographed', rows: [['Kitchen + dining', '22.58 m²'], ['Living room', '20.04 m², one step up (≈15 cm)'], ['Floor', '33 cm terracotta-beige tiles, tiled skirting'], ['Ceiling', '≈ 2.42 m in the kitchen, beams ≈ 18 cm lower'], ['Stairs', '2nd flight stacked above the 1st'], ['Windows', '2 French windows + balconnets']],
+  note: 'Built from your 23 photos, re-checked piece by piece: positions are accurate to about ±10–20 cm. The living room\'s depth (window wall to back wall) is the one size still to confirm with a tape measure. The 2nd floor and the attic aren\'t modelled yet.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
 function updateInfo(){
