@@ -124,6 +124,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
           <button type="button" data-scene="D"><span>After · D</span><small>open mudroom</small></button>
         </div>
       </div>
+      <div class="sec" id="sec-kitchen">
+        <div class="lab">Kitchen (1st floor)</div>
+        <div class="seg scenes" id="kitchens">
+          <button type="button" data-kitchen="today"><span>Today</span><small>as photographed</small></button>
+          <button type="button" data-kitchen="ikea"><span>IKEA plan</span><small>off-white fronts, oak worktop</small></button>
+        </div>
+      </div>
       <div class="sec">
         <div class="lab">View</div>
         <div class="seg" id="views"></div>
@@ -176,7 +183,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
       <div class="sec">
         <div class="lab">Image</div>
         <div class="seg"><button type="button" class="btn" id="shot">Save picture (PNG)</button></div>
-        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after.</p>
+        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or today/IKEA kitchen (1st floor).</p>
       </div>
     </div>
   </aside>
@@ -1578,11 +1585,13 @@ var $ = function(s){ return document.querySelector(s); };
 var KEY = 'maisonModel3D.v1';
 var coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
 var DEF = {level:'ground', scene:'E', view:'overview', ceiling:false, cut:true, labels:true, lamps:true, flood:false, build:false, open:false,
-  hq:!coarse, front:'sage', floor:'existing', paint:'warm', hidden:{}};
+  hq:!coarse, front:'sage', floor:'existing', paint:'warm', kitchen:'today', hidden:{}};
 var S = Object.assign({}, DEF);
 try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && typeof sv === 'object') Object.assign(S, sv); } catch (e) {}
 if (!S.hidden || typeof S.hidden !== 'object') S.hidden = {}; else S.hidden = Object.assign({}, S.hidden);
 var HASH = (location.hash || '').replace('#', ''); if (HASH === 'first' || HASH === 'ground' || HASH === 'both') { S.level = HASH; S.view = 'overview'; }
+if (HASH === 'kitchen' || HASH === 'kitchen-today') { S.level = 'first'; S.kitchen = HASH === 'kitchen' ? 'ikea' : 'today'; S.view = 'kitchen'; S.cut = true; S.ceiling = false; }
+if (S.kitchen !== 'ikea') S.kitchen = 'today';
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* =====================================================================
@@ -2707,8 +2716,8 @@ function buildFirst(){
 function O(name, fn){ beginObj(name); try { fn(); } finally { endObj(); } }   // one removable object
 
 /* ---- measured plan (metres, model axes): x from the piano wall toward the kitchen, z from the back walls to the facade ----
-   living room 3.49 × 5.25 (piano wall to TV wall, TV wall length); kitchen side runs 1.82 m further back (easydiags plan, walls "A") */
-var XT1 = 3.39, XT2 = 3.51, ZL = 0.65, ZK = -1.17, SX1 = 3.51, SX2 = 4.36, SZT = 1.95, SZB = 4.30;
+   living room 3.49 × 5.25 (piano wall to TV wall, TV wall length); the kitchen side runs 1.43 m further back (IKEA survey; walls "A" on the easydiags plan) */
+var XT1 = 3.39, XT2 = 3.51, ZL = 0.65, ZK = ZL - 1.43, SX1 = 3.51, SX2 = 4.36, SZT = 1.95, SZB = 4.30;
 
 function sofaL(y0){ // relax corner sofa 2.80 × 2.10 × 1.02 (measured): long side on the piano wall, return at the back with its backrest to the back wall
   var S1 = MAT.sofa, S2 = MAT.sofaDark, Y = function(v){ return y0 + v; };
@@ -2738,16 +2747,225 @@ function sofaL(y0){ // relax corner sofa 2.80 × 2.10 × 1.02 (measured): long s
   rbox(0.30, Y(0.45), mid + 0.1, 0.75, Y(0.49), mid + 0.6, MAT.cream, 0.02);
 }
 
+/* =====================================================================
+   KITCHEN. Sizes come from IKEA's on-site survey (Dec 2025), measured from the fridge corner "C":
+   along the window-side wall: fridge to 0.71, units to 2.66, peninsula band 2.66–3.29, low wall to 3.44;
+   peninsula 2.115 m long plus a 15 cm end wall; back wall 3.92 m long with a niche 0.92 m wide.
+   ===================================================================== */
+var KE = 7.43;                                            // window-side wall face
+var PZ1 = ZK + 2.664, PZ2 = ZK + 3.29, PXE = KE - 2.115;  // peninsula: front of the units, dining-side face, free end
+var BW = {s2: ZK - 0.14, n: ZK - 0.408, s3: ZK - 0.03, x2: KE - 0.75, xn2: KE - 1.63, xn1: KE - 2.55};   // stepped back wall
+MAT.bod = std({color: 0xe9e1cd, roughness: 0.5, envMapIntensity: 0.35});      // BODBYN off-white
+MAT.bodIn = std({color: 0xe0d7c1, roughness: 0.55, envMapIntensity: 0.3});
+MAT.carc = std({color: 0xf5f5f3, roughness: 0.5});
+MAT.oakTop = uvs(std({map: oakTex, roughness: 0.42, envMapIntensity: 0.5}), 1.1);
+var K_PL = 0.08, K_CT = 0.88, K_WT = 0.92, K_WB = 1.424, K_WTOP = 2.224;      // plinth, carcass top, worktop, wall units bottom/top (IKEA elevation)
+
+function lowWall(){   // masonry upstand around the peninsula, tiled cap with oak edging: existing, and it stays in the IKEA plan
+  var x0 = PXE - 0.15, zc = PZ2 + 0.15;
+  box(x0, 0, PZ2, KE, 1.02, zc, MAT.plaster); box(x0, 0, PZ1 + 0.02, PXE, 1.02, PZ2, MAT.plaster);
+  box(x0 - 0.03, 1.02, PZ2 - 0.05, KE, 1.05, zc + 0.03, MAT.splash); box(x0 - 0.03, 1.02, PZ1, PXE + 0.03, 1.05, PZ2 - 0.05, MAT.splash);
+  box(x0 - 0.05, 1.02, zc + 0.03, KE, 1.07, zc + 0.05, MAT.oak); box(PXE + 0.03, 1.02, PZ2 - 0.07, KE, 1.07, PZ2 - 0.05, MAT.oak);
+  box(x0 - 0.05, 1.02, PZ1 - 0.02, x0 - 0.03, 1.07, zc + 0.03, MAT.oak); box(PXE + 0.03, 1.02, PZ1 - 0.02, PXE + 0.05, 1.07, PZ2 - 0.07, MAT.oak);
+  box(x0 - 0.03, 1.02, PZ1 - 0.02, PXE + 0.03, 1.07, PZ1, MAT.oak);
+}
+function nicheThings(y, i, x1, x2, zc){   // what lives on the niche shelves today: baskets, red enamel pots, storage jars
+  var u = function(t){ return x1 + (x2 - x1) * t; };
+  if (i === 2) for (var j = 0; j < 5; j++) { var jar = cyl(u(0.14 + j * 0.18), y + 0.11, zc, 0.05, 0.22, MAT.glass, null, 'y', 16); jar.renderOrder = 2; cyl(u(0.14 + j * 0.18), y + 0.225, zc, 0.052, 0.015, MAT.oak, null, 'y', 16); }
+  if (i === 1) { cyl(u(0.2), y + 0.065, zc, 0.1, 0.13, MAT.redPot, null, 'y', 20); cyl(u(0.53), y + 0.055, zc, 0.09, 0.11, MAT.redPot, null, 'y', 20); cyl(u(0.83), y + 0.035, zc, 0.08, 0.07, MAT.redPot, null, 'y', 20); }
+  if (i === 0) { box(u(0.06), y, zc - 0.10, u(0.29), y + 0.12, zc + 0.10, MAT.basket); box(u(0.35), y, zc - 0.10, u(0.69), y + 0.11, zc + 0.10, MAT.oak); box(u(0.74), y, zc - 0.10, u(0.95), y + 0.11, zc + 0.10, MAT.basket); }
+}
+
+/* ---------- today, as photographed ---------- */
+function kitchenToday(){
+  var fx = 6.83, z0 = ZK + 0.72, d1 = z0 + 0.50, d2 = d1 + 0.60, d3 = d2 + 0.40, zb = BW.s3;
+  O('Kitchen base units', function(){
+    box(6.79, 0.0, ZK + 0.69, KE, 2.15, z0, MAT.white);
+    box(6.85, 0, z0, KE, 0.10, PZ2, MAT.dark); box(fx, 0.10, z0, KE, 0.86, PZ2, MAT.white);
+    box(6.80, 0.86, z0 - 0.02, KE, 0.90, PZ2, MAT.granite);
+    [0.11, 0.30, 0.49, 0.68].forEach(function(y){ frontX(fx, z0, d1, y, y + 0.175, MAT.cab); cyl(fx - 0.025, y + 0.088, (z0 + d1) / 2, 0.013, 0.025, MAT.chrome, null, 'x', 12); });
+    frontX(fx, d1, d2, 0.12, 0.70, MAT.blackGlass); box(fx - 0.04, 0.64, d1 + 0.06, fx - 0.02, 0.66, d2 - 0.06, MAT.steel); frontX(fx, d1, d2, 0.71, 0.85, MAT.steel);
+    box(6.93, 0.90, d1 + 0.02, 7.38, 0.905, d2 - 0.02, MAT.steel);
+    [[7.04, 0.15], [7.04, 0.45], [7.26, 0.15], [7.26, 0.45]].forEach(function(b){ var ring = add(new T.TorusGeometry(0.045, 0.008, 6, 20), MAT.iron); ring.rotation.x = Math.PI / 2; ring.position.set(b[0], 0.922, d1 + b[1]); cyl(b[0], 0.912, d1 + b[1], 0.028, 0.012, MAT.dark); });
+    frontX(fx, d2, d3, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, d3 - 0.06, 0.012, 0.025, MAT.chrome, null, 'x', 12);
+    frontX(fx, d3, PZ1, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, d3 + 0.06, 0.012, 0.025, MAT.chrome, null, 'x', 12);
+    box(7.415, 0.90, z0 - 0.02, KE, 1.45, PZ2, MAT.splash, null, false); });
+  O('Wall cabinets + hood', function(){
+    var wx = 7.08, w1 = ZK + 3.33;
+    box(wx, 1.45, z0, KE, 2.15, w1, MAT.white);
+    frontX(wx, z0, d1, 1.46, 2.14, MAT.cab); frontX(wx, d1, d2, 1.66, 2.14, MAT.cab);
+    [[d2, MAT.cabGlass], [d2 + 0.50, MAT.cab], [d2 + 1.00, MAT.cab]].forEach(function(c){ frontX(wx, c[0], Math.min(c[0] + 0.50, w1), 1.46, 2.14, c[1]); });
+    box(wx - 0.05, 1.45, d1 + 0.02, KE, 1.62, d2 - 0.02, MAT.white); box(wx - 0.05, 1.445, d1 + 0.08, 7.38, 1.452, d2 - 0.08, MAT.grey);
+    var led = box(wx + 0.02, 1.442, z0 + 0.02, wx + 0.05, 1.45, w1 - 0.02, MAT.diffuser, null, false); led.castShadow = false; });
+  O('Kettle + worktop things', function(){
+    rbox(7.12, 0.90, PZ1 + 0.14, 7.34, 1.18, PZ1 + 0.36, MAT.white, 0.03); cyl(7.2, 1.0, PZ1 - 0.2, 0.07, 0.2, MAT.steel); cyl(7.2, 1.11, PZ1 - 0.2, 0.03, 0.02, MAT.black);
+    cyl(7.25, 1.01, z0 + 0.18, 0.06, 0.22, MAT.glass); cyl(7.28, 1.02, z0 + 0.35, 0.045, 0.24, MAT.white); });
+  /* peninsula: dishwasher at its free end, sink, raised tiled bar on the dining side */
+  O('Peninsula', function(){
+    box(PXE + 0.02, 0, PZ1 + 0.04, fx, 0.10, PZ2, MAT.dark); box(PXE, 0.10, PZ1, fx, 0.86, PZ2, MAT.white);
+    box(PXE, 0.86, PZ1 - 0.03, 6.80, 0.90, PZ2, MAT.granite);
+    frontZ(PZ1, PXE, PXE + 0.60, 0.11, 0.85, MAT.steel); box(PXE + 0.03, 0.80, PZ1 - 0.03, PXE + 0.57, 0.82, PZ1 - 0.02, MAT.dark);
+    frontZ(PZ1, PXE + 0.60, PXE + 1.04, 0.11, 0.85, MAT.cab); frontZ(PZ1, PXE + 1.04, 6.80, 0.11, 0.85, MAT.cab);
+    box(5.95, 0.75, PZ1 + 0.05, 6.45, 0.902, PZ1 + 0.45, MAT.steel); box(5.99, 0.76, PZ1 + 0.08, 6.41, 0.905, PZ1 + 0.42, MAT.dark);
+    cyl(6.20, 1.05, PZ1 + 0.51, 0.012, 0.3, MAT.black); var sp = add(new T.TorusGeometry(0.1, 0.012, 8, 16, Math.PI), MAT.black); sp.position.set(6.20, 1.2, PZ1 + 0.41); sp.rotation.y = Math.PI / 2;
+    label('Peninsula: sink + dishwasher', 6.0, 1.3, PZ1 + 0.27); });
+  O('Dish rack', function(){ box(PXE + 0.07, 0.90, PZ1 + 0.05, PXE + 0.37, 1.02, PZ1 + 0.40, MAT.metal); for (var di = 0; di < 5; di++) box(PXE + 0.10 + di * 0.05, 0.92, PZ1 + 0.10, PXE + 0.11 + di * 0.05, 1.1, PZ1 + 0.35, MAT.white); });
+  /* back corner (photos 8683, 8686, 8709): corner wall unit over the oval table with the microwave + mini oven */
+  O('Corner wall cabinet', function(){
+    box(XT2, 1.45, zb, 4.36, 2.15, zb + 0.35, MAT.white);
+    frontZ(zb + 0.37, XT2, 3.86, 1.46, 2.14, MAT.white); frontZ(zb + 0.37, 3.86, 4.35, 1.46, 2.14, MAT.cab); cyl(3.90, 1.52, zb + 0.375, 0.012, 0.02, MAT.chrome, null, 'z', 10);
+    box(3.68, 2.15, zb + 0.05, 4.24, 2.235, zb + 0.30, MAT.white); });
+  O('Microwave table', function(){
+    var tb = add(new T.CylinderGeometry(0.42, 0.42, 0.025, 40), MAT.white); tb.scale.set(1, 1, 0.66); tb.position.set(3.95, 0.74, zb + 0.28);
+    [[3.63, zb + 0.13], [4.27, zb + 0.13], [3.63, zb + 0.43], [4.27, zb + 0.43]].forEach(function(l){ var lg = cyl(l[0], 0.37, l[1], 0.016, 0.74, MAT.beech); lg.rotation.z = (l[0] < 3.95 ? -1 : 1) * 0.09; lg.rotation.x = (l[1] < zb + 0.28 ? 1 : -1) * 0.06; });
+    box(3.57, 0.755, zb + 0.02, 4.03, 1.01, zb + 0.35, MAT.white); frontZ(zb + 0.36, 3.59, 3.89, 0.78, 0.99, MAT.dark); box(3.92, 0.80, zb + 0.348, 4.00, 0.97, zb + 0.36, MAT.grey);
+    box(3.58, 1.01, zb + 0.02, 4.02, 1.24, zb + 0.33, MAT.steel); frontZ(zb + 0.34, 3.61, 3.91, 1.03, 1.22, MAT.blackGlass);
+    box(4.07, 0.755, zb + 0.17, 4.35, 0.87, zb + 0.43, MAT.oak);
+    cyl(4.31, 1.02, zb + 0.015, 0.13, 0.025, MAT.grey, null, 'z', 24); });
+  O('Stool', function(){ var sz = ZK + 0.87; cyl(4.75, 0.45, sz, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.75 + l[0], 0.22, sz + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; }); });
+  O('Niche shelves', function(){
+    var x1 = BW.xn1, x2 = BW.xn2, z1 = BW.n, z2 = BW.n + 0.31, nc = (z1 + z2) / 2;
+    [0.97, 1.36, 1.78].forEach(function(y, i){ box(x1, y, z1, x2, y + 0.03, z2, MAT.oak); nicheThings(y + 0.03, i, x1, x2, nc); });
+    cyl((x1 + x2) / 2, 1.30, z2 - 0.03, 0.006, x2 - x1 - 0.06, MAT.black, null, 'x', 8); [0.09, 0.25, 0.41, 0.58, 0.74, 0.88].forEach(function(t, i){ cyl(x1 + (x2 - x1) * t, 1.22, z2 - 0.03, 0.008, 0.16, i % 2 ? MAT.dark : MAT.metal, null, 'y', 6); });
+    label('Shelf niche, 92 cm wide', (x1 + x2) / 2, 2.0, z2); });
+}
+
+/* ---------- IKEA plan (Dec 2025): METOD carcasses, BODBYN off-white fronts, oak worktop ----------
+   Every run is drawn in its own group: local x runs along the wall, local z points out into the room. */
+function kHandle(g, x, y, z, vert){   // BAGGANÄS 143 mm bar handle
+  var L = 0.143, r = 0.0045, off = 0.028;
+  cyl(x, y, z + off, r, L, MAT.steel, g, vert ? 'y' : 'x', 8);
+  [-1, 1].forEach(function(s){ cyl(vert ? x : x + s * 0.064, vert ? y + s * 0.064 : y, z + off / 2, r, off, MAT.steel, g, 'z', 6); });
+}
+function kFront(g, x1, x2, y1, y2, D, o){   // framed BODBYN front on the plane z = D; o.h: 'top' (drawer) | 'L' | 'R' (door stile), o.low: wall door, o.glass
+  o = o || {};
+  var a = x1 + 0.002, b = x2 - 0.002, c = y1 + 0.002, d = y2 - 0.002, w = b - a, h = d - c, fw = Math.min(0.058, h * 0.3, w * 0.3), z1 = D + 0.019, m = MAT.bod;
+  box(a, c, D, a + fw, d, z1, m, g); box(b - fw, c, D, b, d, z1, m, g); box(a + fw, d - fw, D, b - fw, d, z1, m, g); box(a + fw, c, D, b - fw, c + fw, z1, m, g);
+  if (o.glass) {
+    var gl = box(a + fw, c + fw, D + 0.008, b - fw, d - fw, D + 0.012, MAT.glass, g, false); gl.renderOrder = 2;
+    box((a + b) / 2 - 0.009, c + fw, D + 0.004, (a + b) / 2 + 0.009, d - fw, z1 - 0.003, m, g, false);
+    [1, 2].forEach(function(i){ var yy = c + fw + (h - 2 * fw) * i / 3; box(a + fw, yy - 0.009, D + 0.004, b - fw, yy + 0.009, z1 - 0.003, m, g, false); });
+  } else box(a + fw, c + fw, D, b - fw, d - fw, D + 0.012, MAT.bodIn, g);
+  if (o.h === 'top') kHandle(g, (a + b) / 2, h < 0.15 ? (c + d) / 2 : d - fw / 2, z1, false);
+  else if (o.h) kHandle(g, o.h === 'L' ? a + fw / 2 : b - fw / 2, o.low ? c + fw + 0.10 : d - fw - 0.10, z1, true);
+}
+function kBase(g, x1, x2, D, z0){ box(x1, K_PL, z0 || 0, x2, K_CT, D, MAT.carc, g); }
+function kPlinth(g, x1, x2, D){ box(x1, 0, D - 0.06, x2, K_PL, D - 0.045, MAT.bod, g, false); }
+function kWall(g, x1, x2){ box(x1, K_WB, 0, x2, K_WTOP, 0.37, MAT.carc, g); }
+function kWallGlass(g, x1, x2, seed){   // open carcass so the glass doors show shelves, glasses and the LED spot
+  var t = 0.018, r = rng(seed);
+  box(x1, K_WB, 0, x2, K_WTOP, 0.012, MAT.carc, g); box(x1, K_WB, 0, x1 + t, K_WTOP, 0.37, MAT.carc, g); box(x2 - t, K_WB, 0, x2, K_WTOP, 0.37, MAT.carc, g);
+  box(x1, K_WB, 0, x2, K_WB + t, 0.37, MAT.carc, g); box(x1, K_WTOP - t, 0, x2, K_WTOP, 0.37, MAT.carc, g);
+  [K_WB + t, K_WB + 0.275, K_WB + 0.535].forEach(function(y, lv){
+    if (lv) { var s = box(x1 + t, y - 0.006, 0.02, x2 - t, y, 0.35, MAT.glass, g, false); s.renderOrder = 2; }
+    for (var x = x1 + 0.09; x < x2 - 0.06; x += 0.105) { var v = r();
+      if (v < 0.45) { var gl = cyl(x, y + 0.06, 0.12 + r() * 0.12, 0.033, 0.12, MAT.glass, g, 'y', 12); gl.renderOrder = 2; }
+      else if (v < 0.8) cyl(x, y + 0.03 + lv * 0.005, 0.18, 0.045, 0.06, MAT.mugs[(r() * 5) | 0], g, 'y', 14, 0.03);
+      else cyl(x, y + 0.045, 0.2, 0.04, 0.09, MAT.potWhite, g, 'y', 14); }
+  });
+  for (var sx = x1 + 0.2; sx < x2 - 0.1; sx += 0.4) { var sp = cyl(sx, K_WTOP - t - 0.004, 0.2, 0.03, 0.006, MAT.diffuser, g, 'y', 14); sp.castShadow = false; }
+}
+function kLed(g, x1, x2){ var l = box(x1, K_WB - 0.011, 0.27, x2, K_WB - 0.003, 0.30, MAT.diffuser, g, false); l.castShadow = false; }
+
+function kitchenIkea(){
+  var D = 0.60, W = 0.37;
+  var east = function(){ return group(KE, 0, ZK, -Math.PI / 2); };       // local x = metres from the fridge corner along the wall
+  var pen = function(){ return group(KE, 0, PZ2, Math.PI); };            // local x = metres from the window-side wall, fronts toward the kitchen
+  var back = function(){ return group(XT2, 0, BW.s3, 0); };              // local x = metres from the corner with the stair-side wall
+  O('New kitchen: base units', function(){
+    var g = east();
+    box(0.701, 0, 0, 0.713, K_WTOP, 0.62, MAT.bod, g);                   // tall side panel beside the fridge (62 × 240, cut to height)
+    kBase(g, 0.713, 3.188, D); kPlinth(g, 0.713, 2.664, D);
+    kFront(g, 0.713, 1.113, 0.08, 0.48, D, {h: 'top'}); kFront(g, 0.713, 1.113, 0.48, 0.68, D, {h: 'top'}); kFront(g, 0.713, 1.113, 0.68, 0.88, D, {h: 'top'});   // 5: three drawers
+    kFront(g, 1.113, 1.713, 0.08, 0.18, D, {h: 'top'});                                                                                                         // 6: drawer under the oven
+    box(1.118, 0.185, D - 0.02, 1.708, 0.70, D + 0.022, MAT.blackGlass, g); box(1.118, 0.70, D - 0.02, 1.708, 0.78, D + 0.022, MAT.steel, g);
+    box(1.17, 0.655, D + 0.022, 1.656, 0.668, D + 0.05, MAT.steel, g); [1.30, 1.413, 1.526].forEach(function(x){ cyl(x, 0.74, D + 0.026, 0.014, 0.012, MAT.dark, g, 'z', 12); });
+    box(1.115, 0.782, D, 1.711, 0.878, D + 0.019, MAT.bod, g);
+    kFront(g, 1.713, 1.913, 0.08, 0.88, D, {h: 'L'});                                                                                                           // 7: pull-out
+    kFront(g, 1.913, 2.513, 0.08, 0.88, D, {h: 'L'});                                                                                                           // 8: corner door
+    box(2.513, 0.08, D - 0.02, 2.664, 0.88, D + 0.019, MAT.bod, g);                                                                                              // corner filler
+    label('Drawers · hob + oven · pull-out · corner', KE - 0.62, 0.45, ZK + 1.6, 'dim');
+  });
+  O('New kitchen: wall cabinets + hood', function(){
+    var g = east();
+    box(0.713, K_WB - 0.03, 0, 0.725, K_WTOP, 0.39, MAT.bod, g);
+    kWall(g, 0.725, 1.125); kFront(g, 0.725, 1.125, K_WB, K_WTOP, W, {h: 'R', low: true});                 // 13
+    kWall(g, 1.125, 1.725); kFront(g, 1.125, 1.725, K_WB, K_WTOP, W, {h: 'R', low: true});                 // 14: built-in hood
+    box(1.16, K_WB - 0.004, 0.03, 1.69, K_WB, 0.35, MAT.steel, g, false); [1.30, 1.55].forEach(function(x){ var s = box(x - 0.03, K_WB - 0.007, 0.27, x + 0.03, K_WB - 0.004, 0.31, MAT.diffuser, g, false); s.castShadow = false; });
+    kWallGlass(g, 1.726, 2.526, 11); kFront(g, 1.726, 2.126, K_WB, K_WTOP, W, {glass: true, h: 'R', low: true}); kFront(g, 2.126, 2.526, K_WB, K_WTOP, W, {glass: true, h: 'L', low: true});   // 15
+    kWallGlass(g, 2.528, 2.928, 17); kFront(g, 2.528, 2.928, K_WB, K_WTOP, W, {glass: true, h: 'L', low: true});                                                                    // 16
+    kWall(g, 2.929, 3.329); kFront(g, 2.929, 3.329, K_WB, K_WTOP, W, {h: 'L', low: true});                 // 17
+    box(3.329, K_WB - 0.03, 0, 3.341, K_WTOP, 0.39, MAT.bod, g);
+    kLed(g, 0.74, 1.11); kLed(g, 1.74, 2.51); kLed(g, 2.54, 2.92); kLed(g, 2.94, 3.32);
+    box(0.725, K_WB - 0.03, W, 3.329, K_WB, W + 0.019, MAT.bod, g, false);                                   // light pelmet under the wall units
+    label('Built-in hood', KE - 0.2, 2.34, ZK + 1.42); label('Glass cabinets with LED', KE - 0.2, 2.34, ZK + 2.33);
+  });
+  O('New kitchen: peninsula', function(){
+    var p = pen(), F = 0.607;
+    box(0.60, K_PL, 0.007, 1.475, K_CT, F, MAT.carc, p); box(0.60, 0, F - 0.06, 1.475, K_PL, F - 0.045, MAT.bod, p, false);
+    box(0.60, K_PL, F - 0.02, 0.675, K_CT, F + 0.019, MAT.bod, p);
+    kFront(p, 0.675, 1.475, 0.08, 0.48, F, {h: 'top'}); kFront(p, 0.675, 1.475, 0.48, 0.68, F, {h: 'top'}); kFront(p, 0.675, 1.475, 0.68, 0.88, F, {h: 'top'});   // 9: sink base
+    box(1.475, 0, 0.007, 1.487, K_CT, F + 0.019, MAT.bod, p);
+    box(1.487, 0.10, 0.03, 2.087, 0.87, F, MAT.white, p); box(1.49, 0.10, F, 2.084, 0.87, F + 0.02, MAT.steel, p); box(1.52, 0.80, F + 0.02, 2.054, 0.82, F + 0.032, MAT.dark, p);   // your dishwasher
+    box(1.49, 0, F - 0.05, 2.084, 0.10, F - 0.035, MAT.dark, p, false); box(2.087, 0, 0.007, 2.115, K_CT, F + 0.019, MAT.bod, p);
+    label('Sink 80 cm + your dishwasher', KE - 1.4, 1.3, PZ2 - 0.3);
+  });
+  O('New kitchen: back-wall run', function(){
+    var b = back();
+    box(0, 0, D - 0.02, 0.05, K_CT, D + 0.019, MAT.bod, b);
+    kBase(b, 0.05, 1.25, D); kPlinth(b, 0.05, 1.25, D);
+    kFront(b, 0.05, 0.65, 0.08, 0.88, D, {h: 'R'}); kFront(b, 0.65, 1.25, 0.08, 0.88, D, {h: 'L'});       // 2 and 3
+    box(1.25, 0, 0, 1.262, K_CT, 0.62, MAT.bod, b);
+    box(0, K_WB - 0.03, W - 0.02, 0.07, K_WTOP, W + 0.019, MAT.bod, b);
+    kWall(b, 0.07, 1.27); kFront(b, 0.07, 0.67, K_WB, K_WTOP, W, {h: 'R', low: true}); kFront(b, 0.67, 1.27, K_WB, K_WTOP, W, {h: 'L', low: true});   // 11 and 12
+    box(1.27, K_WB - 0.03, 0, 1.282, K_WTOP, 0.39, MAT.bod, b); kLed(b, 0.09, 1.25);
+    box(0.07, K_WB - 0.03, W, 1.27, K_WB, W + 0.019, MAT.bod, b, false);
+    label('New run: 2 × 60 cm, base + wall', XT2 + 0.66, 2.34, BW.s3 + 0.25);
+  });
+  O('New kitchen: worktops, hob + sink', function(){
+    var g = east(), p = pen(), b = back(), y0 = K_WT - 0.038;
+    box(0.713, y0, 0, 3.29, K_WT, 0.635, MAT.oakTop, g); box(0.635, y0, 0, 2.115, K_WT, 0.635, MAT.oakTop, p); box(0, y0, 0, 1.27, K_WT, 0.635, MAT.oakTop, b);
+    box(1.118, K_WT, 0.06, 1.708, K_WT + 0.006, 0.58, MAT.blackGlass, g, false);                              // induction hob, 59 × 52
+    [[1.27, 0.19], [1.27, 0.44], [1.555, 0.19], [1.555, 0.44]].forEach(function(z){ var ring = add(new T.TorusGeometry(0.085, 0.0025, 4, 32), MAT.grey, g, false); ring.rotation.x = Math.PI / 2; ring.position.set(z[0], K_WT + 0.0065, z[1]); });
+    box(0.78, K_WT, 0.09, 1.64, K_WT + 0.004, 0.56, MAT.steel, p, false);                                      // inset sink with drainer: bowl toward the window wall
+    box(0.83, K_WT + 0.0005, 0.13, 1.27, K_WT + 0.0045, 0.52, MAT.dark, p, false); cyl(1.05, K_WT + 0.005, 0.325, 0.035, 0.002, MAT.steel, p, 'y', 16);
+    for (var dr = 0; dr < 6; dr++) box(1.33 + dr * 0.048, K_WT + 0.004, 0.14, 1.345 + dr * 0.048, K_WT + 0.0052, 0.51, MAT.grey, p, false);
+    cyl(1.05, K_WT + 0.15, 0.065, 0.014, 0.30, MAT.steel, p); var sp = add(new T.TorusGeometry(0.09, 0.012, 8, 16, Math.PI), MAT.steel, p); sp.rotation.y = Math.PI / 2; sp.position.set(1.05, K_WT + 0.30, 0.155);
+    cyl(1.05, K_WT + 0.275, 0.245, 0.012, 0.05, MAT.steel, p); box(1.07, K_WT + 0.06, 0.055, 1.12, K_WT + 0.075, 0.075, MAT.steel, p);
+    label('Oak worktop, 92 cm high', KE - 0.3, 1.02, PZ1 + 0.3, 'dim'); label('Induction hob', KE - 0.32, 1.0, ZK + 1.41);
+  });
+  O('New kitchen: niche shelves', function(){
+    var x1 = BW.xn1, x2 = BW.xn2, z1 = BW.n, z2 = BW.n + 0.31, nc = (z1 + z2) / 2;
+    [0.97, 1.36, 1.78].forEach(function(y, i){
+      box(x1, y, z1, x2, y + 0.038, z2, MAT.oakTop);
+      [x1, x2 - 0.03].forEach(function(xa, k){ box(xa, y - 0.003, z1, xa + 0.03, y, z2 - 0.02, MAT.alu, null, false); box(k ? xa + 0.027 : xa, y - 0.03, z1, k ? xa + 0.03 : xa + 0.003, y, z2 - 0.02, MAT.alu, null, false); });
+      if (i > 0) { var l = box(x1 + 0.06, y - 0.011, z2 - 0.08, x2 - 0.06, y - 0.003, z2 - 0.05, MAT.diffuser, null, false); l.castShadow = false; }
+      nicheThings(y + 0.038, i, x1, x2, nc);
+    });
+    var lt = box(x1 + 0.06, 2.188, z2 - 0.08, x2 - 0.06, 2.196, z2 - 0.05, MAT.diffuser, null, false); lt.castShadow = false;
+    label('Niche: 3 oak shelves + LED', (x1 + x2) / 2, 2.0, z2);
+  });
+  O('Microwave + mini oven', function(){
+    var b = back();
+    box(0.12, K_WT, 0.10, 0.58, K_WT + 0.255, 0.45, MAT.white, b); box(0.14, K_WT + 0.025, 0.45, 0.44, K_WT + 0.235, 0.462, MAT.dark, b); box(0.47, K_WT + 0.045, 0.45, 0.55, K_WT + 0.215, 0.46, MAT.grey, b);
+    box(0.70, K_WT, 0.10, 1.14, K_WT + 0.23, 0.42, MAT.steel, b); box(0.73, K_WT + 0.02, 0.42, 1.03, K_WT + 0.21, 0.432, MAT.blackGlass, b);
+  });
+  O('Kettle', function(){ cyl(7.2, K_WT + 0.10, PZ1 + 0.3, 0.07, 0.2, MAT.steel); cyl(7.2, K_WT + 0.21, PZ1 + 0.3, 0.03, 0.02, MAT.black); });
+}
+
 function buildFirstInner(){
   var L0 = LIV;   // living room + stair-foot landing: one step UP from the kitchen
   [
-    {x1: 3.11, x2: 7.83, z1: ZK - 0.40, z2: ZK - 0.32, t: 'stone', outer: 5, yb: -0.24},
-    {x1: 3.11, x2: 7.83, z1: ZK - 0.32, z2: ZK, t: 'stone', yb: -0.24, ops: [{a: 5.05, b: 5.90, y0: -0.24, y1: 2.20}]},   // shelf niche, floor to beam
-    {x1: 3.11, x2: XT2, z1: ZK, z2: ZL - 0.40, t: 'stone', outer: 1, yb: -0.24},                                         // step in the party wall (the "A" walls)
+    // back (party) wall, stepped as IKEA measured it: flush for 0.75 m by the fridge, 14 cm back for 0.88 m, the niche (0.92 m wide, 41 cm deep), then 3 cm back for 1.37 m
+    {x1: 3.11, x2: 7.83, z1: ZK - 0.53, z2: BW.n, t: 'stone', outer: 5, yb: -0.24},
+    {x1: 3.11, x2: 7.83, z1: BW.n, z2: BW.s2, t: 'stone', yb: -0.24, ops: [{a: BW.xn1, b: BW.xn2, y0: -0.24, y1: 2.20}]},   // shelf niche, floor to beam
+    {x1: 3.11, x2: BW.xn1, z1: BW.s2, z2: BW.s3, t: 'stone', yb: -0.24},
+    {x1: BW.x2, x2: 7.83, z1: BW.s2, z2: ZK, t: 'stone', yb: -0.24},
+    {x1: 3.11, x2: XT2, z1: BW.s3, z2: ZL - 0.40, t: 'stone', outer: 1, yb: -0.24},                                      // step in the party wall (the "A" walls)
     {x1: -0.5, x2: XT2, z1: ZL - 0.40, z2: ZL, t: 'stone', outer: 5, yb: -0.24},                                           // living-room back wall
     {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: L0 + 2.10}, {a: 5.12, b: 6.32, y0: 0, y1: 2.15}]},
     {x1: -0.5, x2: -0.10, z1: ZL - 0.40, z2: 5.90, t: 'stone', outer: 1, yb: -0.24},
-    {x1: 7.68, x2: 7.83, z1: ZK - 0.40, z2: 5.90, t: 'stone', outer: 0, yb: -0.24},
+    {x1: 7.68, x2: 7.83, z1: ZK - 0.53, z2: 5.90, t: 'stone', outer: 0, yb: -0.24},
     {x1: 7.43, x2: 7.68, z1: ZK, z2: 5.90, t: 'stone', yb: -0.24, ops: [{a: 2.85, b: 3.45, y0: 0.95, y1: 1.75}]},
     // TV wall: 1.22 m opening to the kitchen, 2.33 m of wall, 1.70 m opening to the stairs and dining (measured)
     {x1: XT1, x2: XT2, z1: ZL, z2: 5.90, t: 'part', yb: 0, ops: [{a: ZL, b: ZL + 1.22, y0: 0, y1: L0 + 1.98}, {a: 4.20, b: 5.90, y0: 0, y1: L0 + 1.98}]},
@@ -2755,8 +2973,8 @@ function buildFirstInner(){
     {x1: -0.10, x2: 0.48, z1: ZL, z2: ZL + 0.60, t: 'mas', yb: L0}
   ].forEach(wall);
   // floors: kitchen level with the stairwell left open; living room and stair-foot landing one step up
-  [[XT2, ZK, 7.43, SZT], [SX2, SZT, 7.43, SZB], [4.50, SZB, 7.43, 5.9]].forEach(function(r){ plane(r[0], r[1], r[2], r[3], 0, MAT.tile1, 2.64); });
-  plane(5.05, ZK - 0.32, 5.90, ZK, 0, MAT.tile1, 2.64);
+  [[XT2, BW.s2, 7.43, SZT], [SX2, SZT, 7.43, SZB], [4.50, SZB, 7.43, 5.9]].forEach(function(r){ plane(r[0], r[1], r[2], r[3], 0, MAT.tile1, 2.64); });
+  plane(BW.xn1, BW.n, BW.xn2, BW.s2, 0, MAT.tile1, 2.64);
   plane(-0.1, ZL, XT1, 5.9, L0, MAT.tile1, 2.64);
   plane(XT1, ZL, XT2, ZL + 1.22, L0, MAT.tile1, 2.64); plane(XT1, SZB, XT2, 5.9, L0, MAT.tile1, 2.64);
   plane(XT2, SZB, 4.50, 5.9, L0, MAT.tile1, 2.64);
@@ -2771,8 +2989,9 @@ function buildFirstInner(){
   }
   // tiled skirting
   var sk = MAT.skirt1;
-  skirtX(ZK, XT2, 5.05, 1, sk); skirtX(ZK, 5.90, 7.43, 1, sk); skirtX(ZK - 0.32, 5.05, 5.90, 1, sk); skirtZ(5.05, ZK - 0.32, ZK, 1, sk); skirtZ(5.90, ZK - 0.32, ZK, -1, sk);
-  skirtZ(XT2, ZK, ZL, 1, sk); skirtZ(7.43, ZK, 5.9, -1, sk); skirtX(5.90, 4.53, 5.12, -1, sk); skirtX(5.90, 6.32, 7.43, -1, sk);
+  skirtX(BW.s3, XT2, BW.xn1, 1, sk); skirtX(BW.n, BW.xn1, BW.xn2, 1, sk); skirtX(BW.s2, BW.xn2, BW.x2, 1, sk); skirtX(ZK, BW.x2, 7.43, 1, sk);
+  skirtZ(BW.xn1, BW.n, BW.s3, 1, sk); skirtZ(BW.xn2, BW.n, BW.s2, -1, sk); skirtZ(BW.x2, BW.s2, ZK, -1, sk);
+  skirtZ(XT2, BW.s3, ZL, 1, sk); skirtZ(7.43, ZK, 5.9, -1, sk); skirtX(5.90, 4.53, 5.12, -1, sk); skirtX(5.90, 6.32, 7.43, -1, sk);
   var skL = function(x1, z1, x2, z2){ box(x1, L0, z1, x2, L0 + 0.08, z2, sk, null, false); };
   skL(0.48, ZL, XT1, ZL + 0.009); skL(-0.1, 5.891, 0.02, 5.9); skL(1.90, 5.891, 4.50, 5.9);
   skL(-0.1, ZL + 0.60, -0.091, 5.9); skL(XT1 - 0.009, ZL + 1.22, XT1, 4.20);
@@ -2780,7 +2999,7 @@ function buildFirstInner(){
 
   // ceiling + beams: dark and close (≈ 50 cm) over the kitchen, lighter and wider apart (≈ 70 cm) over the living room
   if (S.ceiling) {
-    [[XT2, ZK, 7.43, 1.70], [-0.1, ZL, XT2, 1.70], [-0.1, 1.70, SX1, 4.56], [4.52, 1.70, 7.43, 4.56], [-0.1, 4.56, 7.43, 5.9]].forEach(function(r){ var m = plane(r[0], r[1], r[2], r[3], F1H, MAT.ceiling, 1.2, true); m.castShadow = true; });
+    [[XT2, BW.s2, 7.43, 1.70], [-0.1, ZL, XT2, 1.70], [-0.1, 1.70, SX1, 4.56], [4.52, 1.70, 7.43, 4.56], [-0.1, 4.56, 7.43, 5.9]].forEach(function(r){ var m = plane(r[0], r[1], r[2], r[3], F1H, MAT.ceiling, 1.2, true); m.castShadow = true; });
     for (var z = ZK + 0.22; z < 5.9; z += 0.50) { var inW = z + 0.08 > 1.70 && z - 0.08 < 4.56; box(inW ? 4.52 : XT2, F1B, z - 0.08, 7.43, F1H, z + 0.08, MAT.beam); }
     [1.30, 2.00, 2.70, 3.40, 4.10, 4.80, 5.50].forEach(function(z2){ box(-0.1, F1B + 0.04, z2 - 0.08, XT1, F1H, z2 + 0.08, MAT.lbeam); });
     box(0.55, F1B + 0.04, ZL, 0.71, F1H, ZL + 0.60, MAT.lbeam);
@@ -2816,77 +3035,23 @@ function buildFirstInner(){
   label('Step up 15 cm', XT2, 0.22, ZL + 0.61, 'dim');
   label('Raised landing, living-room level', 4.0, L0 + 0.1, 5.25, 'dim');
 
-  /* ---- kitchen run on the east wall (photo 8685): fridge in the back corner, 4 drawers, oven under a gas hob, 2 doors, blind corner ---- */
-  var fx = 6.83;
+  /* ---- kitchen: the fridge and the low wall stay; the units are either today's or the IKEA plan ---- */
   O('Fridge', function(){
-    rbox(6.76, 0.01, ZK + 0.03, 7.40, 1.86, ZK + 0.65, MAT.steel, 0.02);
-    box(6.755, 0.66, ZK + 0.04, 6.762, 0.665, ZK + 0.64, MAT.dark, null, false);
+    rbox(6.76, 0.01, ZK + 0.02, 7.40, 1.86, ZK + 0.69, MAT.steel, 0.02);
+    box(6.755, 0.66, ZK + 0.03, 6.762, 0.665, ZK + 0.68, MAT.dark, null, false);
     cyl(6.738, 1.32, ZK + 0.08, 0.011, 0.44, MAT.steel); cyl(6.738, 0.40, ZK + 0.08, 0.011, 0.32, MAT.steel);
-    var mg = add(new T.PlaneGeometry(0.50, 1.12), MAT.magnets2, null, false, false); mg.rotation.y = -Math.PI / 2; mg.position.set(6.752, 1.26, ZK + 0.35);
-    var mr = rng(3); for (var mi = 0; mi < 7; mi++) { var my = 0.25 + mr() * 0.35, mz = ZK + 0.12 + mr() * 0.42; box(6.752, my, mz, 6.758, my + 0.05, mz + 0.06, MAT.magnets[mi % MAT.magnets.length], null, false); }
-    label('Fridge', 7.08, 2.0, ZK + 0.34); });
-  O('Kitchen base units', function(){
-    box(6.79, 0.0, ZK + 0.65, 7.43, 2.15, ZK + 0.72, MAT.white);
-    box(6.85, 0, -0.45, 7.43, 0.10, 1.98, MAT.dark); box(fx, 0.10, -0.45, 7.43, 0.86, 1.98, MAT.white);
-    box(6.80, 0.86, -0.47, 7.43, 0.90, 2.58, MAT.granite);
-    [0.11, 0.30, 0.49, 0.68].forEach(function(y){ frontX(fx, -0.45, 0.05, y, y + 0.175, MAT.cab); cyl(fx - 0.025, y + 0.088, -0.20, 0.013, 0.025, MAT.chrome, null, 'x', 12); });
-    frontX(fx, 0.05, 0.65, 0.12, 0.70, MAT.blackGlass); box(fx - 0.04, 0.64, 0.11, fx - 0.02, 0.66, 0.59, MAT.steel); frontX(fx, 0.05, 0.65, 0.71, 0.85, MAT.steel);
-    box(6.93, 0.90, 0.07, 7.38, 0.905, 0.63, MAT.steel);
-    [[7.04, 0.20], [7.04, 0.50], [7.26, 0.20], [7.26, 0.50]].forEach(function(b){ var ring = add(new T.TorusGeometry(0.045, 0.008, 6, 20), MAT.iron); ring.rotation.x = Math.PI / 2; ring.position.set(b[0], 0.922, b[1]); cyl(b[0], 0.912, b[1], 0.028, 0.012, MAT.dark); });
-    frontX(fx, 0.65, 1.05, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, 0.99, 0.012, 0.025, MAT.chrome, null, 'x', 12);
-    frontX(fx, 1.05, 1.50, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, 1.11, 0.012, 0.025, MAT.chrome, null, 'x', 12);
-    frontX(fx, 1.50, 1.98, 0.11, 0.85, MAT.white);
-    box(7.415, 0.90, -0.47, 7.43, 1.45, 2.58, MAT.splash, null, false); });
-  O('Wall cabinets + hood', function(){
-    var wx = 7.08;
-    box(wx, 1.45, -0.45, 7.43, 2.15, 2.45, MAT.white);
-    [[-0.45, 0.00, MAT.cab], [0.65, 1.10, MAT.cabGlass], [1.10, 1.55, MAT.cab], [1.55, 2.00, MAT.cab], [2.00, 2.45, MAT.cab]].forEach(function(c){ frontX(wx, c[0], c[1], 1.46, 2.14, c[2]); });
-    frontX(wx, 0.00, 0.65, 1.66, 2.14, MAT.cab);
-    box(wx - 0.05, 1.45, 0.02, 7.43, 1.62, 0.63, MAT.white); box(wx - 0.05, 1.445, 0.08, 7.38, 1.452, 0.57, MAT.grey);
-    var led = box(wx + 0.02, 1.442, -0.43, wx + 0.05, 1.45, 2.43, MAT.diffuser, null, false); led.castShadow = false; });
-  O('Kettle + worktop things', function(){
-    rbox(7.12, 0.90, 1.63, 7.34, 1.18, 1.85, MAT.white, 0.03); cyl(7.2, 1.0, 1.30, 0.07, 0.2, MAT.steel); cyl(7.2, 1.11, 1.30, 0.03, 0.02, MAT.black);
-    cyl(7.25, 1.01, -0.27, 0.06, 0.22, MAT.glass); cyl(7.28, 1.02, -0.10, 0.045, 0.24, MAT.white); });
-  O('Jute rug (kitchen)', function(){ plane(5.55, -0.30, 6.72, 1.70, 0.004, MAT.jute, 1); });
-  /* ---- peninsula: dishwasher at its free end, sink, raised tiled bar on the dining side ---- */
-  O('Peninsula', function(){
-    box(5.25, 0, 2.02, 6.80, 0.10, 2.56, MAT.dark); box(5.23, 0.10, 1.98, 6.80, 0.86, 2.58, MAT.white);
-    box(5.20, 0.86, 1.95, 6.80, 0.90, 2.58, MAT.granite);
-    frontZ(1.98, 5.25, 5.85, 0.11, 0.85, MAT.steel); box(5.28, 0.80, 1.95, 5.82, 0.82, 1.96, MAT.dark);
-    frontZ(1.98, 5.85, 6.30, 0.11, 0.85, MAT.cab); frontZ(1.98, 6.30, 6.80, 0.11, 0.85, MAT.cab);
-    box(5.92, 0.75, 2.03, 6.42, 0.902, 2.43, MAT.steel); box(5.96, 0.76, 2.06, 6.38, 0.905, 2.40, MAT.dark);
-    cyl(6.17, 1.05, 2.49, 0.012, 0.3, MAT.black); var sp = add(new T.TorusGeometry(0.1, 0.012, 8, 16, Math.PI), MAT.black); sp.position.set(6.17, 1.2, 2.39); sp.rotation.y = Math.PI / 2;
-    box(5.28, 0.90, 2.55, 6.80, 1.02, 2.59, MAT.white); box(5.23, 1.02, 2.41, 6.82, 1.05, 2.69, MAT.splash); box(5.21, 1.02, 2.39, 6.84, 1.07, 2.41, MAT.oak); box(5.21, 1.02, 2.69, 6.84, 1.07, 2.71, MAT.oak);
-    box(6.80, 0.10, 2.58, 6.82, 1.02, 2.71, MAT.white);
-    label('Peninsula: sink + dishwasher', 6.0, 1.3, 2.25); });
-  O('Dish rack', function(){ box(5.32, 0.90, 2.03, 5.62, 1.02, 2.38, MAT.metal); for (var di = 0; di < 5; di++) box(5.35 + di * 0.05, 0.92, 2.08, 5.36 + di * 0.05, 1.1, 2.33, MAT.white); });
-  /* ---- back corner of the kitchen (photos 8683, 8686, 8709): corner wall unit over the oval table with the microwave + mini oven ---- */
-  O('Corner wall cabinet', function(){
-    box(XT2, 1.45, ZK, 4.36, 2.15, ZK + 0.35, MAT.white);
-    frontZ(ZK + 0.37, XT2, 3.86, 1.46, 2.14, MAT.white); frontZ(ZK + 0.37, 3.86, 4.35, 1.46, 2.14, MAT.cab); cyl(3.90, 1.52, ZK + 0.375, 0.012, 0.02, MAT.chrome, null, 'z', 10);
-    box(3.68, 2.15, ZK + 0.05, 4.24, 2.235, ZK + 0.30, MAT.white); });
-  O('Microwave table', function(){
-    var tb = add(new T.CylinderGeometry(0.42, 0.42, 0.025, 40), MAT.white); tb.scale.set(1, 1, 0.66); tb.position.set(3.95, 0.74, ZK + 0.28);
-    [[3.63, ZK + 0.13], [4.27, ZK + 0.13], [3.63, ZK + 0.43], [4.27, ZK + 0.43]].forEach(function(l){ var lg = cyl(l[0], 0.37, l[1], 0.016, 0.74, MAT.beech); lg.rotation.z = (l[0] < 3.95 ? -1 : 1) * 0.09; lg.rotation.x = (l[1] < ZK + 0.28 ? 1 : -1) * 0.06; });
-    box(3.57, 0.755, ZK + 0.02, 4.03, 1.01, ZK + 0.35, MAT.white); frontZ(ZK + 0.36, 3.59, 3.89, 0.78, 0.99, MAT.dark); box(3.92, 0.80, ZK + 0.348, 4.00, 0.97, ZK + 0.36, MAT.grey);
-    box(3.58, 1.01, ZK + 0.02, 4.02, 1.24, ZK + 0.33, MAT.steel); frontZ(ZK + 0.34, 3.61, 3.91, 1.03, 1.22, MAT.blackGlass);
-    box(4.07, 0.755, ZK + 0.17, 4.35, 0.87, ZK + 0.43, MAT.oak);
-    cyl(4.31, 1.02, ZK + 0.015, 0.13, 0.025, MAT.grey, null, 'z', 24); });
-  O('Stool', function(){ cyl(4.75, 0.45, -0.30, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.75 + l[0], 0.22, -0.30 + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; }); });
-  O('Niche shelves', function(){
-    var nz1 = ZK - 0.32, nz2 = ZK, nc = (nz1 + nz2) / 2;
-    [0.97, 1.36, 1.78].forEach(function(y, i){ box(5.05, y, nz1, 5.90, y + 0.03, nz2, MAT.oak);
-      if (i === 2) for (var j = 0; j < 5; j++) { var jar = cyl(5.17 + j * 0.15, y + 0.13, nc, 0.05, 0.22, MAT.glass, null, 'y', 16); jar.renderOrder = 2; cyl(5.17 + j * 0.15, y + 0.245, nc, 0.052, 0.015, MAT.oak, null, 'y', 16); }
-      if (i === 1) { cyl(5.22, y + 0.08, nc, 0.1, 0.13, MAT.redPot, null, 'y', 20); cyl(5.50, y + 0.07, nc, 0.09, 0.11, MAT.redPot, null, 'y', 20); cyl(5.76, y + 0.05, nc, 0.08, 0.07, MAT.redPot, null, 'y', 20); }
-      if (i === 0) { box(5.10, y + 0.03, nz1 + 0.06, 5.30, y + 0.15, nz2 - 0.06, MAT.basket); box(5.35, y + 0.03, nz1 + 0.06, 5.64, y + 0.14, nz2 - 0.06, MAT.oak); box(5.68, y + 0.03, nz1 + 0.06, 5.86, y + 0.14, nz2 - 0.06, MAT.basket); } });
-    cyl(5.475, 1.30, nz2 - 0.03, 0.006, 0.80, MAT.black, null, 'x', 8); [5.13, 5.28, 5.43, 5.58, 5.73, 5.84].forEach(function(x, i){ cyl(x, 1.22, nz2 - 0.03, 0.008, 0.16, i % 2 ? MAT.dark : MAT.metal, null, 'y', 6); });
-    label('Shelf niche, floor to beam', 5.47, 2.0, ZK); });
+    var mg = add(new T.PlaneGeometry(0.50, 1.12), MAT.magnets2, null, false, false); mg.rotation.y = -Math.PI / 2; mg.position.set(6.752, 1.26, ZK + 0.37);
+    var mr = rng(3); for (var mi = 0; mi < 7; mi++) { var my = 0.25 + mr() * 0.35, mz = ZK + 0.12 + mr() * 0.46; box(6.752, my, mz, 6.758, my + 0.05, mz + 0.06, MAT.magnets[mi % MAT.magnets.length], null, false); }
+    label('Fridge', 7.08, 2.0, ZK + 0.36); });
+  lowWall();
+  if (S.kitchen === 'ikea') kitchenIkea(); else kitchenToday();
+  O('Jute rug (kitchen)', function(){ plane(5.55, ZK + 0.85, 6.72, PZ1 - 0.18, 0.004, MAT.jute, 1); });
   // switches: 3-gang above the top of the stairs, 2-gang on the living-room back wall by the opening
   [1.04, 1.125, 1.21].forEach(function(y){ device('switch', XT2 + 0.006, y, SZT + 0.15, '+x'); });
   [L0 + 1.0, L0 + 1.085].forEach(function(y){ device('switch', 3.25, y, ZL + 0.006, '+z'); });
-  O('Runner (landing)', function(){ plane(3.62, -0.45, 4.27, 1.85, 0.004, MAT.jute, 1); });
+  O('Runner (landing)', function(){ plane(3.62, -0.08, 4.27, 1.85, 0.004, MAT.jute, 1); });
   O('Black cat', function(){ cat(6.0, 0.005, 0.6, 0.6, MAT.cat1, true); });
-  label('KITCHEN + DINING', 5.9, 0.15, 1.2, 'room', '22.58 m²');
+  label('KITCHEN + DINING', 5.9, 0.15, 1.05, 'room', S.kitchen === 'ikea' ? '22.58 m² · IKEA plan' : '22.58 m²');
 
   /* ---- dining ---- */
   frenchWindow(5.12, 6.32, 0, 2.15, 'dining'); radiatorZ(6.42, 7.07, 0.15, 0.75, 0);
@@ -2985,7 +3150,7 @@ function buildFirstInner(){
 
   /* ---- 1st-floor lights ---- */
   if (S.lamps) {
-    [[5.8, 2.05, 0.4, 1, 1.0], [5.7, 2.05, 4.5, 1, 0.9], [1.70, 1.95, 3.30, 1, 1.0], [3.95, 2.1, 0.2, 0, 0.6], [0.64, L0 + 1.3, ZL + 0.26, 0, 0.35]].forEach(function(pt){
+    [[5.8, 2.05, 0.4, 1, 1.0], [5.7, 2.05, 4.5, 1, 0.9], [1.70, 1.95, 3.30, 1, 1.0], [3.95, 2.1, 0.2, 0, 0.6], [0.64, L0 + 1.3, ZL + 0.26, 0, 0.35]].concat(S.kitchen === 'ikea' ? [[7.12, 1.36, ZK + 2.1, 0, 0.3], [XT2 + 0.66, 1.36, BW.s3 + 0.2, 0, 0.28], [(BW.xn1 + BW.xn2) / 2, 2.05, BW.n + 0.18, 0, 0.22]] : []).forEach(function(pt){
       var Lt = new T.PointLight(0xffd8a8, pt[4], 7.5, 1.7); Lt.position.set(pt[0], pt[1], pt[2]);
       if (S.hq && pt[3]) { Lt.castShadow = true; Lt.shadow.mapSize.set(512, 512); Lt.shadow.bias = -0.003; Lt.shadow.normalBias = 0.02; Lt.shadow.camera.near = 0.05; Lt.shadow.camera.far = 8; }
       ROOT.add(Lt); LAMPS.push(Lt);
@@ -3020,7 +3185,7 @@ function build(){
     var g1 = new T.Group(); g1.position.y = Y1 + (lvl === 'both' ? EXPLODE : 0); scene.add(g1); ROOTS.push(g1); ROOT = g1; LABEL_DY = g1.position.y;
     if (lvl === 'first') {
       var fm = [MAT.facade, MAT.facade, MAT.capStone, MAT.facade, MAT.facade, MAT.facade];
-      box(-0.5, -Y1 - 0.02, 0.25, 3.11, -0.24, 6.30, fm); box(3.11, -Y1 - 0.02, -1.57, 7.83, -0.24, 6.30, fm);
+      box(-0.5, -Y1 - 0.02, 0.25, 3.11, -0.24, 6.30, fm); box(3.11, -Y1 - 0.02, ZK - 0.53, 7.83, -0.24, 6.30, fm);
       plane(-12, -10, 20, 18, -Y1 - 0.02, MAT.ground, 4);
     }
     buildFirst();
@@ -3111,7 +3276,9 @@ var WARDROBE_VIEW = {
 var VIEWS_FIRST = {
   overview: {pos: [9.8, Y1 + 7.8, 10.0], tgt: [3.9, Y1 + 0.1, 2.3]},
   arrive: {pos: [4.75, Y1 + 1.62, 1.3], tgt: [6.3, Y1 + 0.95, 4.6], eye: true},
-  kitchen: {pos: [4.7, Y1 + 1.62, 1.6], tgt: [7.3, Y1 + 1.15, -0.5], eye: true},
+  kitchen: {pos: [4.25, Y1 + 1.62, 1.55], tgt: [7.2, Y1 + 1.05, 0.55], eye: true},
+  kback: {pos: [6.35, Y1 + 1.62, 1.45], tgt: [4.55, Y1 + 1.15, -0.9], eye: true},
+  kpen: {pos: [4.95, Y1 + 1.72, 4.05], tgt: [6.5, Y1 + 1.0, 1.3], eye: true},
   dining: {pos: [4.9, Y1 + 1.62, 2.9], tgt: [6.3, Y1 + 0.9, 5.8], eye: true},
   living: {pos: [3.05, Y1 + 1.75, 1.3], tgt: [0.6, Y1 + 0.85, 5.4], eye: true},
   sofa: {pos: [0.5, Y1 + 1.15, 3.35], tgt: [3.39, Y1 + 1.2, 3.03], eye: true},
@@ -3124,7 +3291,7 @@ var VIEWS_BOTH = {
 };
 var VIEW_SETS = {
   ground: [['overview', 'Overview'], ['door', 'Front door'], ['fromstairs', 'From stairs'], ['corner', 'Window corner'], ['wardrobe', 'Wardrobe'], ['stairs', 'Under stairs'], ['plan', 'Plan']],
-  first: [['overview', 'Overview'], ['arrive', 'Top of stairs'], ['kitchen', 'Kitchen'], ['dining', 'Dining'], ['living', 'Living room'], ['sofa', 'From the sofa'], ['upstairs', 'Upper stairs'], ['plan', 'Plan']],
+  first: [['overview', 'Overview'], ['arrive', 'Top of stairs'], ['kitchen', 'Kitchen'], ['kback', 'Kitchen · back wall'], ['kpen', 'Kitchen · from dining'], ['dining', 'Dining'], ['living', 'Living room'], ['sofa', 'From the sofa'], ['upstairs', 'Upper stairs'], ['plan', 'Plan']],
   both: [['overview', 'Overview'], ['plan', 'Plan']]
 };
 function viewsFor(){ return S.level === 'first' ? VIEWS_FIRST : S.level === 'both' ? VIEWS_BOTH : VIEWS; }
@@ -3186,7 +3353,7 @@ window.addEventListener('keydown', function(e){
   if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].indexOf(e.code) >= 0) {
     keys[e.code] = true; if (e.code.indexOf('Arrow') === 0) e.preventDefault();
   }
-  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey && S.level !== 'first') { setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
+  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey) { if (S.level === 'first') setKitchen(S.kitchen === 'ikea' ? 'today' : 'ikea'); else setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
 });
 window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 window.addEventListener('blur', function(){ keys = {}; padHeld = null; });
@@ -3300,12 +3467,14 @@ var INFO = {
   D: {h: 'After: Option D', rows: [['Hall', '≈ 14.5 m², ≈ 12.3 m² clear'], ['Storage', '2.0 m hooks + wall-hung bench'], ['Shoes', 'wall-hung cabinet + under stairs'], ['Cost', '≈ 150 € + ≈ 60 € shoe unit']],
     note: 'Nothing stands on the floor, which makes it the easiest layout to clean after a flood.'}
 };
-INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², ≈ 1.8 m deeper'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
-  note: 'Your measurements, the diagnostic plan and your 27 photos. Sizes you did not measure are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet.'};
+INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², 1.43 m deeper'], ['Kitchen', 'as photographed · switch to the IKEA plan above'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
+  note: 'Your measurements, the diagnostic plan, IKEA\'s kitchen survey and your photos. Sizes nobody measured are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet.'};
+INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Window wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
+  note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
 function updateInfo(){
-  var I = S.level === 'first' ? INFO.first : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
+  var I = S.level === 'first' ? (S.kitchen === 'ikea' ? INFO.ikea : INFO.first) : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
   el.innerHTML = '<h3></h3><dl></dl><p class="hint"></p>';
   el.querySelector('h3').textContent = I.h;
   var dl = el.querySelector('dl');
@@ -3316,6 +3485,7 @@ function pressed(sel, attr, val){ document.querySelectorAll(sel + ' [data-' + at
 function syncUI(){
   pressed('#levels', 'level', S.level); syncObjUI();
   $('#sec-scene').style.display = S.level === 'first' ? 'none' : '';
+  $('#sec-kitchen').style.display = S.level === 'ground' ? 'none' : ''; pressed('#kitchens', 'kitchen', S.kitchen);
   ['t-flood', 't-build', 't-open'].forEach(function(id){ $('#' + id).disabled = S.level === 'first'; });
   pressed('#scenes', 'scene', S.scene); pressed('#views', 'view', S.view); pressed('#fronts', 'front', S.front);
   pressed('#floors', 'floor', S.floor); pressed('#paints', 'paint', S.paint);
@@ -3336,10 +3506,16 @@ $('#views').addEventListener('click', function(e){ var b = e.target.closest('[da
 function setLevel(l){
   S.level = l; renderViews(); if (l === 'both') { S.ceiling = false; S.cut = true; }
   build(); applyView('overview'); syncUI(); persist();
-  try { history.replaceState(null, '', '#' + l); } catch (e) {}
+  try { history.replaceState(null, '', l === 'first' && S.kitchen === 'ikea' ? '#kitchen' : '#' + l); } catch (e) {}
   toast(l === 'first' ? '1st floor' : l === 'both' ? 'Both floors' : 'Ground floor');
 }
 document.querySelectorAll('#levels [data-level]').forEach(function(b){ b.addEventListener('click', function(){ setLevel(b.getAttribute('data-level')); }); });
+function setKitchen(k){
+  S.kitchen = k === 'ikea' ? 'ikea' : 'today'; build(); syncUI(); persist();
+  try { history.replaceState(null, '', S.level === 'first' ? (S.kitchen === 'ikea' ? '#kitchen' : '#first') : '#' + S.level); } catch (e) {}
+  toast(S.kitchen === 'ikea' ? 'Kitchen · IKEA plan' : 'Kitchen · today');
+}
+document.querySelectorAll('#kitchens [data-kitchen]').forEach(function(b){ b.addEventListener('click', function(){ setKitchen(b.getAttribute('data-kitchen')); }); });
 document.querySelectorAll('#fronts [data-front]').forEach(function(b){ b.addEventListener('click', function(){ S.front = b.getAttribute('data-front'); build(); syncUI(); persist(); }); });
 document.querySelectorAll('#floors [data-floor]').forEach(function(b){ b.addEventListener('click', function(){ S.floor = b.getAttribute('data-floor'); build(); syncUI(); persist(); }); });
 document.querySelectorAll('#paints [data-paint]').forEach(function(b){ b.addEventListener('click', function(){ S.paint = b.getAttribute('data-paint'); MAT.plaster.color.setHex(PAINT[S.paint]); updateMirror(); dirty = true; syncUI(); persist(); }); });
@@ -3357,7 +3533,7 @@ $('#shot').addEventListener('click', function(){
   renderer.render(scene, camera);
   try {
     var url = canvas.toDataURL('image/png'), a = document.createElement('a');
-    a.href = url; a.download = 'house-' + (S.level === 'first' ? '1st-floor' : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
+    a.href = url; a.download = 'house-' + (S.level === 'first' ? '1st-floor' + (S.kitchen === 'ikea' ? '-ikea-kitchen' : '') : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
     document.body.appendChild(a); a.click(); a.remove(); toast('Picture saved');
   } catch (e) { toast('This viewer blocks downloads. Open the file in a browser to save pictures.'); }
 });
@@ -3402,7 +3578,7 @@ syncUI();
 applyView(viewsFor()[S.view] ? S.view : 'overview', true);
 $('#loading').remove();
 requestAnimationFrame(frame);
-window.__hall = {S: S, build: build, applyView: applyView, setScene: setScene, setLevel: setLevel, camera: camera, controls: controls, renderer: renderer, scene: scene,
+window.__hall = {S: S, build: build, applyView: applyView, setScene: setScene, setLevel: setLevel, setKitchen: setKitchen, camera: camera, controls: controls, renderer: renderer, scene: scene,
   objs: function(){ return OBJS; }, hideObj: hideObj, restoreObj: restoreObj, setRmMode: setRmMode, objAt: objAt};
 })();
 
