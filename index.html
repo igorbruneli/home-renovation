@@ -33,9 +33,29 @@ p{margin:0; max-width:62ch}
 .when{font-family:var(--f-mono); font-size:.85rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .t{font-family:var(--f-display); font-stretch:86%; font-weight:720; font-size:1.35rem; line-height:1.2}
 .d{grid-column:2; color:var(--ink-2); font-size:.95rem}
+.muted{color:var(--ink-2)} .fine{color:var(--ink-2); font-size:.95rem; max-width:66ch}
 .status{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.07em; font-size:.72rem; font-weight:700; color:var(--hydro); border:1px solid var(--hydro); background:var(--hydro-pale); padding:1px 6px; white-space:nowrap}
 .note{background:var(--sheet); border:1px solid var(--rule); padding:12px 14px; font-size:.9rem; color:var(--ink-2)}
 @media (max-width:560px){.projects a{grid-template-columns:1fr auto} .when{grid-column:1 / -1} .d{grid-column:1 / -1}}
+h2{font-family:var(--f-display); font-stretch:86%; font-weight:740; font-size:clamp(1.4rem,4.5vw,1.9rem); line-height:1.1; margin:0 0 6px; text-wrap:balance}
+section{display:grid; gap:14px}
+.road{list-style:none; margin:0; padding:0; display:grid; border-top:2px solid var(--ink); counter-reset:r}
+.road li{display:grid; grid-template-columns:2.4rem minmax(0,1fr) auto; gap:4px 16px; padding:16px 4px; border-bottom:1px solid var(--rule); counter-increment:r; align-items:baseline}
+.road li::before{content:counter(r); font-family:var(--f-mono); font-weight:600; border:1.5px solid var(--ink); width:1.9rem; height:1.9rem; display:grid; place-items:center; align-self:start}
+.road .t{grid-column:2}
+.road .cost{font-family:var(--f-mono); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right}
+.road .when{grid-column:2}
+.road .d{grid-column:2 / -1; max-width:66ch}
+.road .d a{color:var(--hydro); font-weight:700; text-underline-offset:3px}
+.road .opt{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.07em; font-size:.72rem; font-weight:700; color:var(--ink-2); border:1px solid var(--rule); padding:1px 6px; margin-left:6px; vertical-align:middle}
+@media (max-width:560px){.road li{grid-template-columns:2.4rem minmax(0,1fr)} .road .cost{grid-column:2; text-align:left}}
+table{border-collapse:collapse; width:100%; background:var(--sheet); border:1px solid var(--rule); font-size:.95rem}
+th,td{padding:8px 10px; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top}
+th{font-family:var(--f-display); font-stretch:82%; text-transform:uppercase; letter-spacing:.06em; font-size:.75rem; color:var(--ink-2)}
+td.r,th.r{text-align:right; font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+tr.sum td{border-top:2px solid var(--ink); font-weight:700}
+.scroll{overflow-x:auto} .scroll table{min-width:520px}
+ul.why{margin:0; padding-left:1.2rem; display:grid; gap:6px; max-width:66ch}
 </style>
 </head>
 <body>
@@ -43,8 +63,51 @@ p{margin:0; max-width:62ch}
   <header>
     <div class="eyebrow">Maison · Saint-Julien-en-Genevois</div>
     <h1>Home renovation</h1>
-    <p>Plans, budgets and 3D models for the work on the house, one project per row.</p>
+    <p>Plans, budgets and 3D models for the work on the house: what to do first, what it costs, and one row per project.</p>
   </header>
+  <section aria-labelledby="h-start">
+    <h2 id="h-start">Where to start</h2>
+    <p>Two projects, one order. Cheap and urgent first, then the money that is already there, and the big spend last, once it has a firm price.</p>
+    <ol class="road">
+      <li><span class="t">Stop the water and service the boiler</span><span class="cost">≈ 150 €</span>
+        <span class="when">Now · November 2026</span>
+        <span class="d">The drainage works come before everything: nothing new goes on the ground-floor walls until the pipe is fixed and the walls have dried. Book the gas boiler's yearly service in the same weeks. It is a legal duty, and the 2024 report found no certificate. <a href="hall/plan.html">Hall plan</a></span></li>
+      <li><span class="t">Measure the kitchen and collect two quotes</span><span class="cost">0 €</span>
+        <span class="when">This winter, alongside the hall</span>
+        <span class="d">Thirty minutes with a tape measure, then a quote from an electrician and one from a gas fitter. It costs nothing and turns “somewhere between 6,300 and 10,000 €” into a number you can save for. <a href="kitchen/#start">Kitchen, K-01</a></span></li>
+      <li><span class="t">Build the ground floor hall</span><span class="cost">≈ 1,865 €</span>
+        <span class="when">November 2026 – February 2027</span>
+        <span class="d">The insurance payout of 1,800 € covers it and the walls are already open. It is the smaller job, so it goes first: the dust and the flood-proofing are out of the way before the kitchen starts. <a href="hall/">Ground floor hall</a></span></li>
+      <li><span class="t">A first slice of the kitchen: the back-wall run <span class="opt">Optional</span></span><span class="cost">≈ 950–1,050 €</span>
+        <span class="when">Any time after step 2</span>
+        <span class="d">The two new base units and two wall units on the back wall replace the microwave table. They touch neither the gas, the water nor today's units, so they can go in months before the rest, in the same fronts and worktop. Only do it once the worktop choice and the wall-cabinet height are final. <a href="kitchen/#plan">Kitchen, K-02</a></span></li>
+      <li><span class="t">Build the kitchen</span><span class="cost">6,300–10,000 €</span>
+        <span class="when">From spring 2027, when the money is set aside</span>
+        <span class="d">One to three weeks without a kitchen, depending on who builds it. Doing most of it yourselves, with a fitter for the worktop cuts, is the best value at about 7,500 €. <a href="kitchen/#routes">Kitchen, K-04</a></span></li>
+    </ol>
+    <ul class="why">
+      <li><b>Water, gas and electrics before finishes.</b> They are cheap to get right and expensive to get wrong.</li>
+      <li><b>Spend earmarked money first.</b> The payout is for the hall, and repaired damage keeps the insurance file clean.</li>
+      <li><b>Decide for free before paying.</b> Measurements and quotes cost nothing and remove most of the risk.</li>
+      <li><b>One building site at a time.</b> The hall is finished before the kitchen starts, so only one floor is in pieces.</li>
+    </ul>
+  </section>
+  <section aria-labelledby="h-money">
+    <h2 id="h-money">The money, at a glance</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>What</th><th>When</th><th class="r">Cost</th><th>Paid from</th></tr></thead>
+      <tbody>
+        <tr><td>Boiler service</td><td>Now</td><td class="r">120–180 €</td><td>Household budget, every year</td></tr>
+        <tr><td>Ground floor hall</td><td>Nov 2026 – Feb 2027</td><td class="r">≈ 1,865 €</td><td>1,800 € payout, about 65 € on top</td></tr>
+        <tr><td>Kitchen, mostly yourselves</td><td>From spring 2027</td><td class="r">≈ 7,500 €</td><td>Savings</td></tr>
+        <tr><td class="muted">… leanest: all DIY, laminate worktop, cheapest hob</td><td></td><td class="r">≈ 6,300 €</td><td></td></tr>
+        <tr><td class="muted">… dearest: IKEA fits everything, as planned</td><td></td><td class="r">≈ 9,900 €</td><td></td></tr>
+        <tr class="sum"><td>Out of your own pocket</td><td>Over about a year</td><td class="r">≈ 6,500–10,200 €</td><td>Most likely about 7,700 €</td></tr>
+      </tbody></table></div>
+    <p class="fine">Kitchen figures are IKEA's prices of 10 November 2026 plus estimates for the trades. They firm up once you have the two quotes from step 2.</p>
+  </section>
+  <section aria-labelledby="h-proj">
+  <h2 id="h-proj">Projects</h2>
   <nav class="projects" aria-label="Projects">
     <a href="model/#first">
       <span class="when">Ground + 1st</span>
@@ -65,6 +128,8 @@ p{margin:0; max-width:62ch}
       <span class="d">Remove the office wall, rebuild the flood-damaged walls in moisture-resistant board, and add a hall cabinet for coats and shoes. Plan, budget against the 1,800 € payout, and a 3D model.</span>
     </a>
   </nav>
+  </section>
+  <p class="fine">Not planned yet: the 2nd floor, the attic and anything on the façade. They get a row here when one of them becomes a project.</p>
   <p class="note">Family pages. Search engines are asked not to index them, but anyone with the link can open them.</p>
 </main>
 </body>
