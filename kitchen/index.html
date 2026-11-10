@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kitchen renovation · Home Renovation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout concept: the same drawing set as the hall plan. Each section is a numbered sheet (K-01 …) under a sticky title block
+   that carries the live total. Accent = the green used across the site; oak = the worktop; amber/red flag what needs a decision. */
+:root{
+  --paper:#F2F5F3; --sheet:#FFFFFF; --ink:#1B2A2E; --ink-2:#4B5B5F; --ink-3:#77878A; --rule:#C9D3D0; --rule-2:#E3E9E7;
+  --hydro:#2C7A57; --hydro-ink:#1F5E42; --hydro-pale:#DCEEE3;
+  --water:#2560A6; --water-pale:#DCE7F4;
+  --warn:#A86300; --warn-pale:#FBEBD2; --bad:#B3261E; --bad-pale:#F7DCDA;
+  --oak:#C9A679; --oak-pale:#F1E6D4; --unit:#F6F3EA; --wallfill:#D5DCDA; --wallline:#8E9B98;
+  --f-display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --s-1:.8125rem; --s0:1rem; --s1:1.1875rem; --s2:1.5rem; --s3:2rem; --s4:2.75rem;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --ink-3:#7C8C8A; --rule:#2E3D40; --rule-2:#223033;
+    --hydro:#62C092; --hydro-ink:#8AD6AF; --hydro-pale:#1C3A2C; --water:#78AEEB; --water-pale:#1A2C42;
+    --warn:#F2A846; --warn-pale:#3C2B12; --bad:#FF7B70; --bad-pale:#45201D;
+    --oak:#B08D5E; --oak-pale:#3A3122; --unit:#26343A; --wallfill:#2A3639; --wallline:#55646A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111A1C; --sheet:#172225; --ink:#E2EAE8; --ink-2:#A6B4B1; --ink-3:#7C8C8A; --rule:#2E3D40; --rule-2:#223033;
+  --hydro:#62C092; --hydro-ink:#8AD6AF; --hydro-pale:#1C3A2C; --water:#78AEEB; --water-pale:#1A2C42;
+  --warn:#F2A846; --warn-pale:#3C2B12; --bad:#FF7B70; --bad-pale:#45201D;
+  --oak:#B08D5E; --oak-pale:#3A3122; --unit:#26343A; --wallfill:#2A3639; --wallline:#55646A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-padding-top:128px; scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:var(--s0); line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:var(--hydro-ink); text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid var(--water); outline-offset:2px}
+.wrap{max-width:1120px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-display); font-stretch:87%; line-height:1.15; text-wrap:balance; margin:0}
+h1{font-size:clamp(2rem,6vw,var(--s4)); font-weight:750; letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,4.5vw,var(--s3)); font-weight:700}
+h3{font-size:var(--s1); font-weight:700}
+h4{font-size:var(--s0); font-weight:700}
+p{margin:0}
+.prose{max-width:68ch; display:grid; gap:.8rem}
+.mono,.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+.label{font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.08em; font-size:var(--s-1); font-weight:650; color:var(--ink-2)}
+.muted{color:var(--ink-2)} .small{font-size:var(--s-1)}
+ul.tight,ol.tight{margin:0; padding-left:1.2rem; display:grid; gap:.35rem}
+.fr{font-style:italic; color:var(--ink-2)}
+
+/* ---------- Title block (sticky) ---------- */
+.cartouche{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--sheet); border-bottom:1px solid var(--rule)}
+.cartouche .row{display:flex; align-items:center; gap:.5rem 1.5rem; flex-wrap:wrap; padding-block:.55rem}
+.brand{display:grid; gap:0; min-width:0}
+.brand b{font-family:var(--f-display); font-stretch:82%; font-size:1.125rem; font-weight:750; letter-spacing:.01em}
+.brand a{color:inherit; text-decoration:none} .brand a:hover{text-decoration:underline}
+.brand span{font-size:var(--s-1); color:var(--ink-2)}
+.meter{flex:1 1 300px; min-width:0; display:grid; gap:.3rem}
+.meter-top{display:flex; justify-content:space-between; gap:.25rem .75rem; font-family:var(--f-mono); font-size:.875rem; font-variant-numeric:tabular-nums; flex-wrap:wrap}
+.meter-top strong{font-weight:600}
+.bar{position:relative; height:10px; background:var(--rule-2); border:1px solid var(--rule); overflow:hidden}
+.bar i{position:absolute; inset:0 auto 0 0; background:var(--hydro); width:0; transition:width .25s ease}
+.bar[data-state="tight"] i{background:var(--warn)} .bar[data-state="over"] i{background:var(--bad)}
+.btn{font:inherit; font-family:var(--f-display); font-stretch:85%; font-weight:650; font-size:.9rem; letter-spacing:.02em; cursor:pointer;
+  border:1px solid var(--ink); background:var(--sheet); color:var(--ink); padding:.42rem .8rem; border-radius:2px; text-decoration:none; display:inline-block}
+.btn:hover{background:var(--rule-2)} .btn.primary{background:var(--ink); color:var(--sheet)} .btn.primary:hover{opacity:.9}
+.btn.sm{font-size:.8rem; padding:.25rem .55rem; border-color:var(--rule)}
+.sheetnav{display:flex; gap:.25rem; overflow-x:auto; padding-bottom:.5rem; scrollbar-width:thin}
+.sheetnav a{flex:0 0 auto; text-decoration:none; color:var(--ink-2); font-size:.8125rem; padding:.2rem .5rem; border:1px solid transparent; white-space:nowrap}
+.sheetnav a b{font-family:var(--f-mono); font-weight:600; color:var(--ink); margin-right:.3rem}
+.sheetnav a:hover{border-color:var(--rule); color:var(--ink)}
+
+/* ---------- Sheets ---------- */
+.sheet{padding-block:3rem 1rem}
+.sheet-head{display:grid; grid-template-columns:auto 1fr; gap:.25rem 1rem; align-items:baseline; border-top:2px solid var(--ink); padding-top:.75rem; margin-bottom:1.5rem}
+.sheet-code{font-family:var(--f-mono); font-weight:600; font-size:var(--s1); color:var(--ink); border:1.5px solid var(--ink); padding:.05rem .45rem; align-self:center}
+.sheet-head .sub{grid-column:2; color:var(--ink-2); max-width:70ch}
+@media (max-width:560px){.sheet-head{grid-template-columns:1fr} .sheet-code{justify-self:start} .sheet-head .sub{grid-column:1}}
+.stack{display:grid; gap:1.5rem; align-content:start}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:1.5rem 2rem; align-items:start}
+.two > *{min-width:0}
+.hero{padding-block:2.25rem 1rem; display:grid; gap:1.25rem}
+.hero .eyebrow{display:flex; gap:.5rem 1rem; flex-wrap:wrap}
+.hero p.lede{font-size:var(--s1); max-width:64ch}
+.figures{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); border:1px solid var(--rule); background:var(--sheet)}
+.figures > div{padding:.9rem 1rem; border-right:1px solid var(--rule); display:grid; gap:.15rem; align-content:start}
+.figures > div:last-child{border-right:0}
+.figures .big{font-family:var(--f-mono); font-size:1.6rem; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.1}
+@media (max-width:640px){.figures > div{border-right:0; border-bottom:1px solid var(--rule)} .figures > div:last-child{border-bottom:0}}
+.note{background:var(--sheet); border:1px solid var(--rule); padding:.85rem 1rem; display:grid; gap:.4rem; max-width:80ch; align-content:start}
+.note > .label{color:var(--ink)}
+.note.stop{background:var(--bad-pale); border-color:var(--bad)} .note.stop > .label{color:var(--bad)}
+.note.tip{background:var(--hydro-pale); border-color:var(--hydro)} .note.tip > .label{color:var(--hydro-ink)}
+.note.warn{background:var(--warn-pale); border-color:var(--warn)} .note.warn > .label{color:var(--warn)}
+.pill{display:inline-block; padding:.02rem .4rem; font-family:var(--f-display); font-stretch:80%; text-transform:uppercase; letter-spacing:.06em; font-size:.7rem; font-weight:700; border:1px solid currentColor; white-space:nowrap; vertical-align:middle}
+.pill.ok{color:var(--hydro-ink); background:var(--hydro-pale)} .pill.warn{color:var(--warn); background:var(--warn-pale)}
+.pill.bad{color:var(--bad); background:var(--bad-pale)} .pill.info{color:var(--water); background:var(--water-pale)} .pill.plain{color:var(--ink-2)}
+table.t{border-collapse:collapse; width:100%; background:var(--sheet); border:1px solid var(--rule); font-size:.95rem}
+table.t th,table.t td{padding:.5rem .65rem; border-bottom:1px solid var(--rule-2); text-align:left; vertical-align:top}
+table.t th{font-family:var(--f-display); font-stretch:82%; text-transform:uppercase; letter-spacing:.06em; font-size:.75rem; color:var(--ink-2); border-bottom:1px solid var(--rule); white-space:nowrap}
+table.t td.r,table.t th.r{text-align:right; font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+table.t tr.sum td{border-top:2px solid var(--ink); font-weight:700}
+.scroll{overflow-x:auto}
+
+/* ---------- Shopping list ---------- */
+.toolbar{display:flex; gap:.5rem .75rem; flex-wrap:wrap; align-items:center}
+.seg{display:inline-flex; flex-wrap:wrap; gap:0; border:1px solid var(--ink)}
+.seg button{font:inherit; font-family:var(--f-display); font-stretch:85%; font-weight:650; font-size:.85rem; border:0; border-right:1px solid var(--ink); background:var(--sheet); color:var(--ink); padding:.35rem .7rem; cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--sheet)}
+.totals{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); border:1px solid var(--rule); background:var(--sheet)}
+.totals > div{padding:.65rem .8rem; border-right:1px solid var(--rule); display:grid; gap:.1rem; align-content:start}
+.totals > div:last-child{border-right:0}
+.totals .v{font-family:var(--f-mono); font-size:1.2rem; font-weight:600; font-variant-numeric:tabular-nums}
+@media (max-width:640px){.totals > div{border-right:0; border-bottom:1px solid var(--rule)} .totals > div:last-child{border-bottom:0}}
+#choices{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:.75rem}
+.choice{background:var(--sheet); border:1px solid var(--rule); padding:.8rem 1rem; display:grid; gap:.5rem}
+.choice h4{display:flex; gap:.5rem; align-items:baseline; flex-wrap:wrap}
+.choice .opts{display:grid; gap:.3rem}
+.choice label{display:grid; grid-template-columns:auto 1fr auto; gap:.5rem; align-items:baseline; padding:.3rem .45rem; border:1px solid var(--rule-2); cursor:pointer}
+.choice label:has(input:checked){border-color:var(--hydro); background:var(--hydro-pale)}
+.choice .delta{font-family:var(--f-mono); font-size:.85rem; white-space:nowrap}
+.choice .delta.save{color:var(--hydro-ink); font-weight:600}
+.grp{background:var(--sheet); border:1px solid var(--rule)}
+.grp + .grp{margin-top:.75rem}
+.grp-head{display:grid; grid-template-columns:auto 1fr auto; gap:.2rem .75rem; align-items:baseline; padding:.6rem .8rem; border-bottom:1px solid var(--rule); background:var(--paper)}
+.grp-no{font-family:var(--f-mono); font-weight:600; border:1.5px solid var(--ink); padding:0 .35rem; font-size:.9rem}
+.grp-head h4{font-size:1.02rem}
+.grp-head .where{grid-column:2; font-size:var(--s-1); color:var(--ink-2)}
+.grp-head .sub{font-family:var(--f-mono); font-size:.9rem; font-weight:600; white-space:nowrap}
+.grp.done .grp-head{background:var(--hydro-pale)}
+.it{display:grid; grid-template-columns:auto 48px minmax(0,1fr) auto; gap:.15rem .7rem; padding:.55rem .8rem; border-bottom:1px solid var(--rule-2); align-items:start}
+.it:last-child{border-bottom:0}
+.it input[type=checkbox]{width:1.15rem; height:1.15rem; margin:.2rem 0 0; accent-color:var(--hydro)}
+.it img,.it .noimg{width:48px; height:48px; object-fit:contain; background:#fff; border:1px solid var(--rule-2)}
+.it .noimg{display:block; background:var(--rule-2)}
+.it .nm{font-family:var(--f-display); font-stretch:85%; font-weight:720; letter-spacing:.02em}
+.it .ds{display:block}
+.it .frn{display:block; font-size:var(--s-1); color:var(--ink-3)}
+.it .meta{display:flex; gap:.3rem .6rem; flex-wrap:wrap; align-items:center; margin-top:.2rem; font-size:var(--s-1)}
+.it .art{font-family:var(--f-mono); color:var(--ink-2); border:1px dashed var(--rule); padding:0 .3rem; background:none; cursor:copy; font-size:.8rem}
+.it .art:hover{border-color:var(--ink-2); color:var(--ink)}
+.it .nt{grid-column:3 / -1; font-size:var(--s-1); color:var(--ink-2); max-width:70ch}
+.it .pr{text-align:right; font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap; display:grid; gap:.05rem; justify-items:end}
+.it .pr .tot{font-weight:600}
+.it .pr .u{font-size:.8rem; color:var(--ink-2)}
+.it .pr s{color:var(--ink-3)}
+.it .go{font-family:var(--f-display); font-stretch:85%; font-weight:650; font-size:.8rem; border:1px solid var(--hydro-ink); color:var(--hydro-ink); padding:.1rem .45rem; text-decoration:none; white-space:nowrap; margin-top:.15rem}
+.it .go:hover{background:var(--hydro-pale)}
+.it.bought .ds,.it.bought .nm{text-decoration:line-through; color:var(--ink-3)}
+.it.off{opacity:.6}
+@media (max-width:560px){.it{grid-template-columns:auto 40px minmax(0,1fr)} .it img,.it .noimg{width:40px; height:40px} .it .pr{grid-column:3; display:flex; flex-wrap:wrap; gap:.15rem .6rem; align-items:baseline; justify-content:flex-start; text-align:left} .it .go{margin-top:0} .it .nt{grid-column:1 / -1}}
+details.fold{background:var(--sheet); border:1px solid var(--rule)}
+details.fold > summary{cursor:pointer; padding:.6rem .8rem; font-family:var(--f-display); font-stretch:85%; font-weight:650}
+details.fold[open] > summary{border-bottom:1px solid var(--rule)}
+.hide{display:none !important}
+.toast{position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--sheet); padding:.45rem .9rem; font-size:.9rem; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:40; max-width:90vw}
+.toast.show{opacity:1; transform:translateX(-50%)}
+
+/* ---------- Budget ---------- */
+.calc{background:var(--sheet); border:1px solid var(--rule)}
+.calc .ln{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.2rem 1rem; padding:.55rem .8rem; border-bottom:1px solid var(--rule-2); align-items:center}
+.calc .ln small{display:block; color:var(--ink-2); font-size:var(--s-1); max-width:62ch}
+.calc .ln input[type=number]{font:inherit; font-family:var(--f-mono); width:7.5rem; text-align:right; padding:.25rem .4rem; border:1px solid var(--rule); background:var(--paper); color:var(--ink)}
+.calc .ln .fixed{font-family:var(--f-mono); font-variant-numeric:tabular-nums; font-weight:600}
+.calc .ln.total{border-top:2px solid var(--ink); border-bottom:0; font-weight:700; font-size:1.1rem}
+.routes{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:.75rem}
+.route{background:var(--sheet); border:1px solid var(--rule); padding:.8rem .9rem; display:grid; gap:.45rem; align-content:start; text-align:left; font:inherit; color:inherit; cursor:pointer}
+.route[aria-pressed="true"]{border-color:var(--hydro); box-shadow:inset 0 0 0 2px var(--hydro)}
+.route .rt{font-family:var(--f-display); font-stretch:86%; font-weight:720; font-size:1.1rem}
+.route .rp{font-family:var(--f-mono); font-weight:600; font-size:1.25rem}
+.route ul{margin:0; padding-left:1.05rem; font-size:.9rem; display:grid; gap:.2rem}
+
+@media print{
+  .cartouche{position:static} .sheetnav,.toolbar,.btn,.toast,.it .go,.noprint{display:none !important}
+  body{background:#fff; font-size:10.5pt} .sheet{padding-block:1rem .5rem; break-inside:auto} .grp,.it,.choice,.note,tr{break-inside:avoid}
+  .it img{width:32px; height:32px} a{color:inherit; text-decoration:none} details.fold > *{display:block}
+}
+</style>
+</head>
+<body>
+<div class="cartouche">
+  <div class="wrap">
+    <div class="row">
+      <div class="brand"><b><a href="../">MAISON</a> · KITCHEN</b><span>Plan review, routes, budget and shopping list</span></div>
+      <div class="meter" aria-live="polite">
+        <div class="meter-top"><span><strong data-f="total">–</strong> all in · <span data-f="route"></span></span><span data-f="left"></span></div>
+        <div class="bar hide" id="bar" data-state="ok"><i></i></div>
+      </div>
+    </div>
+    <nav class="sheetnav" id="sheetnav" aria-label="Sections"></nav>
+  </div>
+</div>
+<main>
+<header class="hero wrap" id="top">
+  <div class="eyebrow"><span class="label">1st floor · kitchen</span><span class="label">IKEA plan of 9 Dec 2025</span><span class="label">Prices checked <span data-f="checked">10 Nov 2026</span></span></div>
+  <h1>Kitchen renovation</h1>
+  <p class="lede">IKEA's planner measured the kitchen in December 2025 and drew a new one on the same footprint: off-white framed fronts, an oak worktop, the sink on the peninsula, and a new 1.2 m run on the back wall. This page checks his plan, prices it at today's IKEA prices, and sets out three ways to get it built.</p>
+  <div class="figures">
+    <div><span class="label">IKEA goods today</span><span class="big" data-f="goods0">5,797 €</span><span class="small muted">his list, corrected, plus the items it left out</span></div>
+    <div><span class="label">IKEA's fitting quotes</span><span class="big">2,549 €</span><span class="small muted">fitting 1,543 · removal and extras 946 · delivery 60. They ran out in March 2026.</span></div>
+    <div><span class="label">Work nobody quoted</span><span class="big">≈ 1,200 €</span><span class="small muted">electrician, gas, walls, splashback</span></div>
+    <div><span class="label">All in</span><span class="big" data-f="range">6,300–10,000 €</span><span class="small muted">from doing it yourself with cheaper choices to IKEA doing everything</span></div>
+  </div>
+  <div class="toolbar noprint">
+    <a class="btn primary" href="../model/#kitchen">See it in 3D</a>
+    <a class="btn" href="#list">Shopping list with IKEA links</a>
+    <a class="btn" href="#start">Where to start</a>
+    <button class="btn" type="button" onclick="window.print()">Print</button>
+  </div>
+</header>
+<section class="sheet" id="list" data-nav="Shopping list">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-07</span><h2>Shopping list</h2>
+      <p class="sub">Every article on IKEA's list, with the planner's handwritten corrections applied, today's price, and a direct link to its page on ikea.com/fr. Tick lines as you buy them. Ticks and choices are saved in this browser.</p></div>
+    <div class="stack">
+      <div class="totals" id="list-totals">
+        <div><span class="label">Printed list, Dec 2025</span><span class="v" data-f="printed"></span><span class="small muted"><span data-f="lines"></span> lines, before his corrections</span></div>
+        <div><span class="label">Corrected, today's prices</span><span class="v" data-f="corrected"></span><span class="small muted">quantities fixed, 7 lines crossed out</span></div>
+        <div><span class="label">Added and missing</span><span class="v" data-f="extra"></span><span class="small muted">his handwritten notes, plus hinges</span></div>
+        <div><span class="label">To order, your choices</span><span class="v" data-f="goods"></span><span class="small muted" data-f="bought"></span></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:.6rem">Choices that change the list</h3>
+        <div class="two" id="choices"></div>
+      </div>
+      <div class="toolbar noprint">
+        <div class="seg" id="view" role="group" aria-label="Group the list"><button type="button" data-v="cab">By cabinet</button><button type="button" data-v="art">One line per article</button></div>
+        <div class="seg" id="filter" role="group" aria-label="Filter the list"><button type="button" data-v="all">All</button><button type="button" data-v="todo">Still to buy</button><button type="button" data-v="chg">Changed since the quote</button></div>
+        <button class="btn sm" type="button" id="copy-list">Copy order list</button>
+        <button class="btn sm" type="button" id="untick">Clear ticks</button>
+      </div>
+      <p class="small muted" id="list-count"></p>
+      <div id="groups"></div>
+      <details class="fold" id="removed"><summary>Not ordered: crossed out by the planner or discontinued (<span data-f="nremoved"></span> lines)</summary><div id="removed-items"></div></details>
+      <div class="note"><span class="label">How to order</span>
+        <p>“One line per article” is the list to order from: it adds up the same article across cabinets. The dashed number is IKEA's article number; click it to copy, then paste it into the search box on ikea.com. “Copy order list” puts the whole list on the clipboard, ready to email to IKEA's kitchen service or to check off at the store.</p>
+        <p>Prices and stock were read from ikea.com/fr on <span data-f="checked"></span>. IKEA changes them without notice, so the product page is the reference. Kitchen orders over a set amount often qualify for IKEA's kitchen offers: ask before paying.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="wrap" style="padding-block:2.5rem 3rem">
+  <div class="note"><span class="label">Sources and limits</span>
+    <p>IKEA's four documents of 9 December 2025: the technical report, the article list, the fitting quote and the annex-works quote. Prices, stock and product details were read from ikea.com/fr on <span data-f="checked">10 Nov 2026</span>. Labour figures marked as estimates are my estimates for Haute-Savoie, not quotes.</p>
+    <p>This page is a planning aid. It doesn't replace the fitter's own measurements, or an electrician's and a gas fitter's sign-off. Your ticks, choices and amounts are saved in this browser only.</p>
+    <p class="noprint"><a href="../">All projects</a> · <a href="../model/#kitchen">3D model</a> · <a href="../hall/">Ground floor hall</a></p></div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+'use strict';
+var D = {"summary":{"printed":5475.8,"corrected_dec2025":5305.81,"corrected_today":5390.84,"added":305.93,"missing":100.0,"lines":87,"unique":68,"checked":"10 Nov 2026"},"groups":[{"id":"c2","no":2,"title":"Base cabinet 60 cm, door and shelf","where":"Back wall, new run · left","tag":"ME 102","kind":"cabinet","items":[{"art":"502.056.26","name":"METOD","en":"Base cabinet frame, white, 60×60×80 cm","qty":1,"status":"ok","p0":33.0,"p":34.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-blanc-50205626/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-blanc__0626285_pe692681_s5.jpg","fr":"structure élément bas, blanc, 60x60x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"502.056.12","name":"UTRUSTA","en":"Shelf, white, 60×60 cm","qty":1,"status":"ok","p0":12.0,"p":13.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-50205612/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0162246_pe317457_s5.jpg","fr":"tablette, blanc, 60x60 cm"}]},{"id":"c3","no":3,"title":"Base cabinet 60 cm, door and shelf","where":"Back wall, new run · right","tag":"ME 102","kind":"cabinet","items":[{"art":"502.056.26","name":"METOD","en":"Base cabinet frame, white, 60×60×80 cm","qty":1,"status":"ok","p0":33.0,"p":34.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-blanc-50205626/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-blanc__0626285_pe692681_s5.jpg","fr":"structure élément bas, blanc, 60x60x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"502.056.12","name":"UTRUSTA","en":"Shelf, white, 60×60 cm","qty":1,"status":"ok","p0":12.0,"p":13.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-50205612/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0162246_pe317457_s5.jpg","fr":"tablette, blanc, 60x60 cm"}]},{"id":"c5","no":5,"title":"Base cabinet 40 cm, three drawers","where":"Side wall · beside the fridge","tag":"ME/MA 144","kind":"cabinet","items":[{"art":"802.134.32","name":"METOD","en":"Base cabinet frame, white, 40×60×80 cm","qty":1,"status":"ok","p0":28.0,"p":32.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-blanc-80213432/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-blanc__0156747_pe314813_s5.jpg","fr":"structure élément bas, blanc, 40x60x80 cm"},{"art":"302.054.96","name":"BODBYN","en":"Drawer front, off-white, 40×20 cm","qty":2,"status":"ok","p0":26.0,"p":26.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-face-de-tiroir-blanc-casse-30205496/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-face-de-tiroir-blanc-casse__0645010_pe703163_s5.jpg","fr":"face de tiroir, blanc cassé, 40x20 cm"},{"art":"702.054.99","name":"BODBYN","en":"Drawer front, off-white, 40×40 cm","qty":1,"status":"ok","p0":46.0,"p":46.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-face-de-tiroir-blanc-casse-70205499/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-face-de-tiroir-blanc-casse__0645013_pe703166_s5.jpg","fr":"face de tiroir, blanc cassé, 40x40 cm"},{"art":"002.850.22","name":"MAXIMERA","en":"Drawer, high, white, 40×60 cm","qty":1,"status":"ok","p0":45.0,"p":45.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-haut-blanc-00285022/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-haut-blanc__0301377_pe426679_s5.jpg","fr":"tiroir, haut, blanc, 40x60 cm"},{"art":"002.850.36","name":"MAXIMERA","en":"Drawer, medium, white, 40×60 cm","qty":1,"status":"ok","p0":31.0,"p":32.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-moyen-blanc-00285036/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-moyen-blanc__0301419_pe426673_s5.jpg","fr":"tiroir, moyen, blanc, 40x60 cm"},{"art":"302.850.30","name":"MAXIMERA","en":"Drawer, low, white, 40×60 cm","qty":2,"status":"ok","p0":26.0,"p":27.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-bas-blanc-30285030/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-bas-blanc__0301401_pe426687_s5.jpg","fr":"tiroir, bas, blanc, 40x60 cm"},{"art":"802.214.51","name":"UTRUSTA","en":"Inner drawer front, low, white, 40 cm","qty":1,"status":"ok","p0":5.0,"p":6.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-face-de-tiroir-bas-blanc-80221451/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-face-de-tiroir-bas-blanc__0162423_pe317639_s5.jpg","fr":"face de tiroir, bas, blanc, 40 cm"}]},{"id":"c6","no":6,"title":"Base cabinet 60 cm for hob and oven","where":"Side wall","tag":"ME/MA 216","kind":"cabinet","items":[{"art":"702.135.69","name":"METOD","en":"Base cabinet for built-in oven/sink, white, 60×60×80 cm","qty":1,"status":"ok","p0":36.0,"p":40.0,"url":"https://www.ikea.com/fr/fr/p/metod-el-bas-pr-electro-encastre-evier-blanc-70213569/","img":"https://www.ikea.com/fr/fr/images/products/metod-el-bas-pr-electro-encastre-evier-blanc__0156695_pe314788_s5.jpg","fr":"élément bas pr four/évier encastré, blanc, 60x60x80 cm"},{"art":"502.054.95","name":"BODBYN","en":"Drawer front, off-white, 60×10 cm","qty":1,"status":"ok","p0":52.0,"p":52.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-face-de-tiroir-blanc-casse-50205495/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-face-de-tiroir-blanc-casse__0633961_pe696225_s5.jpg","fr":"face de tiroir, blanc cassé, 60x10 cm"},{"art":"902.850.32","name":"MAXIMERA","en":"Drawer, low, white, 60×60 cm","qty":1,"status":"ok","p0":33.0,"p":34.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-bas-blanc-90285032/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-bas-blanc__0301407_pe426677_s5.jpg","fr":"tiroir, bas, blanc, 60x60 cm"},{"art":"404.678.26","name":"HÖGKLASSIG","en":"Induction hob, IKEA 700, black, 59 cm","qty":1,"status":"ok","p0":629.0,"p":699.0,"url":"https://www.ikea.com/fr/fr/p/hoegklassig-plaque-de-cuisson-a-induction-ikea-700-noir-40467826/","img":"https://www.ikea.com/fr/fr/images/products/hoegklassig-plaque-de-cuisson-a-induction-ikea-700-noir__0854591_pe780679_s5.jpg","note":"Needs its own 32 A circuit in 6 mm² cable. Price is up 70 € since the quote.","fr":"plaque de cuisson à induction, IKEA 700 noir, 59 cm"},{"art":"103.019.60","name":"UTRUSTA","en":"Oven support, galvanised steel","qty":1,"status":"ok","p0":29.99,"p":19.99,"url":"https://www.ikea.com/fr/fr/p/utrusta-support-four-acier-zingue-10301960/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-support-four-acier-zingue__0755148_pe748284_s5.jpg","note":"The list has the oven support but no oven. See “Oven” under Choices.","fr":"support four, acier zingué"}]},{"id":"c7","no":7,"title":"Pull-out base cabinet 20 cm","where":"Side wall","tag":"ME 218","kind":"cabinet","items":[{"art":"302.125.62","name":"METOD","en":"Base cabinet frame, white, 20×60×80 cm","qty":1,"status":"ok","p0":27.0,"p":29.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-blanc-30212562/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-blanc__0626284_pe692675_s5.jpg","fr":"structure élément bas, blanc, 20x60x80 cm"},{"art":"102.054.83","name":"BODBYN","en":"Door, off-white, 20×80 cm","qty":1,"status":"ok","p0":54.0,"p":54.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-10205483/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633869_pe696156_s5.jpg","fr":"porte, blanc cassé, 20x80 cm"},{"art":"202.972.79","name":"MAXIMERA","en":"Pull-out interior fitting, 20 cm","qty":1,"status":"ok","p0":52.0,"p":54.0,"url":"https://www.ikea.com/fr/fr/p/maximera-amenagement-interieur-coulissant-20297279/","img":"https://www.ikea.com/fr/fr/images/products/maximera-amenagement-interieur-coulissant__0625749_pe692439_s5.jpg","fr":"aménagement intérieur coulissant, 20 cm"}]},{"id":"c8","no":8,"title":"Corner base cabinet 128 cm with pull-out fitting","where":"Corner, side wall meets the peninsula","tag":"ME 189","kind":"cabinet","items":[{"art":"405.967.53","name":"METOD","en":"Corner base cabinet frame, white, 128×60×80 cm","qty":1,"status":"ok","p0":80.0,"p":80.0,"url":"https://www.ikea.com/fr/fr/p/metod-element-bas-dangle-blanc-40596753/","img":"https://www.ikea.com/fr/fr/images/products/metod-element-bas-dangle-blanc__1391056_pe965677_s5.jpg","fr":"structure élément bas d'angle, blanc, 128x60x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"405.967.91","name":"UTRUSTA","en":"Corner base pull-out fitting, grey, 128 cm","qty":1,"status":"ok","p0":149.0,"p":149.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-amenagement-coulissant-elt-angle-gris-40596791/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-amenagement-coulissant-elt-angle-gris__1437994_pe984588_s5.jpg","note":"Planner’s note: add hinges for the corner unit (listed under Additions).","fr":"aménagement coulissant élt angle, gris, 128 cm"}]},{"id":"c9","no":9,"title":"Sink base cabinet 80 cm, two drawers","where":"Peninsula","tag":"ME/MA 296","kind":"cabinet","items":[{"art":"502.154.75","name":"METOD","en":"Base cabinet for built-in oven/sink, white, 80×60×80 cm","qty":1,"status":"ok","p0":46.0,"p":50.0,"url":"https://www.ikea.com/fr/fr/p/metod-el-bas-pr-electro-encastre-evier-blanc-50215475/","img":"https://www.ikea.com/fr/fr/images/products/metod-el-bas-pr-electro-encastre-evier-blanc__0808205_pe770725_s5.jpg","fr":"élément bas pr four/évier encastré, blanc, 80x60x80 cm"},{"art":"002.054.93","name":"BODBYN","en":"Drawer front, off-white, 80×40 cm","qty":1,"status":"ok","p0":80.0,"p":80.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-face-de-tiroir-blanc-casse-00205493/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-face-de-tiroir-blanc-casse__0706696_pe725959_s5.jpg","fr":"face de tiroir, blanc cassé, 80x40 cm"},{"art":"902.054.98","name":"BODBYN","en":"Drawer front, off-white, 80×20 cm","qty":2,"status":"ok","p0":54.0,"p":54.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-face-de-tiroir-blanc-casse-90205498/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-face-de-tiroir-blanc-casse__0706697_pe725963_s5.jpg","fr":"face de tiroir, blanc cassé, 80x20 cm"},{"art":"402.850.39","name":"MAXIMERA","en":"Drawer, medium, white, 80×37 cm","qty":1,"status":"ok","p0":45.0,"p":46.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-moyen-blanc-40285039/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-moyen-blanc__0301428_pe426670_s5.jpg","fr":"tiroir, moyen, blanc, 80x37 cm"},{"art":"902.850.27","name":"MAXIMERA","en":"Drawer, high, white, 80×45 cm","qty":1,"status":"ok","p0":65.0,"p":65.0,"url":"https://www.ikea.com/fr/fr/p/maximera-tiroir-haut-blanc-90285027/","img":"https://www.ikea.com/fr/fr/images/products/maximera-tiroir-haut-blanc__0301392_pe426684_s5.jpg","fr":"tiroir, haut, blanc, 80x45 cm"},{"art":"903.151.71","name":"VATTUDALEN","en":"Inset sink, 1 bowl with drainer, stainless steel, 86×47 cm","qty":1,"status":"ok","p0":139.0,"p":139.0,"url":"https://www.ikea.com/fr/fr/p/vattudalen-evier-integre-1-bac-avec-egouttoir-acier-inoxydable-90315171/","img":"https://www.ikea.com/fr/fr/images/products/vattudalen-evier-integre-1-bac-avec-egouttoir-acier-inoxydable__0430268_pe584526_s5.jpg","note":"Inset sink: the worktop cut-out edge must be sealed, above all in oak veneer.","fr":"évier intégré, 1 bac avec égouttoir, acier inoxydable, 86x47 cm"},{"art":"004.551.61","name":"ÄLMAREN","en":"Kitchen mixer tap, stainless-steel colour","qty":1,"status":"ok","p0":59.0,"p":69.0,"url":"https://www.ikea.com/fr/fr/p/aelmaren-mitigeur-couleur-acier-inox-00455161/","img":"https://www.ikea.com/fr/fr/images/products/aelmaren-mitigeur-couleur-acier-inox__0804883_pe769403_s5.jpg","fr":"mitigeur, couleur acier inox"},{"art":"204.202.03","name":"HÅLLBAR","en":"Bin with lid, light grey, 22 l","qty":1,"status":"ok","p0":9.99,"p":9.99,"url":"https://www.ikea.com/fr/fr/p/hallbar-poubelle-avec-couvercle-gris-clair-20420203/","img":"https://www.ikea.com/fr/fr/images/products/hallbar-poubelle-avec-couvercle-gris-clair__0742725_pe742784_s5.jpg","fr":"poubelle avec couvercle, gris clair, 22 l"},{"art":"604.228.70","name":"HÅLLBAR","en":"Frame for waste-sorting bins, white, for an 80 cm drawer","qty":1,"status":"ok","p0":25.0,"p":25.0,"url":"https://www.ikea.com/fr/fr/p/hallbar-support-pour-poubelle-de-tri-blanc-60422870/","img":"https://www.ikea.com/fr/fr/images/products/hallbar-support-pour-poubelle-de-tri-blanc__0742715_pe742780_s5.jpg","fr":"support pour poubelle de tri, blanc, 80 cm"},{"art":"803.980.58","name":"HÅLLBAR","en":"Bin with lid, light grey, 10 l","qty":2,"status":"ok","p0":6.99,"p":6.99,"url":"https://www.ikea.com/fr/fr/p/hallbar-poubelle-avec-couvercle-gris-clair-80398058/","img":"https://www.ikea.com/fr/fr/images/products/hallbar-poubelle-avec-couvercle-gris-clair__0742722_pe742782_s5.jpg","fr":"poubelle avec couvercle, gris clair, 10 l"},{"art":"804.338.82","name":"HÅLLBAR","en":"Bin with lid for food waste, light grey, 10 l","qty":1,"status":"ok","p0":6.99,"p":6.99,"url":"https://www.ikea.com/fr/fr/p/hallbar-poubelle-pr-dechets-biodegradables-gris-clair-80433882/","img":"https://www.ikea.com/fr/fr/images/products/hallbar-poubelle-pr-dechets-biodegradables-gris-clair__0742700_pe742765_s5.jpg","fr":"poubelle pr déchets biodégradables, gris clair, 10 l"},{"art":"904.321.94","name":"HÅLLBAR","en":"Bin with lid, light grey, 3 l","qty":1,"status":"ok","p0":4.99,"p":4.99,"url":"https://www.ikea.com/fr/fr/p/hallbar-poubelle-avec-couvercle-gris-clair-90432194/","img":"https://www.ikea.com/fr/fr/images/products/hallbar-poubelle-avec-couvercle-gris-clair__0742696_pe742763_s5.jpg","fr":"poubelle avec couvercle, gris clair, 3 l"},{"art":"103.115.39","name":"LILLVIKEN","en":"Water trap and strainer, 1 bowl","qty":1,"status":"ok","p0":17.0,"p":17.0,"url":"https://www.ikea.com/fr/fr/p/lillviken-siphon-bonde-1-bac-10311539/","img":"https://www.ikea.com/fr/fr/images/products/lillviken-siphon-bonde-1-bac__0486407_pe622054_s5.jpg","fr":"siphon/bonde 1 bac"},{"art":"203.178.52","name":"LILLVIKEN","en":"Sink plug","qty":1,"status":"ok","p0":5.99,"p":5.99,"url":"https://www.ikea.com/fr/fr/p/lillviken-bouchon-20317852/","img":"https://www.ikea.com/fr/fr/images/products/lillviken-bouchon__0430299_pe584559_s5.jpg","fr":"bouchon"}]},{"id":"c11","no":11,"title":"Wall cabinet 60 cm","where":"Back wall, new run · left","tag":"ME 305","kind":"cabinet","items":[{"art":"302.055.28","name":"METOD","en":"Wall cabinet frame, white, 60×37×80 cm","qty":1,"status":"ok","p0":28.0,"p":30.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-30205528/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0156838_pe314888_s5.jpg","fr":"structure élément mural, blanc, 60x37x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"605.285.84","name":"MITTLED","en":"LED worktop strip, dimmable, white, 60 cm","qty":1,"status":"ok","p0":16.99,"p":19.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-60528584/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869936_pe781531_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 60 cm"},{"art":"102.056.14","name":"UTRUSTA","en":"Shelf, white, 60×37 cm","qty":1,"status":"ok","p0":10.0,"p":10.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-10205614/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0162242_pe317459_s5.jpg","fr":"tablette, blanc, 60x37 cm"}]},{"id":"c12","no":12,"title":"Wall cabinet 60 cm","where":"Back wall, new run · right","tag":"ME 305","kind":"cabinet","items":[{"art":"302.055.28","name":"METOD","en":"Wall cabinet frame, white, 60×37×80 cm","qty":1,"status":"ok","p0":28.0,"p":30.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-30205528/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0156838_pe314888_s5.jpg","fr":"structure élément mural, blanc, 60x37x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"605.285.84","name":"MITTLED","en":"LED worktop strip, dimmable, white, 60 cm","qty":1,"status":"ok","p0":16.99,"p":19.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-60528584/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869936_pe781531_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 60 cm"},{"art":"102.056.14","name":"UTRUSTA","en":"Shelf, white, 60×37 cm","qty":1,"status":"ok","p0":10.0,"p":10.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-10205614/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0162242_pe317459_s5.jpg","fr":"tablette, blanc, 60x37 cm"}]},{"id":"c13","no":13,"title":"Wall cabinet 40 cm","where":"Side wall · beside the fridge","tag":"ME 304","kind":"cabinet","items":[{"art":"702.055.31","name":"METOD","en":"Wall cabinet frame, white, 40×37×80 cm","qty":1,"status":"ok","p0":27.0,"p":28.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-70205531/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0640634_pe699954_s5.jpg","fr":"structure élément mural, blanc, 40x37x80 cm"},{"art":"702.054.80","name":"BODBYN","en":"Door, off-white, 40×80 cm","qty":1,"status":"ok","p0":76.0,"p":76.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-70205480/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633900_pe696165_s5.jpg","fr":"porte, blanc cassé, 40x80 cm"},{"art":"705.285.69","name":"MITTLED","en":"LED worktop strip, dimmable, white, 40 cm","qty":1,"status":"ok","p0":14.99,"p":14.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-70528569/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869934_pe781529_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 40 cm"},{"art":"402.056.22","name":"UTRUSTA","en":"Shelf, white, 40×37 cm","qty":1,"status":"ok","p0":7.0,"p":8.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-40205622/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0625012_pe692055_s5.jpg","fr":"tablette, blanc, 40x37 cm"}]},{"id":"c14","no":14,"title":"Wall cabinet 60 cm with built-in hood","where":"Side wall · above the hob","tag":"ME 484","kind":"cabinet","items":[{"art":"305.476.40","name":"METOD","en":"Wall cabinet for a built-in hood, white, 60×37×80 cm","qty":1,"status":"ok","p0":69.0,"p":70.0,"url":"https://www.ikea.com/fr/fr/p/metod-element-mural-pour-hotte-integree-blanc-30547640/","img":"https://www.ikea.com/fr/fr/images/products/metod-element-mural-pour-hotte-integree-blanc__1192582_pe901163_s5.jpg","fr":"struct élément mural pr hotte intég, blanc, 60x37x80 cm"},{"art":"502.054.81","name":"BODBYN","en":"Door, off-white, 60×80 cm","qty":1,"status":"ok","p0":110.0,"p":110.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-50205481/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633921_pe696182_s5.jpg","fr":"porte, blanc cassé, 60x80 cm"},{"art":"703.891.39","name":"UNDERVERK","en":"Built-in extractor hood, stainless steel, 60 cm","qty":1,"status":"ok","p0":369.0,"p":349.0,"url":"https://www.ikea.com/fr/fr/p/underverk-hotte-aspirante-integree-acier-inoxydable-70389139/","img":"https://www.ikea.com/fr/fr/images/products/underverk-hotte-aspirante-integree-acier-inoxydable__1200484_pe904981_s5.jpg","note":"On a shared wall it will have to recirculate: 79 dB at full speed, against 64 dB when ducted outside. See the plan review.","fr":"hotte aspirante intégrée, acier inoxydable, 60 cm"}]},{"id":"c15","no":15,"title":"Wall cabinet 80 cm, two glass doors","where":"Side wall","tag":"ME 323","kind":"cabinet","items":[{"art":"702.055.26","name":"METOD","en":"Wall cabinet frame, white, 80×37×80 cm","qty":1,"status":"ok","p0":32.0,"p":34.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-70205526/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0156854_pe314896_s5.jpg","fr":"structure élément mural, blanc, 80x37x80 cm"},{"art":"104.850.49","name":"BODBYN","en":"Glass door, off-white, 40×80 cm","qty":2,"status":"ok","p0":88.0,"p":88.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-vitree-blanc-casse-10485049/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-vitree-blanc-casse__0645479_pe703576_s5.jpg","fr":"porte vitrée, blanc cassé, 40x80 cm"},{"art":"005.286.62","name":"MITTLED","en":"LED spotlight, dimmable, white","qty":2,"status":"ok","p0":14.99,"p":14.99,"url":"https://www.ikea.com/fr/fr/p/mittled-spot-a-led-intensite-lumineuse-reglable-blanc-00528662/","img":"https://www.ikea.com/fr/fr/images/products/mittled-spot-a-led-intensite-lumineuse-reglable-blanc__0869946_pe781540_s5.jpg","fr":"spot à LED, intensité lumineuse réglable blanc"},{"art":"705.286.11","name":"MITTLED","en":"LED worktop strip, dimmable, white, 80 cm","qty":1,"status":"ok","p0":19.99,"p":24.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-70528611/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869941_pe781536_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 80 cm"},{"art":"202.056.04","name":"UTRUSTA","en":"Shelf, glass, 80×37 cm","qty":1,"status":"ok","p0":21.0,"p":21.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-verre-20205604/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-verre__0162250_pe317456_s5.jpg","fr":"tablette, verre, 80x37 cm"},{"art":"002.263.15","name":"VARIERA","en":"Cable-hole cover, white","qty":1,"status":"ok","p0":1.5,"p":1.5,"url":"https://www.ikea.com/fr/fr/p/variera-cache-blanc-00226315/","img":"https://www.ikea.com/fr/fr/images/products/variera-cache-blanc__0626425_pe692743_s5.jpg","fr":"cache, blanc"}]},{"id":"c16","no":16,"title":"Wall cabinet 40 cm, glass door","where":"Side wall","tag":"ME 317","kind":"cabinet","items":[{"art":"702.055.31","name":"METOD","en":"Wall cabinet frame, white, 40×37×80 cm","qty":1,"status":"ok","p0":27.0,"p":28.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-70205531/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0640634_pe699954_s5.jpg","fr":"structure élément mural, blanc, 40x37x80 cm"},{"art":"104.850.49","name":"BODBYN","en":"Glass door, off-white, 40×80 cm","qty":1,"status":"ok","p0":88.0,"p":88.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-vitree-blanc-casse-10485049/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-vitree-blanc-casse__0645479_pe703576_s5.jpg","fr":"porte vitrée, blanc cassé, 40x80 cm"},{"art":"005.286.62","name":"MITTLED","en":"LED spotlight, dimmable, white","qty":1,"status":"ok","p0":14.99,"p":14.99,"url":"https://www.ikea.com/fr/fr/p/mittled-spot-a-led-intensite-lumineuse-reglable-blanc-00528662/","img":"https://www.ikea.com/fr/fr/images/products/mittled-spot-a-led-intensite-lumineuse-reglable-blanc__0869946_pe781540_s5.jpg","fr":"spot à LED, intensité lumineuse réglable blanc"},{"art":"705.285.69","name":"MITTLED","en":"LED worktop strip, dimmable, white, 40 cm","qty":1,"status":"ok","p0":14.99,"p":14.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-70528569/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869934_pe781529_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 40 cm"},{"art":"202.133.31","name":"UTRUSTA","en":"Shelf, glass, 40×37 cm","qty":1,"status":"ok","p0":15.0,"p":15.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-verre-20213331/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-verre__0625008_pe692052_s5.jpg","fr":"tablette, verre, 40x37 cm"},{"art":"002.263.15","name":"VARIERA","en":"Cable-hole cover, white","qty":1,"status":"ok","p0":1.5,"p":1.5,"url":"https://www.ikea.com/fr/fr/p/variera-cache-blanc-00226315/","img":"https://www.ikea.com/fr/fr/images/products/variera-cache-blanc__0626425_pe692743_s5.jpg","fr":"cache, blanc"}]},{"id":"c17","no":17,"title":"Wall cabinet 40 cm","where":"Side wall · above the corner","tag":"ME 304","kind":"cabinet","items":[{"art":"702.055.31","name":"METOD","en":"Wall cabinet frame, white, 40×37×80 cm","qty":1,"status":"ok","p0":27.0,"p":28.0,"url":"https://www.ikea.com/fr/fr/p/metod-rangement-mural-blanc-70205531/","img":"https://www.ikea.com/fr/fr/images/products/metod-rangement-mural-blanc__0640634_pe699954_s5.jpg","fr":"structure élément mural, blanc, 40x37x80 cm"},{"art":"702.054.80","name":"BODBYN","en":"Door, off-white, 40×80 cm","qty":1,"status":"ok","p0":76.0,"p":76.0,"url":"https://www.ikea.com/fr/fr/p/bodbyn-porte-blanc-casse-70205480/","img":"https://www.ikea.com/fr/fr/images/products/bodbyn-porte-blanc-casse__0633900_pe696165_s5.jpg","fr":"porte, blanc cassé, 40x80 cm"},{"art":"705.285.69","name":"MITTLED","en":"LED worktop strip, dimmable, white, 40 cm","qty":1,"status":"ok","p0":14.99,"p":14.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-70528569/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869934_pe781529_s5.jpg","fr":"baguette lum LED plan travail cuis, intensité lumineuse réglable blanc, 40 cm"},{"art":"402.056.22","name":"UTRUSTA","en":"Shelf, white, 40×37 cm","qty":1,"status":"ok","p0":7.0,"p":8.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-tablette-blanc-40205622/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-tablette-blanc__0625012_pe692055_s5.jpg","fr":"tablette, blanc, 40x37 cm"}]},{"id":"rail","title":"Suspension rail","kind":"general","items":[{"art":"602.056.64","name":"METOD","en":"Suspension rail, galvanised steel, 200 cm","qty":3,"status":"qty","qty0":5,"p0":20.0,"p":20.0,"url":"https://www.ikea.com/fr/fr/p/metod-rail-de-suspension-acier-zingue-60205664/","img":"https://www.ikea.com/fr/fr/images/products/metod-rail-de-suspension-acier-zingue__0625675_pe692418_s5.jpg","note":"Planner corrected 5 → 3 by hand. Wall cabinets total 3.8 m, so 3 rails of 2 m is right.","fr":"rail de suspension, acier zingué, 200 cm"}]},{"id":"legs","title":"Legs and plinths","kind":"general","items":[{"art":"703.975.06","name":"FÖRBÄTTRA","en":"Plinth, high-gloss white, 220×8 cm","qty":4,"status":"ok","p0":22.0,"p":21.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-plinthe-brillant-blanc-70397506/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-plinthe-brillant-blanc__0633003_pe696034_s5.jpg","note":"Kept by the planner, but it is high-gloss white while the fronts and panels are off-white. See “Plinth colour” under Choices.","fr":"plinthe, brillant blanc, 220x8 cm"},{"art":"705.560.67","name":"METOD","en":"Cabinet leg, 8 cm (pack of 2)","qty":15,"status":"qty","qty0":9,"p0":5.0,"p":5.0,"url":"https://www.ikea.com/fr/fr/p/metod-pied-pour-element-70556067/","img":"https://www.ikea.com/fr/fr/images/products/metod-pied-pour-element__1301901_pe937585_s5.jpg","note":"Planner corrected 9 → 15 packs. Seven base cabinets need about 30 legs; a pack holds 2.","fr":"pied, 8 cm"},{"art":"805.570.28","name":"METOD","en":"Connector, cabinet to cover panel","qty":0,"status":"removed","qty0":1,"p0":9.0,"p":9.0,"url":"https://www.ikea.com/fr/fr/p/metod-raccord-caisson-panneau-de-finition-80557028/","img":"https://www.ikea.com/fr/fr/images/products/metod-raccord-caisson-panneau-de-finition__1287590_pe933943_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"raccord caisson/panneau de finition"},{"art":"805.570.33","name":"METOD","en":"Floor fixing frame for a kitchen island, 210 cm","qty":0,"status":"removed","qty0":1,"p0":59.0,"p":59.0,"url":"https://www.ikea.com/fr/fr/p/metod-cadre-fixation-sol-pr-ilot-cuisine-80557033/","img":"https://www.ikea.com/fr/fr/images/products/metod-cadre-fixation-sol-pr-ilot-cuisine__1287592_pe933944_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"cadre fixation sol pr îlot cuisine, 210 cm"}]},{"id":"panels","title":"Cover panels","kind":"general","items":[{"art":"005.678.42","name":"FÖRBÄTTRA","en":"Cover panel, high-gloss white, 39×86 cm","qty":0,"status":"removed","qty0":3,"p0":22.0,"gone":true,"url":"https://www.ikea.com/fr/fr/search/?q=00567842","note":"Crossed out by the planner. Do not order.","fr":"panneau latéral de finition, brillant blanc, 39x86 cm"},{"art":"102.978.83","name":"FÖRBÄTTRA","en":"Cover panel, white, 39×86 cm","qty":0,"status":"removed","qty0":1,"p0":20.0,"p":22.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-blanc-10297883/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-blanc__0645784_pe703809_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"panneau latéral de finition, blanc, 39x86 cm"},{"art":"402.344.36","name":"FÖRBÄTTRA","en":"Cover panel, off-white, 39×86 cm","qty":4,"status":"ok","p0":20.0,"p":22.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-blanc-casse-40234436/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-blanc-casse__0645789_pe703814_s5.jpg","note":"Kept by the planner: off-white panels for the visible sides of the wall cabinets.","fr":"panneau latéral de finition, blanc cassé, 39x86 cm"},{"art":"402.978.86","name":"FÖRBÄTTRA","en":"Cover panel, white, 62×80 cm","qty":0,"status":"removed","qty0":1,"p0":27.0,"p":30.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-blanc-40297886/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-blanc__0645814_pe703834_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"panneau latéral de finition, blanc, 62x80 cm"},{"art":"505.678.54","name":"FÖRBÄTTRA","en":"Cover panel, high-gloss white, 62×80 cm","qty":0,"status":"removed","qty0":3,"p0":29.0,"p":30.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-brillant-blanc-50567854/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-brillant-blanc__0645820_pe703840_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"panneau latéral de finition, brillant blanc, 62x80 cm"},{"art":"905.678.52","name":"FÖRBÄTTRA","en":"Cover panel, high-gloss white, 62×240 cm","qty":0,"status":"removed","qty0":1,"p0":94.0,"p":93.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-brillant-blanc-90567852/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-brillant-blanc__0645825_pe703832_s5.jpg","note":"Crossed out by the planner. Do not order.","fr":"panneau latéral de finition, brillant blanc, 62x240 cm"}]},{"id":"handles","title":"Handles","kind":"general","items":[{"art":"703.384.18","name":"BAGGANÄS","en":"Handle, stainless steel, 143 mm (pack of 2)","qty":10,"status":"ok","p0":8.0,"p":8.0,"url":"https://www.ikea.com/fr/fr/p/bagganaes-poignee-acier-inoxydable-70338418/","img":"https://www.ikea.com/fr/fr/images/products/bagganaes-poignee-acier-inoxydable__0754230_pe747829_s5.jpg","note":"Ten packs of 2 give 20 handles for 19 fronts: one spare.","fr":"poignée, acier inoxydable, 143 mm"}]},{"id":"worktop","title":"Worktop","kind":"general","items":[{"art":"603.351.99","name":"KARLBY","en":"Worktop, oak veneer, 246×63.5×3.8 cm","qty":4,"status":"qty","qty0":3,"p0":189.0,"p":189.0,"url":"https://www.ikea.com/fr/fr/p/karlby-plan-de-travail-chene-plaque-60335199/","img":"https://www.ikea.com/fr/fr/images/products/karlby-plan-de-travail-chene-plaque__0444150_pe594739_s5.jpg","note":"Planner corrected 3 → 4 slabs: wall run, peninsula, back run, and three niche shelves cut from the rest.","fr":"plan de travail, chêne/plaqué, 246x3.8 cm"}]},{"id":"lighting","title":"Lighting accessories","kind":"general","items":[{"art":"504.468.81","name":"FÖRNIMMA","en":"Power cable for LED driver, 3.5 m","qty":3,"status":"qty","qty0":4,"p0":5.0,"p":6.0,"url":"https://www.ikea.com/fr/fr/p/foernimma-cable-dalimentation-50446881/","img":"https://www.ikea.com/fr/fr/images/products/foernimma-cable-dalimentation__0819752_pe774871_s5.jpg","note":"Planner corrected 4 → 3: one per LED driver.","fr":"câble d'alimentation, 3.5 m"},{"art":"205.281.28","name":"RODRET","en":"Wireless dimmer / switch, white","qty":3,"status":"gone","qty0":4,"p0":6.99,"gone":true,"url":"https://www.ikea.com/fr/fr/search/?q=20528128","note":"No longer sold by IKEA France. See “Lighting control” under Choices.","fr":"variateur d’intensité/interrupteur, connecté blanc"},{"art":"503.561.87","name":"TRÅDFRI","en":"LED driver, smart, grey, 10 W","qty":2,"status":"ok","p0":15.0,"p":15.0,"url":"https://www.ikea.com/fr/fr/p/tradfri-transformateur-electrique-connecte-connecte-gris-50356187/","img":"https://www.ikea.com/fr/fr/images/products/tradfri-transformateur-electrique-connecte-connecte-gris__0625251_pe692159_s5.jpg","fr":"transformateur électrique connecté, connecté gris, 10 W"},{"art":"603.426.56","name":"TRÅDFRI","en":"LED driver, smart, grey, 30 W","qty":3,"status":"qty","qty0":2,"p0":25.0,"p":25.0,"url":"https://www.ikea.com/fr/fr/p/tradfri-transformateur-electrique-connecte-connecte-gris-60342656/","img":"https://www.ikea.com/fr/fr/images/products/tradfri-transformateur-electrique-connecte-connecte-gris__0625253_pe692161_s5.jpg","note":"Planner corrected 2 → 3.","fr":"transformateur électrique connecté, connecté gris, 30 W"},{"art":"704.636.00","name":"VÅGDAL","en":"Connection cable, white, 3.5 m","qty":3,"status":"ok","p0":3.0,"p":3.0,"url":"https://www.ikea.com/fr/fr/p/vagdal-cable-de-raccordement-blanc-70463600/","img":"https://www.ikea.com/fr/fr/images/products/vagdal-cable-de-raccordement-blanc__0869948_pe781542_s5.jpg","fr":"câble de raccordement, blanc, 3.5 m"}]}],"extra":[{"id":"add","title":"Added by the planner","kind":"added","sub":"Written by hand on the list after the visit. None of it is in the printed total.","items":[{"art":"502.057.25","name":"FÖRBÄTTRA","en":"Cover panel, off-white, 62×240 cm","qty":1,"status":"added","p":93.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-blanc-casse-50205725/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-blanc-casse__0645816_pe703836_s5.jpg","note":"Tall side panel that closes the cabinet run next to the fridge."},{"art":"902.057.28","name":"FÖRBÄTTRA","en":"Cover panel, off-white, 62×80 cm","qty":1,"status":"added","p":30.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-panneau-lateral-de-finition-blanc-casse-90205728/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-panneau-lateral-de-finition-blanc-casse__0645822_pe703842_s5.jpg","note":"Side panel for the open end of a base cabinet."},{"art":"702.746.28","name":"FIXA","en":"Worktop support bracket, galvanised steel","qty":2,"status":"added","p":4.99,"url":"https://www.ikea.com/fr/fr/p/fixa-fixation-console-soutien-plan-trav-acier-zingue-70274628/","img":"https://www.ikea.com/fr/fr/images/products/fixa-fixation-console-soutien-plan-trav-acier-zingue__0734546_pe739497_s5.jpg","note":"Carries the worktop where it lands on the low wall at the end of the peninsula."},{"art":"903.233.93","name":"FIXA","en":"Drill template for handles and knobs","qty":1,"status":"added","p":4.99,"url":"https://www.ikea.com/fr/fr/p/fixa-gabarit-de-percage-orange-90323393/","img":"https://www.ikea.com/fr/fr/images/products/fixa-gabarit-de-percage-orange__0755132_pe748285_s5.jpg","oos":true,"note":"Out of stock online today. Any handle jig from a DIY store does the same job (about 10 €)."},{"art":"705.286.11","name":"MITTLED","en":"LED worktop strip, dimmable, white, 80 cm","qty":3,"status":"added","p":24.99,"url":"https://www.ikea.com/fr/fr/p/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc-70528611/","img":"https://www.ikea.com/fr/fr/images/products/mittled-baguette-lum-led-plan-travail-cuis-intensite-lumineuse-reglable-blanc__0869941_pe781536_s5.jpg","note":"For the niche: under two shelves, plus one at the top."},{"art":"104.272.62","name":"UTRUSTA","en":"Hinge, soft-closing, 153° (pack of 2)","qty":1,"status":"added","p":20.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-charn-av-amort-integre-cuisine-10427262/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-charn-av-amort-integre-cuisine__0657689_pe709906_s5.jpg","note":"“Add hinges for the corner unit.” IKEA’s corner combination uses the wide-opening hinge; confirm at the kitchen desk."},{"art":"004.019.55","name":"NYTTIG FIL 500","en":"Charcoal filter for the hood","qty":1,"status":"added","p":49.99,"url":"https://www.ikea.com/fr/fr/p/nyttig-fil-500-filtre-a-charbon-00401955/","img":"https://www.ikea.com/fr/fr/images/products/nyttig-fil-500-filtre-a-charbon__0754957_pe748200_s5.jpg","note":"“Add filters and duct.” IKEA’s page for this hood names this filter for recirculation."},{"art":"902.502.59","name":"NYTTIG TUB 150","en":"Flexible duct for the hood, 150 mm","qty":1,"status":"added","p":23.0,"url":"https://www.ikea.com/fr/fr/p/nyttig-tub-150-tuyau-devacuation-flex-hotte-asp-90250259/","img":"https://www.ikea.com/fr/fr/images/products/nyttig-tub-150-tuyau-devacuation-flex-hotte-asp__0755147_pe748283_s5.jpg","note":"Needed in both modes, ducted or recirculating."}]},{"id":"miss","title":"Missing from the list","kind":"missing","sub":"Not in the printed list and not in the planner’s notes, but the kitchen cannot be finished without them.","items":[{"art":"805.248.82","name":"UTRUSTA","en":"Hinge, soft-closing, 110° (pack of 2)","qty":10,"status":"missing","p":10.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-charn-av-amort-integre-cuisine-80524882/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-charn-av-amort-integre-cuisine__1019773_pe831566_s5.jpg","note":"The list has no door hinges at all. Ten hinged doors (two base, eight wall) need two each; the corner door is covered above."}]}],"choices":[{"id":"worktop","group":"worktop","title":"Worktop","why":"Oak veneer looks best and can be sanded, but it has to be oiled and the sink cut-out sealed with care. Laminate needs no upkeep and costs half.","replaces":["603.351.99"],"default":0,"options":[{"label":"KARLBY oak veneer · as planned","items":[{"art":"603.351.99","name":"KARLBY","en":"Worktop, oak veneer, 246×63.5×3.8 cm","qty":4,"status":"choice","p":189.0,"url":"https://www.ikea.com/fr/fr/p/karlby-plan-de-travail-chene-plaque-60335199/","img":"https://www.ikea.com/fr/fr/images/products/karlby-plan-de-travail-chene-plaque__0444150_pe594739_s5.jpg","note":"Planner corrected 3 → 4 slabs: wall run, peninsula, back run, and three niche shelves cut from the rest.","label":"4 slabs"}]},{"label":"SÄLJAN oak-effect laminate · same 3.8 cm thickness","items":[{"art":"804.392.09","name":"SÄLJAN","en":"Worktop, oak-effect laminate, 246×63.5×3.8 cm","qty":4,"status":"choice","p":90.0,"url":"https://www.ikea.com/fr/fr/p/saeljan-plan-de-travail-motif-chene-stratifie-80439209/","img":"https://www.ikea.com/fr/fr/images/products/saeljan-plan-de-travail-motif-chene-stratifie__1466161_pe995264_s5.jpg","label":"4 slabs"}]},{"label":"EKBACKEN light-oak-effect laminate · 2.8 cm","items":[{"art":"506.338.11","name":"EKBACKEN","en":"Worktop, light-oak-effect laminate, 246×63.5×2.8 cm","qty":4,"status":"choice","p":89.0,"url":"https://www.ikea.com/fr/fr/p/ekbacken-plan-de-travail-motif-chene-clair-stratifie-50633811/","img":"https://www.ikea.com/fr/fr/images/products/ekbacken-plan-de-travail-motif-chene-clair-stratifie__1506392_pe1008791_s5.jpg","label":"4 slabs","note":"Worktop sits 1 cm lower than drawn."}]}]},{"id":"hob","group":"c6","title":"Induction hob","why":"All four are 59 cm induction hobs for the same cabinet. They differ in zone flexibility, power and controls. All need the 32 A circuit.","replaces":["404.678.26"],"default":0,"options":[{"label":"HÖGKLASSIG, IKEA 700 · as planned","items":[{"art":"404.678.26","name":"HÖGKLASSIG","en":"Induction hob, IKEA 700, black, 59 cm","qty":1,"status":"choice","p":699.0,"url":"https://www.ikea.com/fr/fr/p/hoegklassig-plaque-de-cuisson-a-induction-ikea-700-noir-40467826/","img":"https://www.ikea.com/fr/fr/images/products/hoegklassig-plaque-de-cuisson-a-induction-ikea-700-noir__0854591_pe780679_s5.jpg","note":"Needs its own 32 A circuit in 6 mm² cable. Price is up 70 € since the quote.","label":""}]},{"label":"SMAKLIG, IKEA 500","items":[{"art":"504.678.83","name":"SMAKLIG","en":"Induction hob, IKEA 500, black, 59 cm","qty":1,"status":"choice","p":479.0,"url":"https://www.ikea.com/fr/fr/p/smaklig-plaque-de-cuisson-a-induction-ikea-500-noir-50467883/","img":"https://www.ikea.com/fr/fr/images/products/smaklig-plaque-de-cuisson-a-induction-ikea-500-noir__0854617_pe780697_s5.jpg","label":""}]},{"label":"MATMÄSSIG, IKEA 300","items":[{"art":"104.670.93","name":"MATMÄSSIG","en":"Induction hob, IKEA 300, black, 59 cm","qty":1,"status":"choice","p":299.0,"url":"https://www.ikea.com/fr/fr/p/matmaessig-plaque-de-cuisson-a-induction-ikea-300-noir-10467093/","img":"https://www.ikea.com/fr/fr/images/products/matmaessig-plaque-de-cuisson-a-induction-ikea-300-noir__0854606_pe780691_s5.jpg","label":""}]},{"label":"VILSTA, IKEA 300 · the cheapest 59 cm induction hob","items":[{"art":"905.577.25","name":"VILSTA","en":"Induction hob, IKEA 300, black, 59 cm","qty":1,"status":"choice","p":219.0,"url":"https://www.ikea.com/fr/fr/p/vilsta-plaque-de-cuisson-a-induction-ikea-300-noir-90557725/","img":"https://www.ikea.com/fr/fr/images/products/vilsta-plaque-de-cuisson-a-induction-ikea-300-noir__1263504_pe927337_s5.jpg","label":""}]}]},{"id":"oven","group":"c6","title":"Oven","why":"The list has an oven cabinet and support but no oven, so the plan re-uses the one you have. That works if it is a standard 60 cm built-in model.","replaces":[],"default":0,"options":[{"label":"Keep the current oven","items":[]},{"label":"LAGAN, white","items":[{"art":"106.000.54","name":"LAGAN","en":"Oven, white","qty":1,"status":"choice","p":199.0,"url":"https://www.ikea.com/fr/fr/p/lagan-four-blanc-10600054/","img":"https://www.ikea.com/fr/fr/images/products/lagan-four-blanc__1432828_pe982905_s5.jpg","label":""}]},{"label":"LAGAN, stainless-steel colour","items":[{"art":"606.000.56","name":"LAGAN","en":"Oven, stainless-steel colour","qty":1,"status":"choice","p":229.0,"url":"https://www.ikea.com/fr/fr/p/lagan-four-couleur-acier-inox-60600056/","img":"https://www.ikea.com/fr/fr/images/products/lagan-four-couleur-acier-inox__1432831_pe982908_s5.jpg","label":""}]},{"label":"STENABY fan oven with grill","items":[{"art":"006.002.81","name":"STENABY","en":"Fan oven with grill, stainless-steel colour, IKEA 300","qty":1,"status":"choice","p":279.0,"url":"https://www.ikea.com/fr/fr/p/stenaby-four-a-chaleur-brassee-fonction-grill-couleur-acier-inox-ikea-300-00600281/","img":"https://www.ikea.com/fr/fr/images/products/stenaby-four-a-chaleur-brassee-fonction-grill-couleur-acier-inox-ikea-300__1432834_pe982911_s5.jpg","label":""}]}]},{"id":"plinth","group":"legs","title":"Plinth colour","why":"The listed plinth is high-gloss white. Fronts and cover panels are off-white, so the gloss strip will show as a different white along the floor. Same price either way.","replaces":["703.975.06"],"default":1,"options":[{"label":"High-gloss white · as listed","items":[{"art":"703.975.06","name":"FÖRBÄTTRA","en":"Plinth, high-gloss white, 220×8 cm","qty":4,"status":"choice","p":21.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-plinthe-brillant-blanc-70397506/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-plinthe-brillant-blanc__0633003_pe696034_s5.jpg","note":"Kept by the planner, but it is high-gloss white while the fronts and panels are off-white. See “Plinth colour” under Choices.","label":"4 lengths"}]},{"label":"Off-white, matches the fronts","items":[{"art":"602.807.76","name":"FÖRBÄTTRA","en":"Plinth, off-white, 220×8 cm","qty":4,"status":"choice","p":21.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-plinthe-blanc-casse-60280776/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-plinthe-blanc-casse__0633002_pe696033_s5.jpg","label":"4 lengths"}]}]},{"id":"light","group":"lighting","title":"Lighting control","why":"The RODRET dimmer on the list is discontinued. IKEA’s current remote (BILRESA) talks to these LED drivers through the DIRIGERA hub. The cheap route is a normal wall switch on the LED circuit: on and off, no dimming, nothing to pair.","replaces":["205.281.28"],"default":0,"options":[{"label":"Wall switch only, wired by the electrician","items":[]},{"label":"DIRIGERA hub + one BILRESA remote · dimming and phone control","items":[{"art":"105.034.06","name":"DIRIGERA","en":"Smart-home hub, white","qty":1,"status":"choice","p":89.99,"url":"https://www.ikea.com/fr/fr/p/dirigera-passerelle-pour-produits-connectes-blanc-connecte-10503406/","img":"https://www.ikea.com/fr/fr/images/products/dirigera-passerelle-pour-produits-connectes-blanc-connecte__1032017_pe836737_s5.jpg","label":""},{"art":"106.041.65","name":"BILRESA","en":"Remote control, dual button, white","qty":1,"status":"choice","p":6.99,"url":"https://www.ikea.com/fr/fr/p/bilresa-telecommande-blanc-connecte-bouton-double-10604165/","img":"https://www.ikea.com/fr/fr/images/products/bilresa-telecommande-blanc-connecte-bouton-double__1402959_pe969197_s5.jpg","label":""}]}]}],"ref":{"605.518.38":{"art":"605.518.38","name":"LAGAN","en":"Gas hob, white, 59 cm","qty":1,"status":"ref","p":109.0,"url":"https://www.ikea.com/fr/fr/p/lagan-plaque-de-cuisson-au-gaz-blanc-60551838/","img":"https://www.ikea.com/fr/fr/images/products/lagan-plaque-de-cuisson-au-gaz-blanc__1109063_pe869787_s5.jpg"},"103.891.42":{"art":"103.891.42","name":"UTDRAG","en":"Pull-out built-in extractor hood, stainless steel","qty":1,"status":"ref","p":179.0,"url":"https://www.ikea.com/fr/fr/p/utdrag-hotte-aspirante-integree-acier-inoxydable-10389142/","img":"https://www.ikea.com/fr/fr/images/products/utdrag-hotte-aspirante-integree-acier-inoxydable__0755572_pe748471_s5.jpg"},"106.041.65":{"art":"106.041.65","name":"BILRESA","en":"Remote control, dual button, white","qty":1,"status":"ref","p":6.99,"url":"https://www.ikea.com/fr/fr/p/bilresa-telecommande-blanc-connecte-bouton-double-10604165/","img":"https://www.ikea.com/fr/fr/images/products/bilresa-telecommande-blanc-connecte-bouton-double__1402959_pe969197_s5.jpg"},"105.034.06":{"art":"105.034.06","name":"DIRIGERA","en":"Smart-home hub, white","qty":1,"status":"ref","p":89.99,"url":"https://www.ikea.com/fr/fr/p/dirigera-passerelle-pour-produits-connectes-blanc-connecte-10503406/","img":"https://www.ikea.com/fr/fr/images/products/dirigera-passerelle-pour-produits-connectes-blanc-connecte__1032017_pe836737_s5.jpg"},"602.807.76":{"art":"602.807.76","name":"FÖRBÄTTRA","en":"Plinth, off-white, 220×8 cm","qty":1,"status":"ref","p":21.0,"url":"https://www.ikea.com/fr/fr/p/foerbaettra-plinthe-blanc-casse-60280776/","img":"https://www.ikea.com/fr/fr/images/products/foerbaettra-plinthe-blanc-casse__0633002_pe696033_s5.jpg"},"805.248.82":{"art":"805.248.82","name":"UTRUSTA","en":"Hinge, soft-closing, 110° (pack of 2)","qty":1,"status":"ref","p":10.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-charn-av-amort-integre-cuisine-80524882/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-charn-av-amort-integre-cuisine__1019773_pe831566_s5.jpg"},"104.272.62":{"art":"104.272.62","name":"UTRUSTA","en":"Hinge, soft-closing, 153° (pack of 2)","qty":1,"status":"ref","p":20.0,"url":"https://www.ikea.com/fr/fr/p/utrusta-charn-av-amort-integre-cuisine-10427262/","img":"https://www.ikea.com/fr/fr/images/products/utrusta-charn-av-amort-integre-cuisine__0657689_pe709906_s5.jpg"},"804.392.09":{"art":"804.392.09","name":"SÄLJAN","en":"Worktop, oak-effect laminate, 246×63.5×3.8 cm","qty":1,"status":"ref","p":90.0,"url":"https://www.ikea.com/fr/fr/p/saeljan-plan-de-travail-motif-chene-stratifie-80439209/","img":"https://www.ikea.com/fr/fr/images/products/saeljan-plan-de-travail-motif-chene-stratifie__1466161_pe995264_s5.jpg"},"506.338.11":{"art":"506.338.11","name":"EKBACKEN","en":"Worktop, light-oak-effect laminate, 246×63.5×2.8 cm","qty":1,"status":"ref","p":89.0,"url":"https://www.ikea.com/fr/fr/p/ekbacken-plan-de-travail-motif-chene-clair-stratifie-50633811/","img":"https://www.ikea.com/fr/fr/images/products/ekbacken-plan-de-travail-motif-chene-clair-stratifie__1506392_pe1008791_s5.jpg"}}};
+var KEY = 'maisonKitchen.v1';
+var ST = {bought: {}, choice: {}, view: 'cab', filter: 'all', route: 'mix', amt: {}, budget: '', done: {}, risk: true};
+try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && typeof sv === 'object') Object.keys(sv).forEach(function(k){ ST[k] = sv[k]; }); } catch (e) {}
+['bought', 'choice', 'amt', 'done'].forEach(function(k){ if (!ST[k] || typeof ST[k] !== 'object') ST[k] = {}; });
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} }
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function el(tag, attrs, kids){
+  var n = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function(k){ var v = attrs[k]; if (v == null || v === false) return; if (k === 'class') n.className = v; else if (k === 'text') n.textContent = v; else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v); else n.setAttribute(k, v === true ? '' : v); });
+  (kids || []).forEach(function(c){ if (c != null) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+function eur(v, forceDec){
+  var neg = v < 0, a = Math.abs(v), dec = forceDec || Math.abs(a - Math.round(a)) > 0.004;
+  var s = dec ? a.toFixed(2) : String(Math.round(a)), p = s.split('.');
+  p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg ? '−' : '') + p.join('.') + ' €';
+}
+function round0(v){ return eur(Math.round(v)); }
+function setF(name, text){ $$('[data-f="' + name + '"]').forEach(function(n){ n.textContent = text; }); }
+var toastT = 0;
+function toast(msg){ var t = $('#toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('show'); }, 1800); }
+function copyText(txt, okMsg){
+  var done = function(){ toast(okMsg); };
+  var fallback = function(){ var ta = el('textarea', {style: 'position:fixed;left:-999px;top:0'}); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Copy is blocked in this browser'); } ta.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
+}
+
+/* ---------- the list, with the choices applied ---------- */
+function optIndex(c){ var i = ST.choice[c.id]; return (i == null || !c.options[i]) ? c.default : i; }
+function optCost(o){ return o.items.reduce(function(s, it){ return s + it.qty * (it.p || 0); }, 0); }
+function effGroups(){
+  var repl = {}, base = {};
+  D.choices.forEach(function(c){ c.replaces.forEach(function(a){ repl[a] = c.id; }); });
+  D.groups.forEach(function(g){ g.items.forEach(function(it){ if (repl[it.art]) base[g.id + ':' + it.art] = it; }); });
+  var out = D.groups.map(function(g){
+    var rows = g.items.filter(function(it){ return it.status !== 'removed' && !repl[it.art]; }).map(function(it){ return {it: it, key: g.id + ':' + it.art, g: g}; });
+    D.choices.forEach(function(c){
+      if (c.group !== g.id) return;
+      c.options[optIndex(c)].items.forEach(function(it){
+        var b = base[g.id + ':' + it.art], m = {}, src = b || it;
+        Object.keys(src).forEach(function(k){ m[k] = src[k]; }); m.qty = it.qty; if (it.note && !b) m.note = it.note;
+        if (!b) m.status = 'choice'; else if (m.gone) return;
+        rows.push({it: m, key: g.id + ':' + it.art, g: g, choice: c});
+      });
+    });
+    return {g: g, rows: rows};
+  });
+  D.extra.forEach(function(g){ out.push({g: g, rows: g.items.map(function(it){ return {it: it, key: g.id + ':' + it.art, g: g}; })}); });
+  return out;
+}
+function rowTotal(r){ return r.it.gone ? 0 : r.it.qty * (r.it.p || 0); }
+function isChanged(it){ return it.status === 'qty' || it.status === 'added' || it.status === 'missing' || it.status === 'choice' || it.oos || (it.p0 != null && it.p != null && Math.abs(it.p - it.p0) > 0.004); }
+function goodsTotal(){ return effGroups().reduce(function(s, g){ return s + g.rows.reduce(function(a, r){ return a + rowTotal(r); }, 0); }, 0); }
+
+function pill(cls, text, title){ return el('span', {class: 'pill ' + cls, text: text, title: title}); }
+function itemRow(r, keys){
+  var it = r.it, bought = keys.every(function(k){ return ST.bought[k]; });
+  var cb = el('input', {type: 'checkbox', 'aria-label': 'Bought: ' + it.name + ' ' + it.en});
+  cb.checked = bought;
+  cb.addEventListener('change', function(){ keys.forEach(function(k){ if (cb.checked) ST.bought[k] = 1; else delete ST.bought[k]; }); save(); renderList(); });
+  var img = it.img ? el('img', {src: it.img + '?f=xxxs', alt: '', loading: 'lazy', referrerpolicy: 'no-referrer', width: 48, height: 48}) : el('span', {class: 'noimg'});
+  if (it.img) img.addEventListener('error', function(){ img.replaceWith(el('span', {class: 'noimg'})); });
+  var meta = el('div', {class: 'meta'}, [el('button', {type: 'button', class: 'art', title: 'Copy the article number', text: it.art, onclick: function(){ copyText(it.art.replace(/\./g, ''), 'Copied ' + it.art); }})]);
+  if (it.qty0 != null && it.qty0 !== it.qty && it.status !== 'removed') meta.appendChild(pill('warn', 'Qty ' + it.qty0 + ' → ' + it.qty, 'Corrected by hand by the planner'));
+  if (it.status === 'added') meta.appendChild(pill('info', 'Planner’s note'));
+  if (it.status === 'missing') meta.appendChild(pill('bad', 'Not on IKEA’s list'));
+  if (it.status === 'choice') meta.appendChild(pill('ok', 'Your choice'));
+  if (it.status === 'removed') meta.appendChild(pill('plain', 'Crossed out'));
+  if (it.gone) meta.appendChild(pill('bad', 'No longer sold'));
+  if (it.oos) meta.appendChild(pill('warn', 'Out of stock online'));
+  if (r.where) meta.appendChild(el('span', {class: 'muted', text: r.where}));
+  var main = el('div', null, [el('span', {class: 'nm', text: it.name}), ' ', el('span', {class: 'ds', text: it.en}), it.fr ? el('span', {class: 'frn', lang: 'fr', text: it.fr}) : null, meta]);
+  var pr = el('div', {class: 'pr'});
+  if (it.p != null && !it.gone) {
+    var q = it.status === 'removed' ? it.qty0 : it.qty;
+    pr.appendChild(el('span', {class: 'tot', text: eur(q * it.p)}));
+    var u = el('span', {class: 'u'}, [q + ' × ' + eur(it.p)]);
+    if (it.p0 != null && Math.abs(it.p - it.p0) > 0.004) { u.appendChild(document.createTextNode(' ')); u.appendChild(el('s', {text: eur(it.p0), title: 'Price on the December 2025 list'})); }
+    pr.appendChild(u);
+  } else pr.appendChild(el('span', {class: 'u', text: it.p0 != null ? 'was ' + eur(it.p0) : ''}));
+  pr.appendChild(el('a', {class: 'go', href: it.url, target: '_blank', rel: 'noopener', text: it.gone ? 'Search IKEA ↗' : 'IKEA ↗', 'aria-label': 'Open ' + it.name + ' ' + it.en + ' on ikea.com'}));
+  var row = el('div', {class: 'it' + (bought ? ' bought' : '') + (it.status === 'removed' || it.gone ? ' off' : ''), 'data-art': it.art}, [it.status === 'removed' || it.gone ? el('span') : cb, img, main, pr]);
+  if (it.note) row.appendChild(el('div', {class: 'nt', text: it.note}));
+  return row;
+}
+function showRow(r, keys){
+  if (ST.filter === 'todo') return !keys.every(function(k){ return ST.bought[k]; });
+  if (ST.filter === 'chg') return isChanged(r.it);
+  return true;
+}
+function renderList(){
+  var host = $('#groups'); if (!host) return;
+  var eg = effGroups(), total = 0, nLines = 0, nBought = 0, boughtSum = 0, shown = 0;
+  host.textContent = '';
+  eg.forEach(function(g){ g.rows.forEach(function(r){ total += rowTotal(r); nLines++; if (ST.bought[r.key]) { nBought++; boughtSum += rowTotal(r); } }); });
+  if (ST.view === 'art') {
+    var by = {}, order = [];
+    eg.forEach(function(g){ g.rows.forEach(function(r){
+      var a = by[r.it.art]; if (!a) { a = by[r.it.art] = {it: {}, keys: [], n: 0}; Object.keys(r.it).forEach(function(k){ a.it[k] = r.it[k]; }); a.it.qty = 0; delete a.it.qty0; delete a.it.note; if (a.it.status === 'qty') a.it.status = 'ok'; order.push(a); }
+      a.it.qty += r.it.qty; a.keys.push(r.key); a.n++;
+    }); });
+    order.sort(function(a, b){ return (a.it.name + ' ' + a.it.en).localeCompare(b.it.name + ' ' + b.it.en, 'en', {numeric: true}); });
+    var box = el('div', {class: 'grp'}), sum = 0;
+    order.forEach(function(a){ a.where = a.n > 1 ? 'in ' + a.n + ' places' : null; if (!showRow(a, a.keys)) return; box.appendChild(itemRow(a, a.keys)); shown++; sum += rowTotal(a); });
+    box.insertBefore(el('div', {class: 'grp-head'}, [el('span', {class: 'grp-no', text: '∑'}), el('h4', {text: 'All articles, one line each'}), el('span', {class: 'sub', text: eur(sum, true)}), el('span', {class: 'where', text: order.length + ' different articles'})]), box.firstChild);
+    host.appendChild(box);
+  } else {
+    eg.forEach(function(g){
+      var rows = g.rows.filter(function(r){ return showRow(r, [r.key]); }); if (!rows.length) return;
+      var sum = g.rows.reduce(function(a, r){ return a + rowTotal(r); }, 0), all = g.rows.length && g.rows.every(function(r){ return ST.bought[r.key]; });
+      var box = el('div', {class: 'grp' + (all ? ' done' : ''), id: 'g-' + g.g.id});
+      box.appendChild(el('div', {class: 'grp-head'}, [el('span', {class: 'grp-no', text: g.g.no != null ? String(g.g.no) : g.g.kind === 'added' ? '+' : g.g.kind === 'missing' ? '!' : '·'}), el('h4', {text: g.g.title}), el('span', {class: 'sub', text: eur(sum, true)}),
+        el('span', {class: 'where', text: g.g.where ? g.g.where + ' · IKEA code ' + g.g.tag : (g.g.sub || 'For the whole kitchen')})]));
+      rows.forEach(function(r){ box.appendChild(itemRow(r, [r.key])); shown++; });
+      host.appendChild(box);
+    });
+  }
+  if (!shown) host.appendChild(el('p', {class: 'muted', text: ST.filter === 'todo' ? 'Everything is ticked.' : 'Nothing matches this filter.'}));
+  // removed + discontinued
+  var rm = $('#removed-items'); rm.textContent = ''; var nrm = 0;
+  D.groups.forEach(function(g){ g.items.forEach(function(it){ if (it.status === 'removed' || it.gone) { rm.appendChild(itemRow({it: it, where: g.title}, [])); nrm++; } }); });
+  setF('nremoved', String(nrm));
+  var extra = D.extra.reduce(function(s, g){ return s + g.items.reduce(function(a, it){ return a + it.qty * (it.p || 0); }, 0); }, 0);
+  setF('printed', eur(D.summary.printed, true)); setF('lines', String(D.summary.lines)); setF('corrected', eur(total - extra, true)); setF('extra', eur(extra, true)); setF('goods', eur(total, true)); setF('goods0', round0(plannedGoods()));
+  setF('bought', nBought ? 'bought ' + nBought + ' of ' + nLines + ' lines · ' + round0(boughtSum) : nLines + ' lines to buy'); setF('checked', D.summary.checked);
+  var lc = $('#list-count'); if (lc) lc.textContent = ST.view === 'art' ? 'One line per article: this is the list to order from.' : 'Grouped the way IKEA printed it: one block per cabinet, numbered as on the plan, then the parts shared by the whole kitchen.';
+  $$('#view button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-v') === ST.view ? 'true' : 'false'); });
+  $$('#filter button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-v') === ST.filter ? 'true' : 'false'); });
+  renderCalc();
+}
+function renderChoices(){
+  var host = $('#choices'); if (!host) return; host.textContent = '';
+  D.choices.forEach(function(c){
+    var cur = optIndex(c), base = optCost(c.options[0]);
+    var box = el('div', {class: 'choice'}, [el('h4', null, [c.title]), el('p', {class: 'small muted', text: c.why})]);
+    var opts = el('div', {class: 'opts', role: 'radiogroup', 'aria-label': c.title});
+    c.options.forEach(function(o, i){
+      var cost = optCost(o), d = cost - base, rb = el('input', {type: 'radio', name: 'ch-' + c.id});
+      rb.checked = i === cur; rb.addEventListener('change', function(){ ST.choice[c.id] = i; save(); renderChoices(); renderList(); });
+      var links = el('span', null, [o.label]);
+      o.items.forEach(function(it){ links.appendChild(document.createTextNode(' ')); links.appendChild(el('a', {href: it.url, target: '_blank', rel: 'noopener', class: 'small', text: it.art + ' ↗', onclick: function(e){ e.stopPropagation(); }})); });
+      opts.appendChild(el('label', null, [rb, links, el('span', {class: 'delta' + (d < -0.004 ? ' save' : ''), text: i === 0 ? eur(cost) : (d > 0.004 ? '+' : '') + (Math.abs(d) < 0.005 ? 'same price' : eur(d))})]));
+    });
+    box.appendChild(opts); host.appendChild(box);
+  });
+}
+function orderText(){
+  var by = {}, order = [];
+  effGroups().forEach(function(g){ g.rows.forEach(function(r){ if (r.it.gone) return; var a = by[r.it.art]; if (!a) { a = by[r.it.art] = {it: r.it, q: 0}; order.push(a); } a.q += r.it.qty; }); });
+  order.sort(function(a, b){ return (a.it.name + a.it.en).localeCompare(b.it.name + b.it.en, 'en', {numeric: true}); });
+  var t = 0, lines = order.map(function(a){ t += a.q * a.it.p; return a.q + ' x ' + a.it.art + '  ' + a.it.name + ' ' + (a.it.fr || a.it.en) + '  (' + eur(a.it.p) + ')'; });
+  return 'Kitchen order list, prices checked on ikea.com/fr ' + D.summary.checked + '\n' + lines.join('\n') + '\nTotal ' + eur(t, true) + ' for ' + order.length + ' articles';
+}
+
+/* ---------- routes and budget ---------- */
+var LINES = [
+  {id: 'delivery', t: 'IKEA delivery', h: 'Into the room of your choice, as on the quote.', v: {ikea: 60, handy: 60, mix: 60, diy: 60}},
+  {id: 'fit', t: 'Fitting units, worktops, sink and appliances', h: 'IKEA: the fitting quote. Fitter: about three days. Mix: a fitter for the worktop cuts and joints only.', v: {ikea: 1542.84, handy: 1200, mix: 350, diy: 0}},
+  {id: 'strip', t: 'Taking out the old kitchen', h: 'IKEA: annex-works quote, disposal included. Yourself: a day, plus trips to the déchetterie.', v: {ikea: 396.24, handy: 250, mix: 0, diy: 0}},
+  {id: 'extras', t: 'Niche shelves, light pelmet, light points, moving a socket', h: 'The rest of the annex-works quote.', v: {ikea: 549.84, handy: 300, mix: 0, diy: 0}},
+  {id: 'elec', t: 'Electrician', h: 'A 32 A line for the hob, the oven outlet, sockets for hood and dishwasher, feeds for the LED drivers. Estimate: 450–900 €.', v: {ikea: 650, handy: 650, mix: 650, diy: 650}},
+  {id: 'gas', t: 'Gas fitter', h: 'Disconnect the hob and cap the supply. Estimate: 80–150 €.', v: {ikea: 120, handy: 120, mix: 120, diy: 120}},
+  {id: 'walls', t: 'Walls after the old tiles come off', h: 'Filler, primer and paint. More if you pay someone.', v: {ikea: 300, handy: 250, mix: 80, diy: 80}},
+  {id: 'splash', t: 'Splashback', h: 'Wall panels, tiles or washable paint behind hob and worktop, about 2 m².', v: {ikea: 150, handy: 150, mix: 150, diy: 150}},
+  {id: 'tools', t: 'Tools and consumables', h: 'Saw hire or blades, hole saw, anchors for stone, silicone, worktop oil.', v: {ikea: 0, handy: 0, mix: 120, diy: 220}}
+];
+var ROUTE_NAMES = {ikea: 'IKEA does it', handy: 'Independent fitter', mix: 'You, with a pro for the hard cuts', diy: 'All yourselves'};
+function lineVal(l, route){ var k = route + ':' + l.id; return ST.amt[k] != null && ST.amt[k] !== '' ? +ST.amt[k] || 0 : l.v[route]; }
+function worksTotal(route, defaults){ var s = LINES.reduce(function(a, l){ return a + (defaults ? l.v[route] : lineVal(l, route)); }, 0); return ST.risk || defaults ? s * 1.1 : s; }
+function leanGoods(){   // cheapest option in every choice
+  var saved = ST.choice, t; ST.choice = {}; D.choices.forEach(function(c){ var bi = 0, bc = Infinity; c.options.forEach(function(o, i){ var v = optCost(o); if (v < bc - 0.004) { bc = v; bi = i; } }); ST.choice[c.id] = bi; });
+  t = goodsTotal(); ST.choice = saved; return t;
+}
+function plannedGoods(){ var saved = ST.choice, t; ST.choice = {}; t = goodsTotal(); ST.choice = saved; return t; }
+function renderCalc(){
+  var goods = goodsTotal(), route = ROUTE_NAMES[ST.route] ? ST.route : 'mix';
+  var total = goods + worksTotal(route);
+  setF('range', round0(Math.floor((leanGoods() + worksTotal('diy', true)) / 100) * 100).replace(' €', '') + '–' + round0(Math.ceil((plannedGoods() + worksTotal('ikea', true)) / 100) * 100));
+  ['ikea', 'handy', 'mix', 'diy'].forEach(function(r){ setF('rt-' + r, round0(goods + worksTotal(r, true))); setF('rw-' + r, round0(worksTotal(r, true))); });
+  $$('.route[data-route]').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-route') === route ? 'true' : 'false'); });
+  var host = $('#calc');
+  if (host) {
+    host.textContent = '';
+    host.appendChild(el('div', {class: 'ln'}, [el('div', null, [el('b', {text: 'IKEA goods'}), el('small', {text: 'From the shopping list, with your choices.'})]), el('a', {class: 'fixed', href: '#list', text: eur(goods, true)})]));
+    var sub = 0;
+    LINES.forEach(function(l){
+      var v = lineVal(l, route), inp = el('input', {type: 'number', min: '0', step: '10', inputmode: 'decimal', 'aria-label': l.t + ', euros'}); inp.value = String(Math.round(v * 100) / 100); sub += v;
+      inp.addEventListener('change', function(){ var k = route + ':' + l.id; if (inp.value === '' || +inp.value === l.v[route]) delete ST.amt[k]; else ST.amt[k] = +inp.value; save(); renderCalc(); });
+      host.appendChild(el('div', {class: 'ln'}, [el('div', null, [el('b', {text: l.t}), el('small', {text: l.h})]), inp]));
+    });
+    var rk = el('input', {type: 'checkbox', id: 'risk'}); rk.checked = !!ST.risk; rk.addEventListener('change', function(){ ST.risk = rk.checked; save(); renderCalc(); });
+    host.appendChild(el('div', {class: 'ln'}, [el('label', {for: 'risk'}, [rk, ' ', el('b', {text: 'Add 10% to the works for surprises'}), el('small', {text: 'Old stone walls, pipes in odd places, an extra trip by the electrician.'})]), el('span', {class: 'fixed', text: ST.risk ? eur(sub * 0.1, true) : '—'})]));
+    host.appendChild(el('div', {class: 'ln total'}, [el('div', {text: 'Total · ' + ROUTE_NAMES[route]}), el('span', {class: 'fixed', text: eur(total, true)})]));
+  }
+  // title block meter
+  var b = parseFloat(ST.budget), bar = $('#bar'), has = b > 0;
+  setF('total', round0(total)); setF('route', ROUTE_NAMES[route]);
+  if (bar) { var pct = has ? Math.min(100, total / b * 100) : 0; bar.firstElementChild.style.width = pct + '%'; bar.setAttribute('data-state', !has ? 'ok' : total > b ? 'over' : total > b * 0.92 ? 'tight' : 'ok'); bar.classList.toggle('hide', !has); }
+  setF('left', !has ? 'set a budget under K-04' : total > b ? round0(total - b) + ' over your ' + round0(b) : round0(b - total) + ' left of ' + round0(b));
+  var bi = $('#budget'); if (bi && document.activeElement !== bi) bi.value = ST.budget || '';
+}
+
+/* ---------- ticks on steps, checks and questions ---------- */
+function bindTicks(){
+  $$('input[type=checkbox][data-tick]').forEach(function(cb){
+    var k = cb.getAttribute('data-tick'); cb.checked = !!ST.done[k];
+    cb.addEventListener('change', function(){ if (cb.checked) ST.done[k] = 1; else delete ST.done[k]; save(); tickCounts(); });
+  });
+  tickCounts();
+}
+function tickCounts(){ $$('[data-count]').forEach(function(n){ var boxes = $$('input[data-tick^="' + n.getAttribute('data-count') + '"]'); n.textContent = boxes.filter(function(b){ return b.checked; }).length + ' of ' + boxes.length + ' done'; }); }
+
+/* ---------- start ---------- */
+function nav(){
+  var host = $('#sheetnav'); if (!host) return;
+  $$('section.sheet[data-nav]').forEach(function(s){ var code = $('.sheet-code', s); host.appendChild(el('a', {href: '#' + s.id}, [el('b', {text: code ? code.textContent : ''}), s.getAttribute('data-nav')])); });
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('#view button'); if (b) { ST.view = b.getAttribute('data-v'); save(); renderList(); return; }
+  b = e.target.closest('#filter button'); if (b) { ST.filter = b.getAttribute('data-v'); save(); renderList(); return; }
+  b = e.target.closest('.route[data-route]'); if (b) { ST.route = b.getAttribute('data-route'); save(); renderCalc(); return; }
+  b = e.target.closest('[data-cab]'); if (b) { if (ST.view !== 'cab' || ST.filter !== 'all') { ST.view = 'cab'; ST.filter = 'all'; save(); renderList(); } var t = document.getElementById('g-' + b.getAttribute('data-cab')); if (t) { t.scrollIntoView(); e.preventDefault(); } return; }
+  if (e.target.closest('#copy-list')) copyText(orderText(), 'Order list copied');
+  if (e.target.closest('#untick')) { if (Object.keys(ST.bought).length && confirm('Clear every “bought” tick?')) { ST.bought = {}; save(); renderList(); } }
+  if (e.target.closest('#reset-amounts')) { ST.amt = {}; save(); renderCalc(); toast('Amounts reset to the estimates'); }
+});
+var bi = $('#budget'); if (bi) bi.addEventListener('input', function(){ ST.budget = bi.value; save(); renderCalc(); });
+nav(); renderChoices(); renderList(); bindTicks();
+if (typeof window.kitchenPlan === 'function') window.kitchenPlan(D);
+window.__kitchen = {S: ST, D: D, goods: goodsTotal, eff: effGroups, orderText: orderText, works: worksTotal};
+})();
+
+</script>
+</body>
+</html>

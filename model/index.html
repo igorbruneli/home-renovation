@@ -2749,10 +2749,10 @@ function sofaL(y0){ // relax corner sofa 2.80 × 2.10 × 1.02 (measured): long s
 
 /* =====================================================================
    KITCHEN. Sizes come from IKEA's on-site survey (Dec 2025), measured from the fridge corner "C":
-   along the window-side wall: fridge to 0.71, units to 2.66, peninsula band 2.66–3.29, low wall to 3.44;
+   along the side wall: fridge to 0.71, units to 2.66, peninsula band 2.66–3.29, low wall to 3.44;
    peninsula 2.115 m long plus a 15 cm end wall; back wall 3.92 m long with a niche 0.92 m wide.
    ===================================================================== */
-var KE = 7.43;                                            // window-side wall face
+var KE = 7.43;                                            // side wall face
 var PZ1 = ZK + 2.664, PZ2 = ZK + 3.29, PXE = KE - 2.115;  // peninsula: front of the units, dining-side face, free end
 var BW = {s2: ZK - 0.14, n: ZK - 0.408, s3: ZK - 0.03, x2: KE - 0.75, xn2: KE - 1.63, xn1: KE - 2.55};   // stepped back wall
 MAT.bod = std({color: 0xe9e1cd, roughness: 0.5, envMapIntensity: 0.35});      // BODBYN off-white
@@ -2870,7 +2870,7 @@ function kLed(g, x1, x2){ var l = box(x1, K_WB - 0.011, 0.27, x2, K_WB - 0.003, 
 function kitchenIkea(){
   var D = 0.60, W = 0.37;
   var east = function(){ return group(KE, 0, ZK, -Math.PI / 2); };       // local x = metres from the fridge corner along the wall
-  var pen = function(){ return group(KE, 0, PZ2, Math.PI); };            // local x = metres from the window-side wall, fronts toward the kitchen
+  var pen = function(){ return group(KE, 0, PZ2, Math.PI); };            // local x = metres from the side wall, fronts toward the kitchen
   var back = function(){ return group(XT2, 0, BW.s3, 0); };              // local x = metres from the corner with the stair-side wall
   O('New kitchen: base units', function(){
     var g = east();
@@ -2927,7 +2927,7 @@ function kitchenIkea(){
     box(0.713, y0, 0, 3.29, K_WT, 0.635, MAT.oakTop, g); box(0.635, y0, 0, 2.115, K_WT, 0.635, MAT.oakTop, p); box(0, y0, 0, 1.27, K_WT, 0.635, MAT.oakTop, b);
     box(1.118, K_WT, 0.06, 1.708, K_WT + 0.006, 0.58, MAT.blackGlass, g, false);                              // induction hob, 59 × 52
     [[1.27, 0.19], [1.27, 0.44], [1.555, 0.19], [1.555, 0.44]].forEach(function(z){ var ring = add(new T.TorusGeometry(0.085, 0.0025, 4, 32), MAT.grey, g, false); ring.rotation.x = Math.PI / 2; ring.position.set(z[0], K_WT + 0.0065, z[1]); });
-    box(0.78, K_WT, 0.09, 1.64, K_WT + 0.004, 0.56, MAT.steel, p, false);                                      // inset sink with drainer: bowl toward the window wall
+    box(0.78, K_WT, 0.09, 1.64, K_WT + 0.004, 0.56, MAT.steel, p, false);                                      // inset sink with drainer: bowl toward the side wall
     box(0.83, K_WT + 0.0005, 0.13, 1.27, K_WT + 0.0045, 0.52, MAT.dark, p, false); cyl(1.05, K_WT + 0.005, 0.325, 0.035, 0.002, MAT.steel, p, 'y', 16);
     for (var dr = 0; dr < 6; dr++) box(1.33 + dr * 0.048, K_WT + 0.004, 0.14, 1.345 + dr * 0.048, K_WT + 0.0052, 0.51, MAT.grey, p, false);
     cyl(1.05, K_WT + 0.15, 0.065, 0.014, 0.30, MAT.steel, p); var sp = add(new T.TorusGeometry(0.09, 0.012, 8, 16, Math.PI), MAT.steel, p); sp.rotation.y = Math.PI / 2; sp.position.set(1.05, K_WT + 0.30, 0.155);
@@ -3469,7 +3469,7 @@ var INFO = {
 };
 INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², 1.43 m deeper'], ['Kitchen', 'as photographed · switch to the IKEA plan above'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
   note: 'Your measurements, the diagnostic plan, IKEA\'s kitchen survey and your photos. Sizes nobody measured are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet.'};
-INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Window wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
+INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Side wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
   note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
