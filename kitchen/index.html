@@ -86,7 +86,7 @@ ul.tight,ol.tight{margin:0; padding-left:1.2rem; display:grid; gap:.35rem}
 .sheet-code{font-family:var(--f-mono); font-weight:600; font-size:var(--s1); color:var(--ink); border:1.5px solid var(--ink); padding:.05rem .45rem; align-self:center}
 .sheet-head .sub{grid-column:2; color:var(--ink-2); max-width:70ch}
 @media (max-width:560px){.sheet-head{grid-template-columns:1fr} .sheet-code{justify-self:start} .sheet-head .sub{grid-column:1}}
-.stack{display:grid; gap:1.5rem; align-content:start}
+.stack{display:grid; grid-template-columns:minmax(0,1fr); gap:1.5rem; align-content:start}
 .two{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:1.5rem 2rem; align-items:start}
 .two > *{min-width:0}
 .hero{padding-block:2.25rem 1rem; display:grid; gap:1.25rem}
@@ -110,7 +110,8 @@ table.t th,table.t td{padding:.5rem .65rem; border-bottom:1px solid var(--rule-2
 table.t th{font-family:var(--f-display); font-stretch:82%; text-transform:uppercase; letter-spacing:.06em; font-size:.75rem; color:var(--ink-2); border-bottom:1px solid var(--rule); white-space:nowrap}
 table.t td.r,table.t th.r{text-align:right; font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
 table.t tr.sum td{border-top:2px solid var(--ink); font-weight:700}
-.scroll{overflow-x:auto}
+.scroll{overflow-x:auto} .scroll table.t{min-width:620px}
+@media (max-width:640px){.brand span,.meter .rn{display:none} .cartouche .row{padding-block:.4rem; gap:.15rem 1rem} .meter{flex-basis:100%} .sheetnav{padding-bottom:.35rem}}
 
 /* ---------- Shopping list ---------- */
 .toolbar{display:flex; gap:.5rem .75rem; flex-wrap:wrap; align-items:center}
@@ -187,6 +188,59 @@ details.fold[open] > summary{border-bottom:1px solid var(--rule)}
   .it img{width:32px; height:32px} a{color:inherit; text-decoration:none} details.fold > *{display:block}
 }
 </style>
+<style>
+/* ---------- plan drawings ---------- */
+.planbox{background:var(--sheet); border:1px solid var(--rule); overflow-x:auto}
+.planbox > [data-plan] > svg{display:block; width:100%; min-width:600px; max-width:880px; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:.4rem 1.1rem; font-size:var(--s-1); color:var(--ink-2); padding:.6rem .8rem; border-top:1px solid var(--rule)}
+.legend span{display:inline-flex; align-items:center; gap:.4rem}
+.sw{display:inline-block; width:18px; height:12px; border:1.5px solid var(--ink)}
+.sw.top{background:var(--oak-pale); border-color:var(--oak)} .sw.wu{border-style:dashed; border-radius:50%; width:14px; height:14px} .sw.app{background:var(--rule-2)}
+.sw.wall{background:repeating-linear-gradient(45deg,var(--wallfill) 0 3px,var(--wallline) 3px 4px); border-color:var(--wallline)}
+svg text{font-family:var(--f-body)}
+.k-hbg{fill:var(--wallfill)} .k-hl{stroke:var(--wallline); stroke-width:1.2}
+.k-wall{stroke:var(--ink); stroke-width:1.5}
+.k-floor{fill:var(--sheet)} .k-stair{fill:var(--paper); stroke:var(--ink-3); stroke-width:1}
+.k-top{fill:var(--oak-pale); stroke:var(--oak); stroke-width:1.5}
+.k-unit{fill:var(--unit); stroke:var(--ink); stroke-width:1.5} .k-fill{fill:var(--unit); stroke:var(--ink-3); stroke-width:1}
+.k-app{fill:var(--rule-2); stroke:var(--ink); stroke-width:1.5}
+.k-wallunit{fill:none; stroke:var(--hydro-ink); stroke-width:1.5; stroke-dasharray:6 4}
+.k-thin{fill:none; stroke:var(--ink-2); stroke-width:1} .k-sink{fill:var(--sheet); stroke:var(--ink-2); stroke-width:1.2} .k-dot{fill:var(--ink-2)}
+.k-t,.k-s{font-size:12px; fill:var(--ink-2)} .k-room{font-family:var(--f-display); font-size:15px; font-weight:700; letter-spacing:.1em; fill:var(--ink-3)}
+.k-dim{stroke:var(--ink-2); stroke-width:1; fill:none} .k-d{font-family:var(--f-mono); font-size:11.5px; fill:var(--ink)}
+.k-tag rect,.k-tag circle{fill:var(--sheet); stroke:var(--ink); stroke-width:1.5} .k-tag text{font-family:var(--f-mono); font-size:12px; font-weight:600; fill:var(--ink)}
+.k-tag.k-wu circle{stroke:var(--hydro-ink); stroke-dasharray:3 2} .k-tag.k-wu text{fill:var(--hydro-ink)}
+.k-tag:hover rect,.k-tag:hover circle,.k-tag:focus rect,.k-tag:focus circle{fill:var(--hydro-pale)} .k-tag{cursor:pointer}
+.k-pt rect{fill:#F5D90A; stroke:#B3261E; stroke-width:1.5} .k-pt text{font-family:var(--f-display); font-weight:800; font-size:14px; fill:#B3261E}
+.k-sv circle{stroke-width:1.5} .k-sv text{font-family:var(--f-mono); font-size:10.5px; font-weight:600}
+.k-sv.e circle{fill:var(--warn-pale); stroke:var(--warn)} .k-sv.e text{fill:var(--warn)}
+.k-sv.l circle{fill:var(--hydro-pale); stroke:var(--hydro-ink)} .k-sv.l text{fill:var(--hydro-ink)}
+.k-sv.ok circle{fill:var(--sheet); stroke:var(--ink-2)} .k-sv.ok text{fill:var(--ink-2)}
+.k-water{stroke:var(--water); stroke-width:7; stroke-linecap:round} .k-lead{stroke:var(--ink-3); stroke-width:1; fill:none}
+/* ---------- findings, steps ---------- */
+.finding{background:var(--sheet); border:1px solid var(--rule); border-left:5px solid var(--ink-3); padding:.8rem 1rem; display:grid; gap:.45rem; align-content:start}
+.finding.must{border-left-color:var(--bad)} .finding.work{border-left-color:var(--warn)} .finding.check{border-left-color:var(--water)} .finding.save{border-left-color:var(--hydro)}
+.finding h4{display:flex; gap:.5rem; align-items:baseline; flex-wrap:wrap}
+.finding .alt{font-size:.95rem; display:grid; gap:.25rem}
+.finding .alt b{font-family:var(--f-display); font-stretch:85%}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr)); gap:.75rem}
+ol.steps{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:minmax(0,1fr); gap:.6rem; counter-reset:st}
+ol.steps > li{background:var(--sheet); border:1px solid var(--rule); padding:.75rem .9rem .75rem 3.2rem; position:relative; display:grid; grid-template-columns:minmax(0,1fr); gap:.35rem; counter-increment:st}
+@media (max-width:560px){ol.steps > li{padding-left:.9rem; padding-top:2.9rem}}
+ol.steps > li::before{content:counter(st); position:absolute; left:.8rem; top:.7rem; font-family:var(--f-mono); font-weight:600; border:1.5px solid var(--ink); width:1.7rem; height:1.7rem; display:grid; place-items:center}
+ol.steps h4{display:flex; gap:.5rem; flex-wrap:wrap; align-items:baseline}
+ol.steps .who{font-size:var(--s-1); color:var(--ink-2)}
+ul.ticks{list-style:none; margin:0; padding:0; display:grid; gap:.3rem}
+ul.ticks label{display:grid; grid-template-columns:auto 1fr; gap:.55rem; align-items:start; cursor:pointer}
+ul.ticks input{width:1.1rem; height:1.1rem; margin:.2rem 0 0; accent-color:var(--hydro)}
+ul.ticks label:has(input:checked) span{color:var(--ink-3); text-decoration:line-through}
+.budget-in{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+.budget-in input{font:inherit; font-family:var(--f-mono); width:8.5rem; padding:.35rem .5rem; border:1px solid var(--ink); background:var(--sheet); color:var(--ink); text-align:right}
+dl.gloss{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:0; margin:0; background:var(--sheet); border:1px solid var(--rule)}
+dl.gloss dt,dl.gloss dd{margin:0; padding:.4rem .7rem; border-bottom:1px solid var(--rule-2)}
+dl.gloss dt{font-style:italic}
+@media print{.planbox > [data-plan] > svg{min-width:0}}
+</style>
 </head>
 <body>
 <div class="cartouche">
@@ -194,7 +248,7 @@ details.fold[open] > summary{border-bottom:1px solid var(--rule)}
     <div class="row">
       <div class="brand"><b><a href="../">MAISON</a> · KITCHEN</b><span>Plan review, routes, budget and shopping list</span></div>
       <div class="meter" aria-live="polite">
-        <div class="meter-top"><span><strong data-f="total">–</strong> all in · <span data-f="route"></span></span><span data-f="left"></span></div>
+        <div class="meter-top"><span><strong data-f="total">–</strong> all in<span class="rn"> · <span data-f="route"></span></span></span><span class="lf" data-f="left"></span></div>
         <div class="bar hide" id="bar" data-state="ok"><i></i></div>
       </div>
     </div>
@@ -219,6 +273,351 @@ details.fold[open] > summary{border-bottom:1px solid var(--rule)}
     <button class="btn" type="button" onclick="window.print()">Print</button>
   </div>
 </header>
+<section class="sheet" id="start" data-nav="Start here">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-01</span><h2>Where to start</h2>
+      <p class="sub">Five steps, in this order. The first costs nothing and settles most of the open questions. <span data-count="s1-"></span></p></div>
+    <div class="stack">
+      <ol class="steps">
+        <li><h4>Measure five things at home <span class="pill ok">30 minutes, free</span></h4>
+          <ul class="ticks">
+            <li><label><input type="checkbox" data-tick="s1-beam"><span>Floor to the underside of the beams, at the side wall and at the back wall. The plan needs 2.23 m at the side wall and 2.30 m at the back wall.</span></label></li>
+            <li><label><input type="checkbox" data-tick="s1-stairs"><span>The tightest turn on the stairs. A worktop is 2.46 m × 64 cm × 4 cm; the longest piece you need is 2.12 m.</span></label></li>
+            <li><label><input type="checkbox" data-tick="s1-panel"><span>The consumer unit: where it is, whether a slot is free, and the route a new cable would take up to the kitchen. Take a photo with the cover open.</span></label></li>
+            <li><label><input type="checkbox" data-tick="s1-gas"><span>The gas: is the hob on the same mains supply as the boiler, or on a bottle? Where is the tap for the hob?</span></label></li>
+            <li><label><input type="checkbox" data-tick="s1-oven"><span>The oven and dishwasher you plan to keep: both 60 cm wide, the oven a built-in model? Note make and age.</span></label></li>
+          </ul></li>
+        <li><h4>Settle the three choices that move the price most</h4>
+          <div class="scroll"><table class="t">
+            <thead><tr><th>Choice</th><th>As planned</th><th>Cheaper</th><th class="r">Saves</th></tr></thead>
+            <tbody>
+              <tr><td>Who builds it (<a href="#routes">K-04</a>)</td><td>IKEA fits everything</td><td>You, with a fitter for the worktops</td><td class="r">≈ 2,500 €</td></tr>
+              <tr><td>Worktop (<a href="#list">K-07</a>)</td><td>Oak veneer, 4 slabs</td><td>Oak-effect laminate</td><td class="r">396 €</td></tr>
+              <tr><td>Hob (<a href="#list">K-07</a>)</td><td>HÖGKLASSIG, 699 €</td><td>SMAKLIG, MATMÄSSIG or VILSTA</td><td class="r">220–480 €</td></tr>
+            </tbody></table></div></li>
+        <li><h4>Get the two quotes IKEA never gave you</h4>
+          <p>IKEA's technical report puts the preparation on you: “Qui fait les travaux ? Client.” An electrician for the new hob line and the sockets, and a gas fitter to cap the old hob supply. <a href="#trades">K-06</a> has exactly what to ask for, with the positions.</p>
+          <ul class="ticks">
+            <li><label><input type="checkbox" data-tick="s1-qelec"><span>Electrician's quote in hand</span></label></li>
+            <li><label><input type="checkbox" data-tick="s1-qgas"><span>Gas fitter's quote in hand</span></label></li>
+          </ul></li>
+        <li><h4>Refresh IKEA's quotes, or go without them</h4>
+          <p>Both quotes ran out in March 2026 and the list has moved by about +106 € since. If you want IKEA to fit, ask them to re-issue the two quotes against the corrected list in <a href="#list">K-07</a>. If you'll use a fitter or do it yourselves, the list is all you need.</p>
+          <ul class="ticks"><li><label><input type="checkbox" data-tick="s1-route"><span>Route chosen and, if it's IKEA, new quotes requested</span></label></li></ul></li>
+        <li><h4>Book the work in the right order</h4>
+          <p>Electrician and gas fitter first, delivery a few days before the old kitchen comes out, walls repaired before any cabinet goes up. <a href="#steps">K-05</a> has the sequence, who does each step, and how long the kitchen is out of use.</p>
+          <ul class="ticks"><li><label><input type="checkbox" data-tick="s1-book"><span>Dates agreed with the trades and the delivery booked</span></label></li></ul></li>
+      </ol>
+      <div>
+        <h3 style="margin-bottom:.6rem">What IKEA's four documents cover</h3>
+        <div class="scroll"><table class="t">
+          <thead><tr><th>Document</th><th class="r">Amount</th><th>Covers</th><th>Leaves out</th></tr></thead>
+          <tbody>
+            <tr><td><b>Article list</b><br><span class="small muted">87 lines</span></td><td class="r">5,475.80 €</td><td>Cabinets, fronts, worktop, sink, tap, hob, hood, lighting</td><td>Hinges, hood filter and duct, side panels in the right colour, an oven. See <a href="#review">K-03</a>.</td></tr>
+            <tr><td><b>Fitting quote</b></td><td class="r">1,542.84 €</td><td>14 cabinets assembled and fitted, 8.74 m of worktop, sink and tap, 4 appliances, 12 light fittings, packaging taken away</td><td>Everything behind the cabinets: electrics, plumbing, walls</td></tr>
+            <tr><td><b>Annex-works quote</b><br><span class="small muted">IKEA's fitting partner</span></td><td class="r">946.08 €</td><td>Old kitchen out and to the tip 396.24 · three niche shelves cut from worktop 176.64 · light pelmet under the wall units 153.60 · three light points 112.50 · one socket moved 81.90 · sundries 25.20</td><td>Taking the old wall tiles off, repairing the walls afterwards</td></tr>
+            <tr><td><b>Delivery</b></td><td class="r">60.00 €</td><td>Into the room you choose</td><td></td></tr>
+            <tr><td><b>Technical report</b></td><td class="r">—</td><td>The measured plan, and where every outlet and pipe has to be</td><td>States that the preparation work is the client's</td></tr>
+            <tr class="sum"><td>As quoted</td><td class="r">8,024.72 €</td><td colspan="2">Before the missing parts (+406 €), today's prices (+106 €) and the work nobody quoted (≈ 1,200 €)</td></tr>
+          </tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sheet" id="plan" data-nav="The plan">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-02</span><h2>The plan</h2>
+      <p class="sub">IKEA's layout, redrawn from the survey. The numbers are the cabinet numbers on IKEA's list: click one to jump to its parts. Sizes in centimetres.</p></div>
+    <div class="stack">
+      <div class="planbox"><div data-plan="layout"></div>
+        <div class="legend"><span><i class="sw"></i>base unit, numbered</span><span><i class="sw wu"></i>wall unit above</span><span><i class="sw top"></i>oak worktop and shelves</span><span><i class="sw app"></i>appliance you keep</span><span><i class="sw wall"></i>masonry</span><span>A, B, C: the reference points of IKEA's survey</span></div></div>
+      <div class="cols">
+        <div class="note tip"><span class="label">Same footprint, new everything</span>
+          <p>The L along the side wall and the peninsula stay where they are, so water, drains and the low tiled wall don't move. That keeps the plumbing cheap.</p></div>
+        <div><h3>What changes</h3>
+          <ul class="tight" style="margin-top:.5rem">
+            <li>Gas hob out, induction hob in, with a hood built into the wall cabinet above it.</li>
+            <li>Off-white framed fronts with steel bar handles; three wall cabinets get glass doors and a light inside.</li>
+            <li>Oak worktop at 92 cm, about 2 cm higher than today.</li>
+            <li>A new run on the back wall where the microwave table stands: two 60 cm base units and two wall units, 1.27 m of extra worktop.</li>
+            <li>Drawers instead of doors by the hob and under the sink, a 20 cm pull-out, a pull-out fitting in the corner, sorting bins under the sink.</li>
+            <li>Three oak shelves in the niche, and LED strips under every wall cabinet and under the shelves.</li>
+          </ul></div>
+        <div><h3>What stays</h3>
+          <ul class="tight" style="margin-top:.5rem">
+            <li>Fridge, dishwasher and, as far as the list shows, your oven.</li>
+            <li>The low tiled wall around the peninsula, and the niche itself.</li>
+            <li>Sink and dishwasher positions.</li>
+          </ul></div>
+      </div>
+      <p class="small muted">Heights: plinth 8 + unit 80 + worktop 3.8 = 92 cm. Then 50 cm clear, and wall units 80 cm high with their tops at 2.22 m.</p>
+      <p class="noprint"><a class="btn primary" href="../model/#kitchen">Walk through it in 3D</a> <span class="small muted">Switch between “Today” and “IKEA plan” at the top of the panel.</span></p>
+    </div>
+  </div>
+</section>
+<section class="sheet" id="review" data-nav="Plan review">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-03</span><h2>What I'd change or check in his plan</h2>
+      <p class="sub">The layout is sound. The gaps are in the list, in the work around it, and in a few things nobody measured. Red = fix before ordering, amber = work to budget for, blue = check on site, green = ways to spend less.</p></div>
+    <div class="stack">
+      <div><h3 style="margin-bottom:.6rem">Fix before you order</h3>
+        <div class="cols">
+          <div class="finding must"><h4>406 € of parts are not in the printed total <span class="pill bad">List</span></h4>
+            <p>The list has no door hinges at all: eleven hinged doors need two each. The planner wrote in by hand that the corner unit needs hinges, the hood needs a filter and a duct, two side panels must be off-white, and the worktop and niche need brackets and three more LED strips. None of that is priced.</p>
+            <div class="alt"><span><b>Done here:</b> all of it is in the <a href="#list">shopping list</a> under “Added by the planner” (306 €) and “Missing from the list” (100 €).</span></div></div>
+          <div class="finding must"><h4>The quotes have run out and prices moved <span class="pill bad">Quotes</span></h4>
+            <p>All three are dated 9 December 2025 and valid for three months. Since then 33 lines of the list changed price, +106 € in total: the hob is up 70 €, the tap up 10 €, the hood down 20 €.</p>
+            <div class="alt"><span><b>If IKEA fits:</b> ask for both quotes again, against the corrected list. The price per metre of fitting may have moved too.</span></div></div>
+          <div class="finding must"><h4>The dimmer no longer exists <span class="pill bad">List</span></h4>
+            <p>The three RODRET dimmers are discontinued. IKEA's current remote, BILRESA, uses a newer radio standard; IKEA's pages say it works with these LED drivers through the DIRIGERA hub, and buyers report that pairing the two directly fails.</p>
+            <div class="alt"><span><b>Cheapest:</b> have the electrician put the LED feeds on a wall switch. On and off, no dimming, nothing to pair. 0 € of IKEA parts.</span>
+              <span><b>With dimming:</b> <a data-ref="105.034.06" data-price>DIRIGERA hub</a> plus one <a data-ref="106.041.65" data-price>BILRESA remote</a>. Ask IKEA first whether any remote still pairs without the hub.</span></div></div>
+          <div class="finding must"><h4>The plinth is a different white <span class="pill bad">List</span></h4>
+            <p>The plinth on the list is high-gloss white. Fronts and side panels are off-white, so the strip along the floor would show as a colder, shinier white.</p>
+            <div class="alt"><span><b>Swap:</b> <a data-ref="602.807.76" data-price>FÖRBÄTTRA plinth in off-white</a>, same price. It is the default under “Plinth colour” in the list.</span></div></div>
+        </div></div>
+      <div><h3 style="margin-bottom:.6rem">Work nobody has quoted</h3>
+        <div class="cols">
+          <div class="finding work"><h4>Gas to induction is the biggest hidden job <span class="pill warn">≈ 530–1,050 €</span></h4>
+            <p>The induction hob needs its own 32 A circuit in 6 mm² cable from the consumer unit up to the kitchen, and the gas supply to the old hob has to be disconnected and capped by a gas professional. The technical report lists both as the client's work.</p>
+            <div class="alt"><span><b>As planned:</b> electrician ≈ 450–900 € for the hob line and the other outlets, gas fitter ≈ 80–150 €. Estimates: get quotes.</span>
+              <span><b>Alternative, stay on gas:</b> a <a data-ref="605.518.38" data-price>LAGAN gas hob</a> fits the same cabinet. No new line, no capping, and 590 € less for the hob. You keep an open flame under timber beams and a recirculating hood, and the hood must sit higher above a gas hob than the 50 cm drawn, so check its manual before choosing this.</span></div></div>
+          <div class="finding work"><h4>Bare walls after the old kitchen comes out <span class="pill warn">≈ 230–450 €</span></h4>
+            <p>The removal quote says it in so many words: taking off the old wall tiles and repairing the surfaces is not included. And no quote has a splashback, so behind the hob and the worktop there would be painted plaster.</p>
+            <div class="alt"><span><b>Walls:</b> tiles off, filler, primer, two coats. About 80 € of materials if you do it, ≈ 300 € if you pay for it.</span>
+              <span><b>Splashback, about 2 m²:</b> <a href="https://www.ikea.com/fr/fr/cat/credences-et-revetements-muraux-19121/" target="_blank" rel="noopener">IKEA wall panels ↗</a> from 45 € a panel plus fixing strips, tiles, or a scrubbable kitchen paint for about 40 €.</span></div></div>
+          <div class="finding work"><h4>VAT at 20% on both labour quotes <span class="pill warn">≈ 207 € to ask about</span></h4>
+            <p>In a home more than two years old, fitting labour can usually be invoiced at 10% VAT once you sign the attestation. IKEA's fitting quote even has a line for it, “Droit à la TVA 10%”, yet both quotes are calculated at 20%.</p>
+            <div class="alt"><span><b>Ask:</b> “Can you apply the 10% rate with the attestation simplifiée?” At 10% the fitting quote drops by 129 € and the annex works by 79 €. The goods stay at 20%.</span></div></div>
+        </div></div>
+      <div><h3 style="margin-bottom:.6rem">Check on site first</h3>
+        <div class="cols">
+          <div class="finding check"><h4>Wall cabinets against the beams <span class="pill info">Measure</span></h4>
+            <p>The drawings assume a flat ceiling at 2.50 m. The wall cabinets top out at 2.22 m on the side wall. The two on the back wall are drawn 8 cm higher, at 2.30 m, with 58 cm above the worktop instead of 50. Your beams hang below the ceiling.</p>
+            <div class="alt"><span><b>If a beam is in the way:</b> hang all of them at 2.22 m, or use METOD wall cabinets 60 cm high on that wall. The 3D model shows them all at 2.22 m.</span></div></div>
+          <div class="finding check"><h4>The hood is loud when it recirculates <span class="pill info">Decide</span></h4>
+            <p>IKEA gives 630 m³/h at 64 dB for the UNDERVERK when it blows outside, and 365 m³/h at 79 dB when it recirculates through a charcoal filter, both at full speed. Blowing outside means a 150 mm hole through the wall, and only works if that wall is an outside wall.</p>
+            <div class="alt"><span><b>Keep it:</b> cook on speed 1 or 2 and accept the noise on full.</span>
+              <span><b>Alternative:</b> the <a data-ref="103.891.42" data-price>UTDRAG pull-out hood</a> recirculates at 72 dB but moves only 140 m³/h. It mounts differently, so the wall cabinet above the hob changes with it: ask IKEA to swap both.</span></div></div>
+          <div class="finding check"><h4>Getting the worktops up the stairs <span class="pill info">Measure</span></h4>
+            <p>The box for this is unticked in the technical report. Each slab is 2.46 m long, 64 cm wide and heavy.</p>
+            <div class="alt"><span><b>If the turn is tight:</b> cut the slabs to length in the garage first. The longest finished piece is the peninsula, 2.12 m.</span></div></div>
+          <div class="finding check"><h4>No oven on the list <span class="pill info">Confirm</span></h4>
+            <p>The list has the oven cabinet and its support, and the fitting quote counts four appliances, so the plan re-uses your oven and dishwasher. That works if the oven is a standard 60 cm built-in model.</p>
+            <div class="alt"><span><b>If you'd rather replace it:</b> LAGAN from 199 €, STENABY 279 €. Pick one under “Oven” in the list and it is added to the total.</span></div></div>
+          <div class="finding check"><h4>Sockets for the new run <span class="pill info">Ask</span></h4>
+            <p>The report places outlets for the hob, oven, hood, dishwasher and LED drivers. It shows none above the new worktop on the back wall, where the microwave and small appliances will live.</p>
+            <div class="alt"><span><b>Ask the electrician</b> for a double socket above that worktop, and whether the “one socket moved” in the annex quote is the one that would end up behind the new units.</span></div></div>
+          <div class="finding check"><h4>Boxes left unticked in the report <span class="pill info">Fitter</span></h4>
+            <p>Whether the walls are square, the state of the walls, the corner door next to the hood cabinet and the filler of the corner base, and the switches and door swings near the units. Whoever fits the kitchen should confirm these before you order.</p></div>
+        </div></div>
+      <div><h3 style="margin-bottom:.6rem">Where the plan can cost less</h3>
+        <div class="cols">
+          <div class="finding save"><h4>Laminate instead of oak veneer <span class="pill ok">−396 €</span></h4>
+            <p>Oak veneer is real wood on a core: it looks best, but it needs oiling and the sink cut-out has to be sealed perfectly. <a data-ref="804.392.09" data-price>SÄLJAN oak-effect laminate</a> is the same thickness, needs no care, and costs less than half. The niche shelves then get the iron-on edging on their cut ends.</p></div>
+          <div class="finding save"><h4>A simpler hob <span class="pill ok">−220 to −480 €</span></h4>
+            <p>The HÖGKLASSIG went up to 699 €. Any 59 cm IKEA induction hob fits the same cabinet and needs the same 32 A line. The choices are in the list.</p></div>
+          <div class="finding save"><h4>Do the removal and the shelves yourselves <span class="pill ok">−573 €</span></h4>
+            <p>Taking out the old kitchen is priced at 396 € and cutting three shelves from the spare worktop at 177 €. Both are a day's work with a screwdriver, a pry bar and a circular saw, once the gas and power to the hob are safely off.</p></div>
+          <div class="finding save"><h4>Trim the lighting <span class="pill ok">−105 to −220 €</span></h4>
+            <p>Lighting is about 360 € of parts, plus 266 € of labour in the annex quote. The strips under the wall cabinets earn their keep. The niche lighting is the part to drop: three strips, a driver and a cable are about 105 € of parts and 112 € of labour.</p></div>
+          <div class="finding save"><h4>Shelves in the corner instead of the pull-out <span class="pill ok">≈ −130 €</span></h4>
+            <p>The pull-out fitting for the corner base costs 149 €. The same cabinet with plain shelves stores as much; you just reach in for it. Ask IKEA for the corner base with shelves.</p></div>
+        </div></div>
+    </div>
+  </div>
+</section>
+<section class="sheet" id="routes" data-nav="Routes + budget">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-04</span><h2>Three ways to build it, and what each costs</h2>
+      <p class="sub">The goods are the same in every route. What changes is who does the work. Pick a route to load its figures into the budget below; every amount can be edited. Totals include 10% on the works for surprises.</p></div>
+    <div class="stack">
+      <div class="routes">
+        <button type="button" class="route" data-route="ikea"><span class="label">Professional company</span><span class="rt">IKEA does it</span><span class="rp" data-f="rt-ikea"></span>
+          <ul><li>IKEA's fitters take out the old kitchen and fit the new one in about three days.</li><li>One contract, and IKEA answers for the fitting.</li><li>You still book the electrician and gas fitter and repair the walls.</li><li>Dearest route. Both quotes need re-issuing.</li></ul></button>
+        <button type="button" class="route" data-route="handy"><span class="label">Handyman</span><span class="rt">Independent fitter</span><span class="rp" data-f="rt-handy"></span>
+          <ul><li>You order the goods. A kitchen fitter or a handyman who knows IKEA kitchens removes, fits, and can do walls and splashback in the same visit.</li><li>About three days' work. My figure is an estimate: get two fixed-price quotes against this plan.</li><li>Ask for references and proof of insurance.</li></ul></button>
+        <button type="button" class="route" data-route="mix"><span class="label">Mostly DIY <span class="pill ok">Best value</span></span><span class="rt">You, with a pro for the hard cuts</span><span class="rp" data-f="rt-mix"></span>
+          <ul><li>You strip the old kitchen, build and hang the cabinets, fit fronts, plinths and lights.</li><li>A fitter comes for half a day to cut and joint the worktops and cut out for sink and hob: the one step that can't be redone.</li><li>Two or three weekends.</li></ul></button>
+        <button type="button" class="route" data-route="diy"><span class="label">DIY</span><span class="rt">All yourselves</span><span class="rp" data-f="rt-diy"></span>
+          <ul><li>Everything except the electrics and the gas.</li><li>Two people, five to seven working days. IKEA's instructions are good; the stone walls and the oak worktop are the hard parts.</li><li>You need the tools listed below, or to hire them.</li></ul></button>
+      </div>
+      <div class="two">
+        <div class="stack">
+          <div class="budget-in noprint"><label for="budget"><b>Your budget</b></label><input id="budget" type="number" min="0" step="100" inputmode="decimal" placeholder="e.g. 7500"> <span class="small muted">€ · shows in the bar at the top</span></div>
+          <div class="calc" id="calc"></div>
+          <p class="noprint"><button class="btn sm" type="button" id="reset-amounts">Reset amounts to the estimates</button></p>
+        </div>
+        <div class="stack">
+          <div class="note"><span class="label">Where each figure comes from</span>
+            <ul class="tight">
+              <li><b>IKEA route:</b> IKEA's own quotes of December 2025, to the cent. Expect a little more when re-issued.</li>
+              <li><b>Fitter, electrician, gas, walls:</b> my estimates for Haute-Savoie, close to Geneva, where trades cost more than the French average. Replace them with your quotes.</li>
+              <li><b>Goods:</b> ikea.com/fr on <span data-f="checked"></span>, with the choices you made in the list.</li>
+            </ul></div>
+          <div class="note warn"><span class="label">In every route</span>
+            <p>The electrician and the gas fitter are not optional and not DIY. A hob circuit done wrong is a fire risk your insurer can refuse to cover, and gas work is reserved for a qualified professional.</p></div>
+          <details class="fold"><summary>Tools for the DIY routes</summary>
+            <div style="padding:.7rem .9rem; display:grid; gap:.5rem">
+              <ul class="tight">
+                <li>Cordless drill-driver, and a hammer drill with masonry bits for the stone walls.</li>
+                <li>Anchors made for stone or hollow masonry for the suspension rail. The plugs in the box are for plain concrete.</li>
+                <li>A long spirit level or a cross-line laser, tape, pencil, clamps.</li>
+                <li>For the worktops: a plunge or circular saw with a fine blade and a guide rail, a jigsaw for the cut-outs, worktop connecting bolts, clear silicone, hard-wax oil.</li>
+                <li>A handle-drilling jig (IKEA's FIXA template is out of stock online; any DIY store has one).</li>
+                <li>A second pair of hands for the wall cabinets and every worktop.</li>
+              </ul>
+              <p class="small muted">Hire shops rent a plunge saw with rail for about 30–40 € a day.</p></div></details>
+        </div>
+      </div>
+      <div><h3 style="margin-bottom:.6rem">Who does what</h3>
+        <div class="scroll"><table class="t">
+          <thead><tr><th>Job</th><th>IKEA does it</th><th>Independent fitter</th><th>You + a pro</th><th>All yourselves</th></tr></thead>
+          <tbody>
+            <tr><td>Order, receive and check the goods</td><td>You</td><td>You</td><td>You</td><td>You</td></tr>
+            <tr><td>Electrician and gas fitter</td><td>You book them</td><td>You book them</td><td>You book them</td><td>You book them</td></tr>
+            <tr><td>Take out the old kitchen</td><td>IKEA</td><td>Fitter</td><td>You</td><td>You</td></tr>
+            <tr><td>Old tiles off, repair and paint walls</td><td>You or a painter</td><td>Fitter</td><td>You</td><td>You</td></tr>
+            <tr><td>Assemble, hang and level the cabinets</td><td>IKEA</td><td>Fitter</td><td>You</td><td>You</td></tr>
+            <tr><td>Worktops: cut, joint, cut-outs</td><td>IKEA</td><td>Fitter</td><td>Fitter</td><td>You</td></tr>
+            <tr><td>Sink, tap, dishwasher</td><td>IKEA</td><td>Fitter</td><td>You</td><td>You</td></tr>
+            <tr><td>Connect hob, oven and hood</td><td>IKEA, to outlets your electrician prepared</td><td>Electrician</td><td>Electrician</td><td>Electrician</td></tr>
+            <tr><td>Fronts, handles, plinths, shelves, LED strips</td><td>IKEA</td><td>Fitter</td><td>You</td><td>You</td></tr>
+            <tr><td>Splashback</td><td>You</td><td>Fitter</td><td>You</td><td>You</td></tr>
+          </tbody></table></div></div>
+    </div>
+  </div>
+</section>
+<section class="sheet" id="steps" data-nav="Step by step">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-05</span><h2>Step by step</h2>
+      <p class="sub">The order matters more than the speed. Plan for the kitchen to be out of use for about a week if IKEA or a fitter does it, and two to three weeks if you work at weekends. <span data-count="s5-"></span></p></div>
+    <ol class="steps">
+      <li><h4>Decide and book <span class="pill plain">Before any money moves</span></h4>
+        <p class="who">You</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-1a"><span>The five measurements from <a href="#start">K-01</a> are done, and the wall-cabinet height is settled.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-1b"><span>Route, worktop and hob chosen. Electrician and gas fitter booked for the week the old kitchen comes out.</span></label></li>
+        </ul></li>
+      <li><h4>Order and take delivery <span class="pill plain">2–3 weeks ahead</span></h4>
+        <p class="who">You</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-2a"><span>Order everything in one go from “One line per article” in <a href="#list">K-07</a>, so one missing box can't stall the job.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-2b"><span>Count the packages against the delivery note the same day. Lay the worktops flat, off the floor, in the house for a few days before cutting.</span></label></li>
+        </ul></li>
+      <li><h4>Set up a temporary kitchen <span class="pill plain">1 hour</span></h4>
+        <p class="who">You</p>
+        <ul class="ticks"><li><label><input type="checkbox" data-tick="s5-3a"><span>Fridge stays plugged in. Microwave, kettle and a tray of basics move to the dining table; washing-up goes to the bathroom.</span></label></li></ul></li>
+      <li><h4>Make it safe, then strip it out <span class="pill warn">Gas fitter first</span> <span class="pill plain">1 day</span></h4>
+        <p class="who">Gas fitter, then IKEA, the fitter or you</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-4a"><span>The gas fitter disconnects the hob and caps the supply. Nobody touches the hob before that.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-4b"><span>Kitchen circuits off at the consumer unit, water off at the stop valve, sink and dishwasher disconnected.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-4c"><span>Doors and drawers off, then worktop, wall cabinets, base cabinets. Old wall tiles off. Everything to the déchetterie.</span></label></li>
+        </ul></li>
+      <li><h4>Cables and pipes <span class="pill warn">Electrician</span> <span class="pill plain">½–1 day</span></h4>
+        <p class="who">Electrician; a plumber only if a pipe has to move</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-5a"><span>New 32 A line for the hob, oven outlet, hood and dishwasher sockets, LED feeds, a socket above the new run. Positions in <a href="#trades">K-06</a>.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-5b"><span>Water and drains checked against K-06: everything under the sink, nothing behind a built-in unit.</span></label></li>
+        </ul></li>
+      <li><h4>Walls <span class="pill plain">2 days with drying</span></h4>
+        <p class="who">You, the fitter or a painter</p>
+        <ul class="ticks"><li><label><input type="checkbox" data-tick="s5-6a"><span>Fill, sand, prime, two coats. Painting is far easier before the cabinets go up.</span></label></li></ul></li>
+      <li><h4>Wall cabinets first <span class="pill plain">1 day</span></h4>
+        <p class="who">IKEA, the fitter or you two</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-7a"><span>Mark a level line for the suspension rail. Fix it into the stone with anchors made for it, one every 30 cm or so.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-7b"><span>Hang 13 to 17 on the side wall and 11, 12 on the back wall. Check each against the beams before screwing them together.</span></label></li>
+        </ul></li>
+      <li><h4>Base cabinets <span class="pill plain">1 day</span></h4>
+        <p class="who">IKEA, the fitter or you</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-8a"><span>Find the highest point of the floor and set every leg from there. Start in the corner with cabinet 8, then work outward.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-8b"><span>Screw cabinets to each other and to the rail, add side panels and fillers, slide the dishwasher in to check its gap.</span></label></li>
+        </ul></li>
+      <li><h4>Worktops <span class="pill bad">The step not to rush</span> <span class="pill plain">½–1 day</span></h4>
+        <p class="who">IKEA or a fitter. In the all-DIY route: you, with a guide rail and a new blade</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-9a"><span>Peninsula in one piece from the side wall to the end wall, on the two brackets. The side-wall piece butts against it at the corner.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-9b"><span>Cut-outs for sink and hob to the sizes in their instructions. Measure twice. Seal every cut edge before anything goes in.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-9c"><span>Oak: oil the top, the edges and the underside around the sink before first use. Laminate: nothing to do.</span></label></li>
+        </ul></li>
+      <li><h4>Water, hob, oven, hood <span class="pill warn">Electrician</span> <span class="pill plain">½ day</span></h4>
+        <p class="who">IKEA or the fitter for the water; the electrician for hob and oven</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-10a"><span>Sink, trap, tap and dishwasher connected, then run water for ten minutes and check every joint with dry paper.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-10b"><span>Hob and oven wired, hood plugged in with its duct and charcoal filter. Test every zone and speed.</span></label></li>
+        </ul></li>
+      <li><h4>Fronts and finishing <span class="pill plain">1 day</span></h4>
+        <p class="who">IKEA, the fitter or you</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-11a"><span>Drawers, doors and hinges, then handles with a drilling jig so they all line up. Plinths last.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-11b"><span>Niche shelves on their angles, LED strips and drivers, the pelmet under the wall cabinets.</span></label></li>
+        </ul></li>
+      <li><h4>Splashback and sign-off <span class="pill plain">½ day</span></h4>
+        <p class="who">You or the fitter</p>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="s5-12a"><span>Splashback up, silicone along the back of the worktop and around the sink.</span></label></li>
+          <li><label><input type="checkbox" data-tick="s5-12b"><span>Walk round with a list of anything loose, scratched or missing while the fitter is still there. File receipts and invoices: they are the proof for every guarantee.</span></label></li>
+        </ul></li>
+    </ol>
+  </div>
+</section>
+<section class="sheet" id="trades" data-nav="For the trades">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-06</span><h2>What the electrician and the plumber need</h2>
+      <p class="sub">Taken from IKEA's technical report. Positions are measured from point A, the corner where the peninsula meets the side wall, toward C (along the side wall) or toward B (along the peninsula). Heights are above the finished floor. Show this sheet to the trades.</p></div>
+    <div class="stack">
+      <div class="planbox"><div data-plan="services"></div>
+        <div class="legend"><span><i class="sw" style="border-radius:50%; background:var(--warn-pale); border-color:var(--warn)"></i>power outlet</span><span><i class="sw" style="border-radius:50%; background:var(--hydro-pale); border-color:var(--hydro-ink)"></i>feed for LED lighting</span><span><i class="sw" style="background:var(--water); border-color:var(--water); height:6px"></i>water and drains</span><span>No socket above the hob or the sink</span></div></div>
+      <div class="two">
+        <div><h3 style="margin-bottom:.6rem">Electrics</h3>
+          <div class="scroll"><table class="t">
+            <thead><tr><th>For</th><th>Where</th><th>Height</th><th>Supply</th></tr></thead>
+            <tbody>
+              <tr><td>Induction hob</td><td>Side wall, about 1.80 m from A</td><td>0.50 m</td><td>Cable outlet on its own circuit, 32 A, 6 mm²</td></tr>
+              <tr><td>Oven</td><td>Same place</td><td>0.50 m</td><td>Cable outlet, 20 A, 2.5 mm²</td></tr>
+              <tr><td>Hood</td><td>Same place, high up</td><td>≈ 2.00 m</td><td>Socket, 16 A</td></tr>
+              <tr><td>Dishwasher</td><td>Peninsula, under the sink, about 0.90 m from A</td><td>0.50 m</td><td>Socket, 20 A</td></tr>
+              <tr><td>Fridge</td><td>Where it is</td><td></td><td>Existing socket is fine</td></tr>
+              <tr><td>LED lighting</td><td>Behind the wall cabinets on both walls, and up the niche</td><td>≈ 2.00 m</td><td>Cable outlets, 10 A, 1.5 mm². Put them on a wall switch.</td></tr>
+              <tr><td>New back-wall run</td><td>Above the worktop</td><td>≈ 1.10 m</td><td>A double socket. Not in the report: my addition.</td></tr>
+            </tbody></table></div></div>
+        <div><h3 style="margin-bottom:.6rem">Water</h3>
+          <div class="scroll"><table class="t">
+            <thead><tr><th>For</th><th>Where</th><th>Height</th></tr></thead>
+            <tbody>
+              <tr><td>Hot and cold for the sink</td><td>Under the sink, between 0.70 and 1.20 m from A</td><td>0.65 m</td></tr>
+              <tr><td>Dishwasher stop valve</td><td>Same zone</td><td>0.60 m</td></tr>
+              <tr><td>Sink drain, PVC 40 mm</td><td>Same zone</td><td>0.40 m</td></tr>
+              <tr><td>Dishwasher drain</td><td>Same zone</td><td>0.65 m</td></tr>
+              <tr><td colspan="3">Nothing may sit behind a built-in unit: pipes there stop the cabinet going back against the wall.</td></tr>
+            </tbody></table></div>
+          <p class="small muted" style="margin-top:.6rem">The sink stays where it is, so if today's pipes already come up inside that zone, no plumber is needed before the fitting.</p></div>
+      </div>
+      <div class="cols">
+        <div class="note"><span class="label">Say this to the electrician</span>
+          <ul class="tight">
+            <li lang="fr" class="fr">« Une ligne dédiée 32 A en 6 mm² pour une plaque à induction, du tableau jusqu'à la cuisine au 1er étage. »</li>
+            <li lang="fr" class="fr">« Une sortie de câble 20 A pour le four, une prise 16 A pour la hotte à 2 m, une prise 20 A pour le lave-vaisselle sous l'évier. »</li>
+            <li lang="fr" class="fr">« Des alimentations pour l'éclairage LED derrière les meubles hauts, commandées par un interrupteur. »</li>
+            <li lang="fr" class="fr">« Une prise double au-dessus du nouveau plan de travail. »</li>
+          </ul>
+          <p class="small muted">Ask whether the consumer unit has room, and whether the hob circuit will sit behind a type A 30 mA RCD as the French wiring rules ask. Your 2024 report found the installation in good order, which keeps this simple.</p></div>
+        <div class="note"><span class="label">Say this to the gas fitter</span>
+          <ul class="tight"><li lang="fr" class="fr">« Dépose de la plaque de cuisson gaz et bouchonnage de l'arrivée, par un professionnel du gaz. »</li></ul>
+          <p class="small muted">The boiler in the garage stays on gas, so only the branch to the hob is capped. It's a good moment to book the boiler's yearly service with the same visit.</p></div>
+        <div class="note"><span class="label">Say this to a fitter</span>
+          <ul class="tight">
+            <li lang="fr" class="fr">« Pose d'une cuisine IKEA METOD : 14 caissons, 4 plans de travail en chêne plaqué avec découpes pour l'évier et la plaque, raccordement de l'évier et du lave-vaisselle. »</li>
+            <li lang="fr" class="fr">« Dépose et évacuation de l'ancienne cuisine. Prix forfaitaire, TVA à 10 % avec attestation. »</li>
+          </ul>
+          <p class="small muted">Send them the plan in <a href="#plan">K-02</a> and the list in <a href="#list">K-07</a> so the price is for this kitchen, not a guess.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="sheet" id="list" data-nav="Shopping list">
   <div class="wrap">
     <div class="sheet-head"><span class="sheet-code">K-07</span><h2>Shopping list</h2>
@@ -249,6 +648,54 @@ details.fold[open] > summary{border-bottom:1px solid var(--rule)}
     </div>
   </div>
 </section>
+<section class="sheet" id="ask" data-nav="Questions">
+  <div class="wrap">
+    <div class="sheet-head"><span class="sheet-code">K-08</span><h2>Questions to ask, and the French for it</h2>
+      <p class="sub">Tick them off as you get answers. <span data-count="q-"></span></p></div>
+    <div class="cols">
+      <div class="note"><span class="label">IKEA kitchen service</span>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="q-i1"><span>Can you re-issue the fitting and annex-works quotes against the corrected list?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i2"><span>Please add the hinges, the hood filter and duct, the off-white side panels and plinth. Is anything else missing for these cabinets?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i3"><span>RODRET is gone: which remote pairs with the TRÅDFRI drivers without a hub?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i4"><span>Why are cabinets 11 and 12 drawn 8 cm higher than the others? Can all be hung at 2.22 m?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i5"><span>Can the 10% VAT rate apply to the fitting?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i6"><span>What would the corner base cost with shelves instead of the pull-out fitting?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i7"><span>Is there a kitchen offer running, and does this order qualify?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-i8"><span>What does the fitting guarantee cover, and for how long?</span></label></li>
+        </ul></div>
+      <div class="note"><span class="label">Electrician and gas fitter</span>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="q-e1"><span>Is there room in the consumer unit for a 32 A circuit, and what route will the cable take?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-e2"><span>Fixed price for everything in K-06, including making good the chases?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-e3"><span>Can you come twice: once after the strip-out, once to connect hob and oven?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-e4"><span>Gas: price to disconnect the hob and cap the branch, and can you service the boiler on the same visit?</span></label></li>
+        </ul></div>
+      <div class="note"><span class="label">An independent fitter</span>
+        <ul class="ticks">
+          <li><label><input type="checkbox" data-tick="q-f1"><span>Have you fitted IKEA METOD kitchens? Photos or a reference?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-f2"><span>Fixed price for removal, fitting, worktops and connections. What is not included?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-f3"><span>Are you insured (responsabilité civile professionnelle, and décennale if you do the walls)?</span></label></li>
+          <li><label><input type="checkbox" data-tick="q-f4"><span>Will you check the walls, the beams and the stairs before I order?</span></label></li>
+        </ul></div>
+    </div>
+    <h3 style="margin:1.5rem 0 .6rem">Words you will hear</h3>
+    <dl class="gloss" lang="fr">
+      <dt>le plan de travail</dt><dd lang="en">worktop</dd>
+      <dt>un meuble bas · un meuble haut · un caisson</dt><dd lang="en">base unit · wall unit · cabinet carcass</dd>
+      <dt>une façade · une charnière · une plinthe</dt><dd lang="en">front · hinge · plinth</dd>
+      <dt>la crédence</dt><dd lang="en">splashback</dd>
+      <dt>une hotte à recyclage · à évacuation</dt><dd lang="en">recirculating hood · hood ducted outside</dd>
+      <dt>une plaque à induction · une ligne dédiée</dt><dd lang="en">induction hob · a circuit of its own</dd>
+      <dt>le tableau électrique · un disjoncteur</dt><dd lang="en">consumer unit · breaker</dd>
+      <dt>une prise · une sortie de câble</dt><dd lang="en">socket · cable outlet</dd>
+      <dt>bouchonner l'arrivée de gaz</dt><dd lang="en">to cap the gas supply</dd>
+      <dt>la dépose · la pose</dt><dd lang="en">removal · fitting</dd>
+      <dt>un devis · un acompte · une attestation de TVA</dt><dd lang="en">quote · deposit · VAT certificate for the 10% rate</dd>
+      <dt>la déchetterie</dt><dd lang="en">the tip</dd>
+    </dl>
+  </div>
+</section>
 </main>
 <footer class="wrap" style="padding-block:2.5rem 3rem">
   <div class="note"><span class="label">Sources and limits</span>
@@ -257,6 +704,96 @@ details.fold[open] > summary{border-bottom:1px solid var(--rule)}
     <p class="noprint"><a href="../">All projects</a> · <a href="../model/#kitchen">3D model</a> · <a href="../hall/">Ground floor hall</a></p></div>
 </footer>
 <div class="toast" id="toast" role="status"></div>
+<script>
+/* Plan of the kitchen, drawn from IKEA's survey. u = metres from the side wall, v = metres from corner C along the side wall. */
+window.kitchenPlan = function(){
+  var S = 150, X0 = 96, Y0 = 168, W = 880, H = 812, RW = 3.92;
+  var X = function(u){ return +(X0 + (RW - u) * S).toFixed(1); }, Y = function(v){ return +(Y0 + v * S).toFixed(1); };
+  function rect(u1, v1, u2, v2, cls, extra){ var x = Math.min(X(u1), X(u2)), y = Math.min(Y(v1), Y(v2)); return '<rect x="' + x + '" y="' + y + '" width="' + Math.abs(X(u1) - X(u2)).toFixed(1) + '" height="' + Math.abs(Y(v1) - Y(v2)).toFixed(1) + '" class="' + cls + '"' + (extra || '') + '/>'; }
+  function text(u, v, s, cls, anchor, rot){ var x = X(u), y = Y(v); return '<text x="' + x + '" y="' + y + '" class="' + (cls || 'k-t') + '" text-anchor="' + (anchor || 'middle') + '"' + (rot ? ' transform="rotate(' + rot + ' ' + x + ' ' + y + ')"' : '') + '>' + s + '</text>'; }
+  function tag(u, v, n, id, wallUnit, title){
+    var x = X(u), y = Y(v), r = 11;
+    return '<a href="#g-' + id + '" data-cab="' + id + '" class="k-tag' + (wallUnit ? ' k-wu' : '') + '"><title>' + title + '</title>' +
+      (wallUnit ? '<circle cx="' + x + '" cy="' + y + '" r="' + r + '"/>' : '<rect x="' + (x - r) + '" y="' + (y - r) + '" width="' + 2 * r + '" height="' + 2 * r + '"/>') +
+      '<text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle">' + n + '</text></a>';
+  }
+  function dimV(u, v1, v2, label){   // dimension along the side wall (vertical on the page), drawn at distance u (negative = outside the wall)
+    var x = X(u); return '<path class="k-dim" d="M' + x + ' ' + Y(v1) + 'V' + Y(v2) + 'M' + (x - 4) + ' ' + Y(v1) + 'h8M' + (x - 4) + ' ' + Y(v2) + 'h8"/>' + '<text x="' + (x + 7) + '" y="' + ((Y(v1) + Y(v2)) / 2 + 4) + '" class="k-d">' + label + '</text>';
+  }
+  function dimU(v, u1, u2, label, below){ var y = Y(v); return '<path class="k-dim" d="M' + X(u1) + ' ' + y + 'H' + X(u2) + 'M' + X(u1) + ' ' + (y - 4) + 'v8M' + X(u2) + ' ' + (y - 4) + 'v8"/>' + '<text x="' + ((X(u1) + X(u2)) / 2) + '" y="' + (y + (below ? 15 : -6)) + '" class="k-d" text-anchor="middle">' + label + '</text>'; }
+  function pt(u, v, s){ var x = X(u), y = Y(v); return '<g class="k-pt"><rect x="' + (x - 10) + '" y="' + (y - 10) + '" width="20" height="20"/><text x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">' + s + '</text></g>'; }
+  function base(services){
+    var o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (services ? 'Plan of the kitchen with the positions the electrician and plumber need' : 'Plan of the new kitchen with the cabinet numbers used in the shopping list') + '">' +
+      '<defs><pattern id="kh' + (services ? 's' : '') + '" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" class="k-hbg"/><path d="M0 0V7" class="k-hl"/></pattern></defs>';
+    var hatch = ' style="fill:url(#kh' + (services ? 's' : '') + ')"';
+    // floor
+    o += '<path class="k-floor" d="M' + X(RW) + ' ' + Y(-0.03) + 'H' + X(2.55) + 'V' + Y(-0.408) + 'H' + X(1.63) + 'V' + Y(-0.14) + 'H' + X(0.75) + 'V' + Y(0) + 'H' + X(0) + 'V' + Y(4.1) + 'H' + X(RW) + 'Z"/>';
+    // walls: back wall (stepped), side wall, stair-side wall with the opening to the living room
+    o += '<path class="k-wall"' + hatch + ' d="M' + X(4.3) + ' ' + Y(-0.78) + 'H' + X(-0.4) + 'V' + Y(4.1) + 'H' + X(0) + 'V' + Y(0) + 'H' + X(0.75) + 'V' + Y(-0.14) + 'H' + X(1.63) + 'V' + Y(-0.408) + 'H' + X(2.55) + 'V' + Y(-0.03) + 'H' + X(RW) + 'V' + Y(1.43) + 'H' + X(4.3) + 'Z"/>';
+    o += rect(RW, 2.65, 4.04, 4.1, 'k-wall', hatch);
+    // stairwell
+    o += rect(3.07, 2.73, RW, 4.1, 'k-stair'); for (var s = 0; s < 6; s++) o += '<path class="k-thin" d="M' + X(3.07) + ' ' + Y(2.95 + s * 0.2) + 'H' + X(RW) + '"/>';
+    o += text(3.5, 3.55, 'Stairs', 'k-s');
+    // low wall around the peninsula
+    o += rect(0, 3.29, 2.265, 3.44, 'k-wall', hatch) + rect(2.115, 2.664, 2.265, 3.29, 'k-wall', hatch);
+    // worktops
+    o += rect(0, 0.713, 0.635, 3.29, 'k-top') + rect(0.635, 2.655, 2.115, 3.29, 'k-top') + rect(2.65, -0.03, RW, 0.605, 'k-top');
+    // niche shelves
+    o += rect(1.63, -0.408, 2.55, -0.098, 'k-top');
+    // fridge, units
+    o += rect(0, 0.01, 0.66, 0.70, 'k-app');
+    [[0.713, 1.113], [1.113, 1.713], [1.713, 1.913], [1.913, 2.513]].forEach(function(c){ o += rect(0, c[0], 0.62, c[1], 'k-unit'); });
+    o += rect(0, 2.513, 0.62, 2.664, 'k-fill') + rect(0, 2.664, 0.675, 3.29, 'k-unit') + rect(0.675, 2.664, 1.475, 3.29, 'k-unit') + rect(1.487, 2.664, 2.087, 3.29, 'k-app');
+    o += rect(2.67, -0.03, 3.27, 0.59, 'k-unit') + rect(3.27, -0.03, 3.87, 0.59, 'k-unit');
+    // hob, sink
+    o += rect(0.06, 1.14, 0.58, 1.686, 'k-thin', ' rx="5"');
+    o += rect(0.83, 2.76, 1.27, 3.16, 'k-sink') + rect(1.3, 2.76, 1.62, 3.16, 'k-thin') + '<circle class="k-thin" cx="' + X(1.05) + '" cy="' + Y(2.96) + '" r="5"/>' + '<circle class="k-dot" cx="' + X(1.05) + '" cy="' + Y(3.22) + '" r="4"/>';
+    return o;
+  }
+  function layout(){
+    var o = base(false);
+    // wall units (dashed)
+    [[0.725, 1.125], [1.125, 1.725], [1.726, 2.526], [2.528, 2.928], [2.929, 3.329]].forEach(function(c){ o += rect(0, c[0], 0.39, c[1], 'k-wallunit'); });
+    o += rect(2.65, -0.03, 3.25, 0.36, 'k-wallunit') + rect(3.25, -0.03, 3.85, 0.36, 'k-wallunit');
+    // labels
+    o += text(0.33, 0.39, 'Fridge', 'k-s') + text(0.33, 0.52, '(kept)', 'k-s');
+    o += text(1.787, 3.02, 'Dish-', 'k-s') + text(1.787, 3.14, 'washer', 'k-s');
+    o += text(0.02, 3.58, 'Low tiled wall (stays)', 'k-s', 'end') + text(2.09, -0.5, 'Niche: 3 oak shelves', 'k-s') + text(2.2, 1.55, 'KITCHEN', 'k-room') + text(1.75, 4.02, 'DINING', 'k-room');
+    o += text(4.17, 2.04, 'To the living room', 'k-s', 'middle', -90) + text(0.32, 1.56, 'hob', 'k-s');
+    // numbers: squares = base units, circles = wall units
+    o += tag(0.49, 0.913, 5, 'c5', false, 'Base 40 cm, three drawers') + tag(0.49, 1.24, 6, 'c6', false, 'Base 60 cm, hob and oven') + tag(0.47, 1.813, 7, 'c7', false, 'Pull-out 20 cm') + tag(0.47, 2.25, 8, 'c8', false, 'Corner base 128 cm') + tag(0.752, 2.96, 9, 'c9', false, 'Sink base 80 cm');
+    o += tag(3.57, 0.42, 2, 'c2', false, 'Base 60 cm') + tag(2.97, 0.42, 3, 'c3', false, 'Base 60 cm');
+    o += tag(0.16, 0.925, 13, 'c13', true, 'Wall 40 cm') + tag(0.16, 1.24, 14, 'c14', true, 'Wall 60 cm with hood') + tag(0.16, 2.126, 15, 'c15', true, 'Wall 80 cm, glass doors') + tag(0.16, 2.728, 16, 'c16', true, 'Wall 40 cm, glass door') + tag(0.16, 3.129, 17, 'c17', true, 'Wall 40 cm');
+    o += tag(3.55, 0.12, 11, 'c11', true, 'Wall 60 cm') + tag(2.95, 0.12, 12, 'c12', true, 'Wall 60 cm');
+    // dimensions (cm)
+    [[0, 0.713, '71'], [0.713, 1.113, '40'], [1.113, 1.713, '60'], [1.713, 1.913, '20'], [1.913, 3.29, '138']].forEach(function(d){ o += dimV(-0.52, d[0], d[1], d[2]); });
+    o += dimV(-0.86, 0, 3.29, '329 to A');
+    [[0, 0.75, '75'], [0.75, 1.63, '88'], [1.63, 2.55, '92'], [2.55, RW, '137']].forEach(function(d){ o += dimU(-0.9, d[0], d[1], d[2]); });
+    [[0, 0.675, '67'], [0.675, 1.475, '80'], [1.475, 2.115, '64'], [2.115, 2.265, '15']].forEach(function(d){ o += dimU(3.72, d[0], d[1], d[2], true); });
+    o += dimU(0.78, 2.65, RW, '127', true);
+    o += pt(-0.2, -0.2, 'C') + pt(-0.2, 3.29, 'A') + pt(2.42, 3.29, 'B');
+    return o + '</svg>';
+  }
+  function services(){
+    var o = base(true);
+    function mark(u, v, cls, s){ var x = X(u), y = Y(v); return '<g class="k-sv ' + cls + '"><circle cx="' + x + '" cy="' + y + '" r="10"/><text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle">' + s + '</text></g>'; }
+    function lead(u, v, u2, v2, lines, anchor){ var x = X(u2), y = Y(v2), t = '<path class="k-lead" d="M' + X(u) + ' ' + Y(v) + 'L' + x + ' ' + y + '"/>'; lines.forEach(function(l, i){ t += '<text x="' + (x + (anchor === 'end' ? -5 : 5)) + '" y="' + (y + 4 + i * 14) + '" class="k-s" text-anchor="' + (anchor || 'start') + '">' + l + '</text>'; }); return t; }
+    o += '<path class="k-water" d="M' + X(0.70) + ' ' + Y(3.24) + 'H' + X(1.20) + '"/>';
+    o += lead(0.95, 3.24, 1.5, 3.72, ['Water + drains: all under the sink,', '0.70–1.20 m from A. Taps at 0.65 m,', 'drains (PVC 40) at 0.40 m.'], 'end');
+    o += mark(0.9, 3.05, 'e', 'DW') + lead(0.9, 2.95, 1.55, 2.36, ['Dishwasher socket, 20 A,', 'under the sink, 0.50 m high'], 'end');
+    o += mark(0.06, 1.49, 'e', '32') + mark(0.06, 1.3, 'e', '20') + mark(0.06, 1.68, 'e', 'H');
+    o += lead(0.16, 1.49, 0.9, 1.66, ['1.80 m from A, on the side wall:', '32 = hob, own 32 A line, 6 mm², at 0.50 m', '20 = oven outlet, 20 A, 2.5 mm², at 0.50 m', 'H = hood socket, 16 A, at 2.00 m'], 'end');
+    o += mark(0.06, 2.6, 'l', 'L') + mark(3.3, 0.03, 'l', 'L') + mark(2.09, -0.34, 'l', 'L');
+    o += lead(3.3, 0.13, 3.2, 0.86, ['L = feed for the LED drivers, 10 A,', '1.5 mm², behind the wall units', 'at 2.00 m; one more up the niche'], 'start');
+    o += mark(0.06, 0.35, 'ok', '✓') + lead(0.16, 0.35, 0.85, 0.3, ['Fridge socket: fine as it is'], 'end');
+    o += pt(-0.2, -0.2, 'C') + pt(-0.2, 3.29, 'A') + pt(2.42, 3.29, 'B');
+    return o + '</svg>';
+  }
+  var a = document.querySelector('[data-plan="layout"]'), b = document.querySelector('[data-plan="services"]');
+  if (a) a.innerHTML = layout(); if (b) b.innerHTML = services();
+};
+
+</script>
 <script>
 (function(){
 'use strict';
@@ -461,7 +998,7 @@ function renderCalc(){
   var b = parseFloat(ST.budget), bar = $('#bar'), has = b > 0;
   setF('total', round0(total)); setF('route', ROUTE_NAMES[route]);
   if (bar) { var pct = has ? Math.min(100, total / b * 100) : 0; bar.firstElementChild.style.width = pct + '%'; bar.setAttribute('data-state', !has ? 'ok' : total > b ? 'over' : total > b * 0.92 ? 'tight' : 'ok'); bar.classList.toggle('hide', !has); }
-  setF('left', !has ? 'set a budget under K-04' : total > b ? round0(total - b) + ' over your ' + round0(b) : round0(b - total) + ' left of ' + round0(b));
+  setF('left', !has ? 'no budget set' : total > b ? round0(total - b) + ' over your ' + round0(b) : round0(b - total) + ' left of ' + round0(b));
   var bi = $('#budget'); if (bi && document.activeElement !== bi) bi.value = ST.budget || '';
 }
 
@@ -475,6 +1012,12 @@ function bindTicks(){
 }
 function tickCounts(){ $$('[data-count]').forEach(function(n){ var boxes = $$('input[data-tick^="' + n.getAttribute('data-count') + '"]'); n.textContent = boxes.filter(function(b){ return b.checked; }).length + ' of ' + boxes.length + ' done'; }); }
 
+function refLinks(){   // <a data-ref="art"> gets the product URL; data-price appends today's price
+  var idx = {}; Object.keys(D.ref || {}).forEach(function(k){ idx[k] = D.ref[k]; });
+  D.groups.concat(D.extra).forEach(function(g){ g.items.forEach(function(it){ idx[it.art] = idx[it.art] || it; }); });
+  D.choices.forEach(function(c){ c.options.forEach(function(o){ o.items.forEach(function(it){ idx[it.art] = idx[it.art] || it; }); }); });
+  $$('a[data-ref]').forEach(function(a){ var it = idx[a.getAttribute('data-ref')]; if (!it) return; a.href = it.url; a.target = '_blank'; a.rel = 'noopener'; a.appendChild(document.createTextNode(a.hasAttribute('data-price') && it.p != null ? ' (' + eur(it.p) + ') ↗' : ' ↗')); });
+}
 /* ---------- start ---------- */
 function nav(){
   var host = $('#sheetnav'); if (!host) return;
@@ -490,7 +1033,7 @@ document.addEventListener('click', function(e){
   if (e.target.closest('#reset-amounts')) { ST.amt = {}; save(); renderCalc(); toast('Amounts reset to the estimates'); }
 });
 var bi = $('#budget'); if (bi) bi.addEventListener('input', function(){ ST.budget = bi.value; save(); renderCalc(); });
-nav(); renderChoices(); renderList(); bindTicks();
+nav(); refLinks(); renderChoices(); renderList(); bindTicks();
 if (typeof window.kitchenPlan === 'function') window.kitchenPlan(D);
 window.__kitchen = {S: ST, D: D, goods: goodsTotal, eff: effGroups, orderText: orderText, works: worksTotal};
 })();
