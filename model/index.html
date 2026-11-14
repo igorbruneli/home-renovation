@@ -128,7 +128,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
         <div class="lab">Kitchen (1st floor)</div>
         <div class="seg scenes" id="kitchens">
           <button type="button" data-kitchen="today"><span>Today</span><small>as photographed</small></button>
-          <button type="button" data-kitchen="ikea"><span>IKEA plan</span><small>off-white fronts, oak worktop</small></button>
+          <button type="button" data-kitchen="stage1"><span>Stage 1</span><small>back wall + wall cabinets</small></button>
+          <button type="button" data-kitchen="ikea"><span>IKEA plan</span><small>the finished kitchen</small></button>
         </div>
       </div>
       <div class="sec">
@@ -183,7 +184,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
       <div class="sec">
         <div class="lab">Image</div>
         <div class="seg"><button type="button" class="btn" id="shot">Save picture (PNG)</button></div>
-        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or today/IKEA kitchen (1st floor).</p>
+        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or step through the kitchen stages (1st floor).</p>
       </div>
     </div>
   </aside>
@@ -1590,8 +1591,8 @@ var S = Object.assign({}, DEF);
 try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && typeof sv === 'object') Object.assign(S, sv); } catch (e) {}
 if (!S.hidden || typeof S.hidden !== 'object') S.hidden = {}; else S.hidden = Object.assign({}, S.hidden);
 var HASH = (location.hash || '').replace('#', ''); if (HASH === 'first' || HASH === 'ground' || HASH === 'both') { S.level = HASH; S.view = 'overview'; }
-if (HASH === 'kitchen' || HASH === 'kitchen-today') { S.level = 'first'; S.kitchen = HASH === 'kitchen' ? 'ikea' : 'today'; S.view = 'kitchen'; S.cut = true; S.ceiling = false; }
-if (S.kitchen !== 'ikea') S.kitchen = 'today';
+if (HASH === 'kitchen' || HASH === 'kitchen-today' || HASH === 'stage1') { S.level = 'first'; S.kitchen = HASH === 'kitchen' ? 'ikea' : HASH === 'stage1' ? 'stage1' : 'today'; S.view = 'kitchen'; S.cut = true; S.ceiling = false; }
+if (S.kitchen !== 'ikea' && S.kitchen !== 'stage1') S.kitchen = 'today';
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* =====================================================================
@@ -2777,10 +2778,10 @@ function nicheThings(y, i, x1, x2, zc){   // what lives on the niche shelves tod
 }
 
 /* ---------- today, as photographed ---------- */
-function kitchenToday(){
+function kitchenToday(st){   // st: stage 1, where today's base units stay and the wall cabinets have gone
   var fx = 6.83, z0 = ZK + 0.72, d1 = z0 + 0.50, d2 = d1 + 0.60, d3 = d2 + 0.40, zb = BW.s3;
   O('Kitchen base units', function(){
-    box(6.79, 0.0, ZK + 0.69, KE, 2.15, z0, MAT.white);
+    box(6.79, 0.0, ZK + 0.69, KE, st ? 0.90 : 2.15, z0, MAT.white);
     box(6.85, 0, z0, KE, 0.10, PZ2, MAT.dark); box(fx, 0.10, z0, KE, 0.86, PZ2, MAT.white);
     box(6.80, 0.86, z0 - 0.02, KE, 0.90, PZ2, MAT.granite);
     [0.11, 0.30, 0.49, 0.68].forEach(function(y){ frontX(fx, z0, d1, y, y + 0.175, MAT.cab); cyl(fx - 0.025, y + 0.088, (z0 + d1) / 2, 0.013, 0.025, MAT.chrome, null, 'x', 12); });
@@ -2790,7 +2791,7 @@ function kitchenToday(){
     frontX(fx, d2, d3, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, d3 - 0.06, 0.012, 0.025, MAT.chrome, null, 'x', 12);
     frontX(fx, d3, PZ1, 0.11, 0.85, MAT.cab); cyl(fx - 0.025, 0.76, d3 + 0.06, 0.012, 0.025, MAT.chrome, null, 'x', 12);
     box(7.415, 0.90, z0 - 0.02, KE, 1.45, PZ2, MAT.splash, null, false); });
-  O('Wall cabinets + hood', function(){
+  if (!st) O('Wall cabinets + hood', function(){
     var wx = 7.08, w1 = ZK + 3.33;
     box(wx, 1.45, z0, KE, 2.15, w1, MAT.white);
     frontX(wx, z0, d1, 1.46, 2.14, MAT.cab); frontX(wx, d1, d2, 1.66, 2.14, MAT.cab);
@@ -2811,18 +2812,18 @@ function kitchenToday(){
     label('Peninsula: sink + dishwasher', 6.0, 1.3, PZ1 + 0.27); });
   O('Dish rack', function(){ box(PXE + 0.07, 0.90, PZ1 + 0.05, PXE + 0.37, 1.02, PZ1 + 0.40, MAT.metal); for (var di = 0; di < 5; di++) box(PXE + 0.10 + di * 0.05, 0.92, PZ1 + 0.10, PXE + 0.11 + di * 0.05, 1.1, PZ1 + 0.35, MAT.white); });
   /* back corner (photos 8683, 8686, 8709): corner wall unit over the oval table with the microwave + mini oven */
-  O('Corner wall cabinet', function(){
+  if (!st) O('Corner wall cabinet', function(){
     box(XT2, 1.45, zb, 4.36, 2.15, zb + 0.35, MAT.white);
     frontZ(zb + 0.37, XT2, 3.86, 1.46, 2.14, MAT.white); frontZ(zb + 0.37, 3.86, 4.35, 1.46, 2.14, MAT.cab); cyl(3.90, 1.52, zb + 0.375, 0.012, 0.02, MAT.chrome, null, 'z', 10);
     box(3.68, 2.15, zb + 0.05, 4.24, 2.235, zb + 0.30, MAT.white); });
-  O('Microwave table', function(){
+  if (!st) O('Microwave table', function(){
     var tb = add(new T.CylinderGeometry(0.42, 0.42, 0.025, 40), MAT.white); tb.scale.set(1, 1, 0.66); tb.position.set(3.95, 0.74, zb + 0.28);
     [[3.63, zb + 0.13], [4.27, zb + 0.13], [3.63, zb + 0.43], [4.27, zb + 0.43]].forEach(function(l){ var lg = cyl(l[0], 0.37, l[1], 0.016, 0.74, MAT.beech); lg.rotation.z = (l[0] < 3.95 ? -1 : 1) * 0.09; lg.rotation.x = (l[1] < zb + 0.28 ? 1 : -1) * 0.06; });
     box(3.57, 0.755, zb + 0.02, 4.03, 1.01, zb + 0.35, MAT.white); frontZ(zb + 0.36, 3.59, 3.89, 0.78, 0.99, MAT.dark); box(3.92, 0.80, zb + 0.348, 4.00, 0.97, zb + 0.36, MAT.grey);
     box(3.58, 1.01, zb + 0.02, 4.02, 1.24, zb + 0.33, MAT.steel); frontZ(zb + 0.34, 3.61, 3.91, 1.03, 1.22, MAT.blackGlass);
     box(4.07, 0.755, zb + 0.17, 4.35, 0.87, zb + 0.43, MAT.oak);
     cyl(4.31, 1.02, zb + 0.015, 0.13, 0.025, MAT.grey, null, 'z', 24); });
-  O('Stool', function(){ var sz = ZK + 0.87; cyl(4.75, 0.45, sz, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.75 + l[0], 0.22, sz + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; }); });
+  if (!st) O('Stool', function(){ var sz = ZK + 0.87; cyl(4.75, 0.45, sz, 0.15, 0.03, MAT.oak, null, 'y', 24); [[0, 0.1], [0.09, -0.06], [-0.09, -0.06]].forEach(function(l){ var lg = cyl(4.75 + l[0], 0.22, sz + l[1], 0.008, 0.45, MAT.black, null, 'y', 6); lg.rotation.x = l[1] * 0.8; lg.rotation.z = -l[0] * 0.8; }); });
   O('Niche shelves', function(){
     var x1 = BW.xn1, x2 = BW.xn2, z1 = BW.n, z2 = BW.n + 0.31, nc = (z1 + z2) / 2;
     [0.97, 1.36, 1.78].forEach(function(y, i){ box(x1, y, z1, x2, y + 0.03, z2, MAT.oak); nicheThings(y + 0.03, i, x1, x2, nc); });
@@ -2867,12 +2868,12 @@ function kWallGlass(g, x1, x2, seed){   // open carcass so the glass doors show 
 }
 function kLed(g, x1, x2){ var l = box(x1, K_WB - 0.011, 0.27, x2, K_WB - 0.003, 0.30, MAT.diffuser, g, false); l.castShadow = false; }
 
-function kitchenIkea(){
+function kitchenIkea(st){   // st: stage 1 only: the back-wall run and the wall cabinets, with the gap left for cabinet 14
   var D = 0.60, W = 0.37;
   var east = function(){ return group(KE, 0, ZK, -Math.PI / 2); };       // local x = metres from the fridge corner along the wall
   var pen = function(){ return group(KE, 0, PZ2, Math.PI); };            // local x = metres from the side wall, fronts toward the kitchen
   var back = function(){ return group(XT2, 0, BW.s3, 0); };              // local x = metres from the corner with the stair-side wall
-  O('New kitchen: base units', function(){
+  if (!st) O('New kitchen: base units', function(){
     var g = east();
     box(0.701, 0, 0, 0.713, K_WTOP, 0.62, MAT.bod, g);                   // tall side panel beside the fridge (62 × 240, cut to height)
     kBase(g, 0.713, 3.188, D); kPlinth(g, 0.713, 2.664, D);
@@ -2890,17 +2891,19 @@ function kitchenIkea(){
     var g = east();
     box(0.713, K_WB - 0.03, 0, 0.725, K_WTOP, 0.39, MAT.bod, g);
     kWall(g, 0.725, 1.125); kFront(g, 0.725, 1.125, K_WB, K_WTOP, W, {h: 'R', low: true});                 // 13
-    kWall(g, 1.125, 1.725); kFront(g, 1.125, 1.725, K_WB, K_WTOP, W, {h: 'R', low: true});                 // 14: built-in hood
-    box(1.16, K_WB - 0.004, 0.03, 1.69, K_WB, 0.35, MAT.steel, g, false); [1.30, 1.55].forEach(function(x){ var s = box(x - 0.03, K_WB - 0.007, 0.27, x + 0.03, K_WB - 0.004, 0.31, MAT.diffuser, g, false); s.castShadow = false; });
+    if (!st) { kWall(g, 1.125, 1.725); kFront(g, 1.125, 1.725, K_WB, K_WTOP, W, {h: 'R', low: true});                 // 14: built-in hood
+    box(1.16, K_WB - 0.004, 0.03, 1.69, K_WB, 0.35, MAT.steel, g, false); [1.30, 1.55].forEach(function(x){ var s = box(x - 0.03, K_WB - 0.007, 0.27, x + 0.03, K_WB - 0.004, 0.31, MAT.diffuser, g, false); s.castShadow = false; }); }
+    else { box(1.125, K_WTOP - 0.06, 0, 1.725, K_WTOP - 0.005, 0.012, MAT.alu, g, false); label('Gap for cabinet 14 + hood: waits for the induction hob', KE - 0.05, 1.86, ZK + 1.425); }
     kWallGlass(g, 1.726, 2.526, 11); kFront(g, 1.726, 2.126, K_WB, K_WTOP, W, {glass: true, h: 'R', low: true}); kFront(g, 2.126, 2.526, K_WB, K_WTOP, W, {glass: true, h: 'L', low: true});   // 15
     kWallGlass(g, 2.528, 2.928, 17); kFront(g, 2.528, 2.928, K_WB, K_WTOP, W, {glass: true, h: 'L', low: true});                                                                    // 16
     kWall(g, 2.929, 3.329); kFront(g, 2.929, 3.329, K_WB, K_WTOP, W, {h: 'L', low: true});                 // 17
     box(3.329, K_WB - 0.03, 0, 3.341, K_WTOP, 0.39, MAT.bod, g);
     kLed(g, 0.74, 1.11); kLed(g, 1.74, 2.51); kLed(g, 2.54, 2.92); kLed(g, 2.94, 3.32);
-    box(0.725, K_WB - 0.03, W, 3.329, K_WB, W + 0.019, MAT.bod, g, false);                                   // light pelmet under the wall units
-    label('Built-in hood', KE - 0.2, 2.34, ZK + 1.42); label('Glass cabinets with LED', KE - 0.2, 2.34, ZK + 2.33);
+    if (st) { box(0.725, K_WB - 0.03, W, 1.125, K_WB, W + 0.019, MAT.bod, g, false); box(1.726, K_WB - 0.03, W, 3.329, K_WB, W + 0.019, MAT.bod, g, false); label('New wall cabinets 13 · 15 · 16 · 17', KE - 0.2, 2.34, ZK + 2.5); }
+    else { box(0.725, K_WB - 0.03, W, 3.329, K_WB, W + 0.019, MAT.bod, g, false);                                   // light pelmet under the wall units
+    label('Built-in hood', KE - 0.2, 2.34, ZK + 1.42); label('Glass cabinets with LED', KE - 0.2, 2.34, ZK + 2.33); }
   });
-  O('New kitchen: peninsula', function(){
+  if (!st) O('New kitchen: peninsula', function(){
     var p = pen(), F = 0.607;
     box(0.60, K_PL, 0.007, 1.475, K_CT, F, MAT.carc, p); box(0.60, 0, F - 0.06, 1.475, K_PL, F - 0.045, MAT.bod, p, false);
     box(0.60, K_PL, F - 0.02, 0.675, K_CT, F + 0.019, MAT.bod, p);
@@ -2924,7 +2927,8 @@ function kitchenIkea(){
   });
   O('New kitchen: worktops, hob + sink', function(){
     var g = east(), p = pen(), b = back(), y0 = K_WT - 0.038;
-    box(0.713, y0, 0, 3.29, K_WT, 0.635, MAT.oakTop, g); box(0.635, y0, 0, 2.115, K_WT, 0.635, MAT.oakTop, p); box(0, y0, 0, 1.27, K_WT, 0.635, MAT.oakTop, b);
+    box(0, y0, 0, 1.275, K_WT, 0.635, MAT.oakTop, b); if (st) return;
+    box(0.713, y0, 0, 3.29, K_WT, 0.635, MAT.oakTop, g); box(0.635, y0, 0, 2.115, K_WT, 0.635, MAT.oakTop, p);
     box(1.118, K_WT, 0.06, 1.708, K_WT + 0.006, 0.58, MAT.blackGlass, g, false);                              // induction hob, 59 × 52
     [[1.27, 0.19], [1.27, 0.44], [1.555, 0.19], [1.555, 0.44]].forEach(function(z){ var ring = add(new T.TorusGeometry(0.085, 0.0025, 4, 32), MAT.grey, g, false); ring.rotation.x = Math.PI / 2; ring.position.set(z[0], K_WT + 0.0065, z[1]); });
     box(0.78, K_WT, 0.09, 1.64, K_WT + 0.004, 0.56, MAT.steel, p, false);                                      // inset sink with drainer: bowl toward the side wall
@@ -2934,7 +2938,7 @@ function kitchenIkea(){
     cyl(1.05, K_WT + 0.275, 0.245, 0.012, 0.05, MAT.steel, p); box(1.07, K_WT + 0.06, 0.055, 1.12, K_WT + 0.075, 0.075, MAT.steel, p);
     label('Oak worktop, 92 cm high', KE - 0.3, 1.02, PZ1 + 0.3, 'dim'); label('Induction hob', KE - 0.32, 1.0, ZK + 1.41);
   });
-  O('New kitchen: niche shelves', function(){
+  if (!st) O('New kitchen: niche shelves', function(){
     var x1 = BW.xn1, x2 = BW.xn2, z1 = BW.n, z2 = BW.n + 0.31, nc = (z1 + z2) / 2;
     [0.97, 1.36, 1.78].forEach(function(y, i){
       box(x1, y, z1, x2, y + 0.038, z2, MAT.oakTop);
@@ -2950,7 +2954,7 @@ function kitchenIkea(){
     box(0.12, K_WT, 0.10, 0.58, K_WT + 0.255, 0.45, MAT.white, b); box(0.14, K_WT + 0.025, 0.45, 0.44, K_WT + 0.235, 0.462, MAT.dark, b); box(0.47, K_WT + 0.045, 0.45, 0.55, K_WT + 0.215, 0.46, MAT.grey, b);
     box(0.70, K_WT, 0.10, 1.14, K_WT + 0.23, 0.42, MAT.steel, b); box(0.73, K_WT + 0.02, 0.42, 1.03, K_WT + 0.21, 0.432, MAT.blackGlass, b);
   });
-  O('Kettle', function(){ cyl(7.2, K_WT + 0.10, PZ1 + 0.3, 0.07, 0.2, MAT.steel); cyl(7.2, K_WT + 0.21, PZ1 + 0.3, 0.03, 0.02, MAT.black); });
+  if (!st) O('Kettle', function(){ cyl(7.2, K_WT + 0.10, PZ1 + 0.3, 0.07, 0.2, MAT.steel); cyl(7.2, K_WT + 0.21, PZ1 + 0.3, 0.03, 0.02, MAT.black); });
 }
 
 function buildFirstInner(){
@@ -3044,14 +3048,14 @@ function buildFirstInner(){
     var mr = rng(3); for (var mi = 0; mi < 7; mi++) { var my = 0.25 + mr() * 0.35, mz = ZK + 0.12 + mr() * 0.46; box(6.752, my, mz, 6.758, my + 0.05, mz + 0.06, MAT.magnets[mi % MAT.magnets.length], null, false); }
     label('Fridge', 7.08, 2.0, ZK + 0.36); });
   lowWall();
-  if (S.kitchen === 'ikea') kitchenIkea(); else kitchenToday();
+  if (S.kitchen === 'ikea') kitchenIkea(); else if (S.kitchen === 'stage1') { kitchenToday(true); kitchenIkea(true); } else kitchenToday();
   O('Jute rug (kitchen)', function(){ plane(5.55, ZK + 0.85, 6.72, PZ1 - 0.18, 0.004, MAT.jute, 1); });
   // switches: 3-gang above the top of the stairs, 2-gang on the living-room back wall by the opening
   [1.04, 1.125, 1.21].forEach(function(y){ device('switch', XT2 + 0.006, y, SZT + 0.15, '+x'); });
   [L0 + 1.0, L0 + 1.085].forEach(function(y){ device('switch', 3.25, y, ZL + 0.006, '+z'); });
   O('Runner (landing)', function(){ plane(3.62, -0.08, 4.27, 1.85, 0.004, MAT.jute, 1); });
   O('Black cat', function(){ cat(6.0, 0.005, 0.6, 0.6, MAT.cat1, true); });
-  label('KITCHEN + DINING', 5.9, 0.15, 1.05, 'room', S.kitchen === 'ikea' ? '22.58 m² · IKEA plan' : '22.58 m²');
+  label('KITCHEN + DINING', 5.9, 0.15, 1.05, 'room', S.kitchen === 'ikea' ? '22.58 m² · IKEA plan' : S.kitchen === 'stage1' ? '22.58 m² · kitchen stage 1' : '22.58 m²');
 
   /* ---- dining ---- */
   frenchWindow(5.12, 6.32, 0, 2.15, 'dining'); radiatorZ(6.42, 7.07, 0.15, 0.75, 0);
@@ -3150,7 +3154,7 @@ function buildFirstInner(){
 
   /* ---- 1st-floor lights ---- */
   if (S.lamps) {
-    [[5.8, 2.05, 0.4, 1, 1.0], [5.7, 2.05, 4.5, 1, 0.9], [1.70, 1.95, 3.30, 1, 1.0], [3.95, 2.1, 0.2, 0, 0.6], [0.64, L0 + 1.3, ZL + 0.26, 0, 0.35]].concat(S.kitchen === 'ikea' ? [[7.12, 1.36, ZK + 2.1, 0, 0.3], [XT2 + 0.66, 1.36, BW.s3 + 0.2, 0, 0.28], [(BW.xn1 + BW.xn2) / 2, 2.05, BW.n + 0.18, 0, 0.22]] : []).forEach(function(pt){
+    [[5.8, 2.05, 0.4, 1, 1.0], [5.7, 2.05, 4.5, 1, 0.9], [1.70, 1.95, 3.30, 1, 1.0], [3.95, 2.1, 0.2, 0, 0.6], [0.64, L0 + 1.3, ZL + 0.26, 0, 0.35]].concat(S.kitchen !== 'today' ? [[7.12, 1.36, ZK + 2.1, 0, 0.3], [XT2 + 0.66, 1.36, BW.s3 + 0.2, 0, 0.28], [(BW.xn1 + BW.xn2) / 2, 2.05, BW.n + 0.18, 0, 0.22]] : []).forEach(function(pt){
       var Lt = new T.PointLight(0xffd8a8, pt[4], 7.5, 1.7); Lt.position.set(pt[0], pt[1], pt[2]);
       if (S.hq && pt[3]) { Lt.castShadow = true; Lt.shadow.mapSize.set(512, 512); Lt.shadow.bias = -0.003; Lt.shadow.normalBias = 0.02; Lt.shadow.camera.near = 0.05; Lt.shadow.camera.far = 8; }
       ROOT.add(Lt); LAMPS.push(Lt);
@@ -3353,7 +3357,7 @@ window.addEventListener('keydown', function(e){
   if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].indexOf(e.code) >= 0) {
     keys[e.code] = true; if (e.code.indexOf('Arrow') === 0) e.preventDefault();
   }
-  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey) { if (S.level === 'first') setKitchen(S.kitchen === 'ikea' ? 'today' : 'ikea'); else setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
+  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey) { if (S.level === 'first') setKitchen(S.kitchen === 'today' ? 'stage1' : S.kitchen === 'stage1' ? 'ikea' : 'today'); else setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
 });
 window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 window.addEventListener('blur', function(){ keys = {}; padHeld = null; });
@@ -3467,14 +3471,16 @@ var INFO = {
   D: {h: 'After: Option D', rows: [['Hall', '≈ 14.5 m², ≈ 12.3 m² clear'], ['Storage', '2.0 m hooks + wall-hung bench'], ['Shoes', 'wall-hung cabinet + under stairs'], ['Cost', '≈ 150 € + ≈ 60 € shoe unit']],
     note: 'Nothing stands on the floor, which makes it the easiest layout to clean after a flood.'}
 };
-INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², 1.43 m deeper'], ['Kitchen', 'as photographed · switch to the IKEA plan above'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
+INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², 1.43 m deeper'], ['Kitchen', 'as photographed · switch to stage 1 or the IKEA plan above'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
   note: 'Your measurements, the diagnostic plan, IKEA\'s kitchen survey and your photos. Sizes nobody measured are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet.'};
+INFO.stage1 = {h: '1st floor: kitchen, stage 1', rows: [['New, back wall', 'base 2 + 3, worktop, wall 11 + 12'], ['New, side wall', 'wall cabinets 13 · 15 · 16 · 17'], ['Stays', 'today\'s base units, gas hob, sink, tiles'], ['Waits', 'cabinet 14 + hood, until the hob is induction'], ['Wall cabinets', 'bottom at 1.42 m, top at 2.22 m'], ['Microwave', 'moves onto the new worktop']],
+  note: 'The kitchen after the first order, built yourselves. The new wall cabinets hang where the finished kitchen needs them, so they meet today\'s tiles a little differently. The 60 cm above the gas hob stays empty: a hood must sit 65 cm above gas. Steps and cart check are on the kitchen page, S-1.'};
 INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Side wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
   note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
 function updateInfo(){
-  var I = S.level === 'first' ? (S.kitchen === 'ikea' ? INFO.ikea : INFO.first) : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
+  var I = S.level === 'first' ? (S.kitchen === 'ikea' ? INFO.ikea : S.kitchen === 'stage1' ? INFO.stage1 : INFO.first) : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
   el.innerHTML = '<h3></h3><dl></dl><p class="hint"></p>';
   el.querySelector('h3').textContent = I.h;
   var dl = el.querySelector('dl');
@@ -3506,14 +3512,14 @@ $('#views').addEventListener('click', function(e){ var b = e.target.closest('[da
 function setLevel(l){
   S.level = l; renderViews(); if (l === 'both') { S.ceiling = false; S.cut = true; }
   build(); applyView('overview'); syncUI(); persist();
-  try { history.replaceState(null, '', l === 'first' && S.kitchen === 'ikea' ? '#kitchen' : '#' + l); } catch (e) {}
+  try { history.replaceState(null, '', l === 'first' && S.kitchen === 'ikea' ? '#kitchen' : l === 'first' && S.kitchen === 'stage1' ? '#stage1' : '#' + l); } catch (e) {}
   toast(l === 'first' ? '1st floor' : l === 'both' ? 'Both floors' : 'Ground floor');
 }
 document.querySelectorAll('#levels [data-level]').forEach(function(b){ b.addEventListener('click', function(){ setLevel(b.getAttribute('data-level')); }); });
 function setKitchen(k){
-  S.kitchen = k === 'ikea' ? 'ikea' : 'today'; build(); syncUI(); persist();
-  try { history.replaceState(null, '', S.level === 'first' ? (S.kitchen === 'ikea' ? '#kitchen' : '#first') : '#' + S.level); } catch (e) {}
-  toast(S.kitchen === 'ikea' ? 'Kitchen · IKEA plan' : 'Kitchen · today');
+  S.kitchen = k === 'ikea' || k === 'stage1' ? k : 'today'; build(); syncUI(); persist();
+  try { history.replaceState(null, '', S.level === 'first' ? (S.kitchen === 'ikea' ? '#kitchen' : S.kitchen === 'stage1' ? '#stage1' : '#first') : '#' + S.level); } catch (e) {}
+  toast(S.kitchen === 'ikea' ? 'Kitchen · IKEA plan' : S.kitchen === 'stage1' ? 'Kitchen · stage 1' : 'Kitchen · today');
 }
 document.querySelectorAll('#kitchens [data-kitchen]').forEach(function(b){ b.addEventListener('click', function(){ setKitchen(b.getAttribute('data-kitchen')); }); });
 document.querySelectorAll('#fronts [data-front]').forEach(function(b){ b.addEventListener('click', function(){ S.front = b.getAttribute('data-front'); build(); syncUI(); persist(); }); });
@@ -3533,7 +3539,7 @@ $('#shot').addEventListener('click', function(){
   renderer.render(scene, camera);
   try {
     var url = canvas.toDataURL('image/png'), a = document.createElement('a');
-    a.href = url; a.download = 'house-' + (S.level === 'first' ? '1st-floor' + (S.kitchen === 'ikea' ? '-ikea-kitchen' : '') : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
+    a.href = url; a.download = 'house-' + (S.level === 'first' ? '1st-floor' + (S.kitchen === 'ikea' ? '-ikea-kitchen' : S.kitchen === 'stage1' ? '-kitchen-stage-1' : '') : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
     document.body.appendChild(a); a.click(); a.remove(); toast('Picture saved');
   } catch (e) { toast('This viewer blocks downloads. Open the file in a browser to save pictures.'); }
 });
