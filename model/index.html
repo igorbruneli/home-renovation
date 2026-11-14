@@ -96,12 +96,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
 </head>
 <body>
 <div id="app">
-  <canvas id="c" tabindex="0" aria-label="3D model of the ground floor. Drag to orbit, scroll or pinch to zoom, right-drag or two fingers to pan, double-click to zoom to a spot."></canvas>
+  <canvas id="c" tabindex="0" aria-label="3D model of the house. Drag to orbit, scroll or pinch to zoom, right-drag or two fingers to pan, double-click to zoom to a spot."></canvas>
   <div id="labels" aria-hidden="true"></div>
   <div id="loading">Building the model…</div>
   <aside id="panel" aria-label="Model controls">
     <div class="p-head">
-      <div><b>MAISON · 3D MODEL</b><span>Ground + 1st floor · from the plans and your photos · ±10 cm</span></div>
+      <div><b>MAISON · 3D MODEL</b><span>Ground floor, 1st floor and the front · from the plans and your photos</span></div>
       <button class="btn" id="collapse" type="button" aria-expanded="true">Hide</button>
     </div>
     <div class="p-body">
@@ -111,6 +111,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
           <button type="button" data-level="ground">Ground floor</button>
           <button type="button" data-level="first">1st floor</button>
           <button type="button" data-level="both">Both</button>
+          <button type="button" data-level="front">Outside</button>
         </div>
       </div>
       <div class="sec" id="sec-scene">
@@ -122,6 +123,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
           <button type="button" data-scene="B"><span>After · B</span><small>side wardrobe</small></button>
           <button type="button" data-scene="C"><span>After · C</span><small>hall + desk</small></button>
           <button type="button" data-scene="D"><span>After · D</span><small>open mudroom</small></button>
+        </div>
+      </div>
+      <div class="sec" id="sec-yard">
+        <div class="lab">Forecourt works</div>
+        <div class="seg scenes" id="yards">
+          <button type="button" data-yard="before"><span>Today</span><small>as photographed</small></button>
+          <button type="button" data-yard="after"><span>After the works</span><small>42 m² rebuilt, new drains</small></button>
         </div>
       </div>
       <div class="sec" id="sec-kitchen">
@@ -144,7 +152,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
           <label><input type="checkbox" id="t-cut">Cut walls (dollhouse)</label>
           <label><input type="checkbox" id="t-labels">Labels + sizes</label>
           <label><input type="checkbox" id="t-lamps">Lights on</label>
-          <label><input type="checkbox" id="t-flood">Flood 50 cm + barrier</label>
+          <label><input type="checkbox" id="t-flood"><span id="lab-flood">Flood 50 cm + barrier</span></label>
+          <label id="row-under"><input type="checkbox" id="t-under">Cut-away: layers and pipe</label>
           <label><input type="checkbox" id="t-build">Building stage</label>
           <label><input type="checkbox" id="t-open">Wardrobe open</label>
           <label><input type="checkbox" id="t-hq">High quality</label>
@@ -169,7 +178,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
           <button type="button" data-front="curtain">Curtain</button>
         </div>
       </div>
-      <div class="sec">
+      <div class="sec" id="sec-fin">
         <div class="lab">Finishes</div>
         <div class="seg" id="floors">
           <button type="button" data-floor="existing">Keep tiles 33×33</button>
@@ -1586,11 +1595,13 @@ var $ = function(s){ return document.querySelector(s); };
 var KEY = 'maisonModel3D.v1';
 var coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
 var DEF = {level:'ground', scene:'E', view:'overview', ceiling:false, cut:true, labels:true, lamps:true, flood:false, build:false, open:false,
-  hq:!coarse, front:'sage', floor:'existing', paint:'warm', kitchen:'today', hidden:{}};
+  hq:!coarse, front:'sage', floor:'existing', paint:'warm', kitchen:'today', yard:'before', under:false, hidden:{}};
 var S = Object.assign({}, DEF);
 try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && typeof sv === 'object') Object.assign(S, sv); } catch (e) {}
 if (!S.hidden || typeof S.hidden !== 'object') S.hidden = {}; else S.hidden = Object.assign({}, S.hidden);
 var HASH = (location.hash || '').replace('#', ''); if (HASH === 'first' || HASH === 'ground' || HASH === 'both') { S.level = HASH; S.view = 'overview'; }
+if (HASH === 'front' || HASH === 'front-after') { S.level = 'front'; S.view = 'overview'; S.yard = HASH === 'front-after' ? 'after' : 'before'; S.flood = false; }
+if (S.yard !== 'after') S.yard = 'before';
 if (HASH === 'kitchen' || HASH === 'kitchen-today' || HASH === 'stage1') { S.level = 'first'; S.kitchen = HASH === 'kitchen' ? 'ikea' : HASH === 'stage1' ? 'stage1' : 'today'; S.view = 'kitchen'; S.cut = true; S.ceiling = false; }
 if (S.kitchen !== 'ikea' && S.kitchen !== 'stage1') S.kitchen = 'today';
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -2967,7 +2978,7 @@ function buildFirstInner(){
     {x1: BW.x2, x2: 7.83, z1: BW.s2, z2: ZK, t: 'stone', yb: -0.24},
     {x1: 3.11, x2: XT2, z1: BW.s3, z2: ZL - 0.40, t: 'stone', outer: 1, yb: -0.24},                                      // step in the party wall (the "A" walls)
     {x1: -0.5, x2: XT2, z1: ZL - 0.40, z2: ZL, t: 'stone', outer: 5, yb: -0.24},                                           // living-room back wall
-    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: L0 + 2.10}, {a: 5.12, b: 6.32, y0: 0, y1: 2.15}]},
+    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: L0 + 2.10}, {a: 4.65, b: 5.95, y0: 0, y1: 2.15}]},   // dining window: position and width from the façade photos
     {x1: -0.5, x2: -0.10, z1: ZL - 0.40, z2: 5.90, t: 'stone', outer: 1, yb: -0.24},
     {x1: 7.68, x2: 7.83, z1: ZK - 0.53, z2: 5.90, t: 'stone', outer: 0, yb: -0.24},
     {x1: 7.43, x2: 7.68, z1: ZK, z2: 5.90, t: 'stone', yb: -0.24, ops: [{a: 2.85, b: 3.45, y0: 0.95, y1: 1.75}]},
@@ -2995,7 +3006,7 @@ function buildFirstInner(){
   var sk = MAT.skirt1;
   skirtX(BW.s3, XT2, BW.xn1, 1, sk); skirtX(BW.n, BW.xn1, BW.xn2, 1, sk); skirtX(BW.s2, BW.xn2, BW.x2, 1, sk); skirtX(ZK, BW.x2, 7.43, 1, sk);
   skirtZ(BW.xn1, BW.n, BW.s3, 1, sk); skirtZ(BW.xn2, BW.n, BW.s2, -1, sk); skirtZ(BW.x2, BW.s2, ZK, -1, sk);
-  skirtZ(XT2, BW.s3, ZL, 1, sk); skirtZ(7.43, ZK, 5.9, -1, sk); skirtX(5.90, 4.53, 5.12, -1, sk); skirtX(5.90, 6.32, 7.43, -1, sk);
+  skirtZ(XT2, BW.s3, ZL, 1, sk); skirtZ(7.43, ZK, 5.9, -1, sk); skirtX(5.90, 4.53, 4.65, -1, sk); skirtX(5.90, 5.95, 7.43, -1, sk);
   var skL = function(x1, z1, x2, z2){ box(x1, L0, z1, x2, L0 + 0.08, z2, sk, null, false); };
   skL(0.48, ZL, XT1, ZL + 0.009); skL(-0.1, 5.891, 0.02, 5.9); skL(1.90, 5.891, 4.50, 5.9);
   skL(-0.1, ZL + 0.60, -0.091, 5.9); skL(XT1 - 0.009, ZL + 1.22, XT1, 4.20);
@@ -3058,8 +3069,8 @@ function buildFirstInner(){
   label('KITCHEN + DINING', 5.9, 0.15, 1.05, 'room', S.kitchen === 'ikea' ? '22.58 m² · IKEA plan' : S.kitchen === 'stage1' ? '22.58 m² · kitchen stage 1' : '22.58 m²');
 
   /* ---- dining ---- */
-  frenchWindow(5.12, 6.32, 0, 2.15, 'dining'); radiatorZ(6.42, 7.07, 0.15, 0.75, 0);
-  label('French window + balconnet', 5.72, 2.32, 6.0);
+  frenchWindow(4.65, 5.95, 0, 2.15, 'dining'); radiatorZ(6.08, 6.73, 0.15, 0.75, 0);
+  label('French window + balconnet', 5.30, 2.32, 6.0);
   O('Coat tree', function(){
     var ct = group(7.18, 0, 5.62, 0); cyl(0, 0.85, 0, 0.035, 1.7, MAT.oak, ct, 'y', 10);
     [[0.12, 1.45, 0.6], [-0.1, 1.6, -0.7], [0.08, 1.25, 2.2], [-0.09, 1.35, 3.6]].forEach(function(b){ var br = cyl(b[0], b[1], 0, 0.014, 0.28, MAT.oak, ct, 'y', 6); br.rotation.z = -b[0] * 4; br.rotation.y = b[2]; });
@@ -3163,6 +3174,234 @@ function buildFirstInner(){
   if (S.ceiling) label('2nd floor not modelled yet', 3.94, 2.6, 3.2, 'dim');
 }
 
+/* =====================================================================
+   OUTSIDE: the front of the house and the forecourt, before and after the surfacing and drainage works.
+   Built from six photos, a rainy-day video and the contractor's quote: 42 m² dug out and rebuilt (40 cm of 0/80,
+   a levelling layer of 0/20, 7 cm of hot asphalt), 7 m of PVC 125 rainwater pipe, 3 m of hand-built masonry gutter,
+   3 m of reinforced channel drain. The quote gives quantities, not positions: the layout of the drains is a reading.
+   x runs as indoors (garage side → neighbour's wall), z grows away from the façade, y = 0 at the doorstep.
+   ===================================================================== */
+var FZ = 6.30, FXE = 7.33, ZS = 13.3, ZC = 10.9, YG = -0.03, NEWZ = 11.66;   // façade plane, neighbour's wall, building opposite, neighbour's corner, yard level, edge of the new surface
+var FRONT_READY = false;
+function frontMats(){
+  if (FRONT_READY) return; FRONT_READY = true;
+  var c, g, r, i;
+  MAT.xRender = uvs(std({color: 0xe3ba8a, bumpMap: plasterBump, bumpScale: 0.035, roughness: 1}), 0.8);
+  MAT.xCream = uvs(std({color: 0xe6e4d3, bumpMap: plasterBump, bumpScale: 0.03, roughness: 1}), 0.9);
+  MAT.xGreyWall = uvs(std({color: 0xa7a9aa, bumpMap: plasterBump, bumpScale: 0.02, roughness: 1}), 0.9);
+  MAT.xYellow = uvs(std({color: 0xeadfb4, bumpMap: plasterBump, bumpScale: 0.03, roughness: 1}), 0.9);
+  MAT.xBand = std({color: 0xa8a48f, roughness: 0.95});
+  MAT.xStone = uvs(std({color: 0xa29f97, bumpMap: plasterBump, bumpScale: 0.05, roughness: 1}), 0.4);
+  MAT.xZinc = std({color: 0x8d9599, metalness: 0.75, roughness: 0.45, envMapIntensity: 0.7});
+  MAT.xRedIron = std({color: 0x8f3526, roughness: 0.6});
+  MAT.xTimber = uvs(std({map: frontTexV, color: 0xe2b27a, roughness: 0.7}), 1.2);
+  MAT.xWinGlass = std({color: 0x1d2a33, roughness: 0.05, metalness: 0.2, envMapIntensity: 1.2});
+  MAT.xSoil = uvs(std({color: 0x6b5a48, bumpMap: plasterBump, bumpScale: 0.06, roughness: 1}), 0.5);
+  MAT.xPipe = std({color: 0xc46a34, roughness: 0.5});
+  MAT.xIron = std({color: 0x3b3f42, metalness: 0.5, roughness: 0.6});
+  MAT.xRust = std({color: 0x7a4a30, roughness: 0.9});
+  MAT.xCar = std({color: 0x263e73, metalness: 0.2, roughness: 0.35, envMapIntensity: 0.45}); MAT.xCut = std({color: 0x6f777a, roughness: 1});
+  MAT.xArrow = new T.MeshBasicMaterial({color: 0x1f6fd0, transparent: true, opacity: 0.78, depthWrite: false, side: T.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4});
+  MAT.xPuddle = new T.MeshStandardMaterial({color: 0x3f6fa8, transparent: true, opacity: 0.55, roughness: 0.03, metalness: 0.1, envMapIntensity: 1.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3});
+  MAT.xMark = new T.MeshBasicMaterial({color: 0xe0762c, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4});
+  // garage door: white, vertical ribs
+  c = mkCanvas(256, 256); g = c.getContext('2d'); g.fillStyle = '#eeeeea'; g.fillRect(0, 0, 256, 256);
+  for (i = 0; i < 22; i++) { g.fillStyle = 'rgba(0,0,0,0.13)'; g.fillRect(i * 11.7, 0, 2, 256); g.fillStyle = 'rgba(255,255,255,0.7)'; g.fillRect(i * 11.7 + 2, 0, 2, 256); }
+  g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(0, 252, 256, 4);
+  MAT.xGarage = unit(std({map: clampTex(c), roughness: 0.55}));
+  // shutters: honey-coloured boards with a Z brace
+  c = mkCanvas(128, 384); g = c.getContext('2d'); g.fillStyle = '#d99a4e'; g.fillRect(0, 0, 128, 384);
+  for (i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#cf8f43' : '#e0a55a'; g.fillRect(i * 18.3, 0, 17, 384); g.fillStyle = 'rgba(70,35,10,0.45)'; g.fillRect(i * 18.3 + 17, 0, 1.4, 384); }
+  g.fillStyle = '#c98a40'; [28, 180, 332].forEach(function(y){ g.fillRect(0, y, 128, 24); }); g.strokeStyle = '#c98a40'; g.lineWidth = 22; g.beginPath(); g.moveTo(10, 52); g.lineTo(118, 180); g.moveTo(118, 204); g.lineTo(10, 332); g.stroke();
+  g.strokeStyle = 'rgba(70,35,10,0.35)'; g.lineWidth = 1.5; [28, 52, 180, 204, 332, 356].forEach(function(y){ g.beginPath(); g.moveTo(0, y); g.lineTo(128, y); g.stroke(); });
+  MAT.xShutter = unit(std({map: clampTex(c), roughness: 0.6}));
+  // front door: oak with a glazed panel behind scrolled ironwork
+  c = mkCanvas(256, 512); g = c.getContext('2d'); g.fillStyle = '#a8672f'; g.fillRect(0, 0, 256, 512);
+  r = rng(5); for (i = 0; i < 60; i++) { g.fillStyle = 'rgba(60,30,8,' + (0.05 + r() * 0.1) + ')'; g.fillRect(r() * 256, 0, 1 + r() * 2, 512); }
+  g.strokeStyle = 'rgba(50,25,8,0.7)'; g.lineWidth = 5; g.strokeRect(34, 300, 188, 176); g.strokeRect(34, 36, 188, 232);
+  g.fillStyle = '#10161b'; g.fillRect(44, 46, 168, 212); g.strokeStyle = '#d9dde0'; g.lineWidth = 3;
+  for (i = 0; i < 4; i++) for (var j = 0; j < 5; j++) { g.beginPath(); g.arc(65 + i * 42, 68 + j * 42, 15, (i + j) % 2 ? 0 : Math.PI, (i + j) % 2 ? Math.PI * 1.5 : Math.PI * 2.5); g.stroke(); }
+  g.fillStyle = '#c9a24b'; g.fillRect(214, 280, 18, 8);
+  MAT.xDoor = unit(std({map: clampTex(c), roughness: 0.5}));
+  // roof tiles
+  c = mkCanvas(256, 256); g = c.getContext('2d'); g.fillStyle = '#8d5a44'; g.fillRect(0, 0, 256, 256); r = rng(9);
+  for (var ty = 0; ty < 8; ty++) for (var tx = 0; tx < 9; tx++) { g.fillStyle = ['#9a6249', '#84503c', '#a56d52', '#7b4a39'][(r() * 4) | 0]; g.beginPath(); g.ellipse(tx * 32 + (ty % 2) * 16, ty * 32 + 30, 15, 30, 0, Math.PI, 0); g.fill(); g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(tx * 32 + (ty % 2) * 16 - 15, ty * 32 + 29, 30, 2); }
+  MAT.xRoof = uvs(std({map: toTex(c, true), roughness: 0.9}), 1.1);
+  // old asphalt: patched, cracked, a little moss
+  c = mkCanvas(1024, 1024); g = c.getContext('2d'); g.fillStyle = '#56575a'; g.fillRect(0, 0, 1024, 1024); r = rng(21);
+  for (i = 0; i < 26000; i++) { var v = r(); g.fillStyle = v < 0.5 ? 'rgba(20,20,22,0.35)' : v < 0.85 ? 'rgba(170,168,160,0.3)' : 'rgba(210,205,195,0.35)'; g.fillRect(r() * 1024, r() * 1024, 1 + r() * 2.5, 1 + r() * 2.5); }
+  for (i = 0; i < 16; i++) { g.fillStyle = ['rgba(128,126,120,0.55)', 'rgba(104,103,100,0.6)', 'rgba(60,60,62,0.6)', 'rgba(150,146,138,0.45)'][(r() * 4) | 0]; var px = r() * 1024, py = r() * 1024, n = 5 + ((r() * 4) | 0); g.beginPath(); for (var k = 0; k < n; k++) { var a = k / n * 6.283, rad = 60 + r() * 130; g[k ? 'lineTo' : 'moveTo'](px + Math.cos(a) * rad * 1.5, py + Math.sin(a) * rad); } g.closePath(); g.fill(); }
+  g.strokeStyle = 'rgba(15,15,16,0.8)'; g.lineWidth = 2.2;
+  for (i = 0; i < 20; i++) { var cx = r() * 1024, cy = r() * 1024, ca = r() * 6.283; g.beginPath(); g.moveTo(cx, cy); for (k = 0; k < 26; k++) { ca += (r() - 0.5) * 0.9; cx += Math.cos(ca) * 22; cy += Math.sin(ca) * 22; g.lineTo(cx, cy); } g.stroke(); }
+  for (i = 0; i < 9; i++) { g.fillStyle = 'rgba(70,92,48,0.4)'; g.beginPath(); g.ellipse(r() * 1024, r() * 1024, 40 + r() * 60, 8 + r() * 14, r() * 3, 0, 6.283); g.fill(); }
+  MAT.xAsphOld = std({map: toTex(c, true), roughness: 0.95, envMapIntensity: 0.2}); MAT.xAsphOldB = uvs(std({map: MAT.xAsphOld.map, roughness: 0.95, envMapIntensity: 0.2}), 6.4);
+  // new asphalt: even, near black
+  c = mkCanvas(512, 512); g = c.getContext('2d'); g.fillStyle = '#3a3c3f'; g.fillRect(0, 0, 512, 512); r = rng(33);
+  for (i = 0; i < 22000; i++) { g.fillStyle = r() < 0.5 ? 'rgba(0,0,0,0.35)' : 'rgba(120,120,120,0.22)'; g.fillRect(r() * 512, r() * 512, 1.5, 1.5); }
+  MAT.xAsphNew = uvs(std({map: toTex(c, true), roughness: 0.9, envMapIntensity: 0.25}), 1.5); MAT.xAsphNewP = std({map: MAT.xAsphNew.map, roughness: 0.9, envMapIntensity: 0.25});
+  // crushed stone, coarse (0/80) and fine (0/20)
+  [['xG80', 96, 9, 26, '#8d8a84'], ['xG20', 96, 3, 9, '#a39f97']].forEach(function(d){
+    var cc = mkCanvas(512, 512), gg = cc.getContext('2d'), rr = rng(d[1] + d[2]); gg.fillStyle = d[4]; gg.fillRect(0, 0, 512, 512);
+    for (var q = 0; q < (d[2] > 5 ? 900 : 5000); q++) { gg.fillStyle = ['#6f6c66', '#b9b5ad', '#99958d', '#57544f', '#c9c5bb'][(rr() * 5) | 0]; var s2 = d[2] + rr() * (d[3] - d[2]); gg.beginPath(); gg.ellipse(rr() * 512, rr() * 512, s2, s2 * (0.6 + rr() * 0.4), rr() * 3, 0, 6.283); gg.fill(); }
+    MAT[d[0]] = uvs(std({map: toTex(cc, true), roughness: 1}), 1.0); });
+  // gratings
+  c = mkCanvas(128, 128); g = c.getContext('2d'); g.fillStyle = '#2b2d2f'; g.fillRect(0, 0, 128, 128); g.fillStyle = '#8b8f92'; for (i = 0; i < 8; i++) g.fillRect(i * 16 + 3, 6, 9, 116); g.strokeStyle = '#8b8f92'; g.lineWidth = 6; g.strokeRect(3, 3, 122, 122);
+  var gt = toTex(c, true); MAT.xGrate = uvs(std({map: gt, roughness: 0.6, metalness: 0.4}), 0.14); MAT.xGully = unit(std({map: gt, roughness: 0.7, metalness: 0.3})); MAT.xGullyRust = unit(std({map: gt, color: 0xc08a5c, roughness: 0.9}));
+  c = mkCanvas(256, 256); g = c.getContext('2d'); g.fillStyle = '#4a4d50'; g.fillRect(0, 0, 256, 256); g.strokeStyle = '#2c2e30'; g.lineWidth = 5; for (i = -8; i < 16; i++) { g.beginPath(); g.moveTo(i * 22, 0); g.lineTo(i * 22 + 256, 256); g.stroke(); g.beginPath(); g.moveTo(i * 22 + 256, 0); g.lineTo(i * 22, 256); g.stroke(); }
+  MAT.xManhole = unit(std({map: toTex(c, true), roughness: 0.7, metalness: 0.5}));
+}
+function clampTex(c){ var t = toTex(c, true); t.wrapS = t.wrapT = T.ClampToEdgeWrapping; return t; }
+function xwall(x1, x2, y1, y2, z1, z2, ops, mat){   // a wall along x with rectangular openings
+  var cur = x1; (ops || []).slice().sort(function(a, b){ return a.a - b.a; }).forEach(function(o){
+    if (o.a > cur) box(cur, y1, z1, o.a, y2, z2, mat);
+    if (o.y0 > y1) box(o.a, y1, z1, o.b, o.y0, z2, mat);
+    if (o.y1 < y2) box(o.a, o.y1, z1, o.b, y2, z2, mat);
+    cur = o.b; });
+  if (cur < x2) box(cur, y1, z1, x2, y2, z2, mat);
+}
+function slopeX(x1, y1, x2, y2, z1, z2, h, mat){   // slab rising along x
+  var L = Math.hypot(x2 - x1, y2 - y1), gm = new T.BoxGeometry(L, h, z2 - z1); boxUV(gm, L, h, z2 - z1, mat);
+  var m = add(gm, mat, null, false); m.rotation.z = Math.atan2(y2 - y1, x2 - x1); m.position.set((x1 + x2) / 2, (y1 + y2) / 2 - h / 2, (z1 + z2) / 2); return m;
+}
+function xWindow(a, b, y0, y1){   // french window seen from outside: painted surround, white frames, railing, flower boxes, shutters folded back
+  var mid = (a + b) / 2, zf = FZ - 0.17, sw = (b - a) / 2 + 0.015, f = 0.065;
+  box(a - 0.13, y0, FZ, a, y1, FZ + 0.012, MAT.xBand); box(b, y0, FZ, b + 0.13, y1, FZ + 0.012, MAT.xBand); box(a - 0.17, y1, FZ, b + 0.17, y1 + 0.30, FZ + 0.015, MAT.xBand); box(a - 0.13, y0 - 0.05, FZ - 0.02, b + 0.13, y0, FZ + 0.06, MAT.xStone);
+  box(a, y0, zf - 0.04, b, y1, zf - 0.03, MAT.xWinGlass, null, false);
+  box(a, y0, zf - 0.03, a + f, y1, zf + 0.03, MAT.white); box(b - f, y0, zf - 0.03, b, y1, zf + 0.03, MAT.white); box(a, y1 - f, zf - 0.03, b, y1, zf + 0.03, MAT.white); box(a, y0, zf - 0.03, b, y0 + 0.09, zf + 0.03, MAT.white);
+  box(mid - 0.05, y0, zf - 0.03, mid + 0.05, y1, zf + 0.04, MAT.white);
+  // railing in the reveal
+  var zr = FZ - 0.03; box(a, y0 + 0.93, zr - 0.012, b, y0 + 0.96, zr + 0.012, MAT.iron, null, false); box(a, y0 + 0.07, zr - 0.01, b, y0 + 0.09, zr + 0.01, MAT.iron, null, false); box(a, y0 + 0.50, zr - 0.008, b, y0 + 0.515, zr + 0.008, MAT.iron, null, false);
+  for (var x = a + 0.06; x < b - 0.02; x += 0.105) cyl(x, y0 + 0.515, zr, 0.006, 0.86, MAT.iron, null, 'y', 6);
+  [[a + 0.04, mid - 0.03], [mid + 0.03, b - 0.04]].forEach(function(fb){ box(fb[0], y0 + 0.80, zr + 0.02, fb[1], y0 + 0.93, zr + 0.17, MAT.dark);
+    for (var j = 0; j * 0.085 < fb[1] - fb[0] - 0.06; j++) { var lf = add(new T.SphereGeometry(0.055, 8, 6), j % 3 === 1 ? MAT.geranium : MAT.leaf); lf.position.set(fb[0] + 0.05 + j * 0.085, y0 + 0.98 + (j % 2) * 0.03, zr + 0.10); } });
+  // shutters, open flat against the wall
+  [[a - 0.14 - sw, a - 0.14], [b + 0.14, b + 0.14 + sw]].forEach(function(s){ box(s[0], y0 + 0.02, FZ + 0.03, s[1], y1 - 0.01, FZ + 0.065, MAT.xShutter); box(s[0] + 0.02, y0 + 1.25, FZ + 0.065, s[0] + 0.24, y0 + 1.28, FZ + 0.075, MAT.iron, null, false); });
+}
+function xGully(x, z, rust){ box(x - 0.2, YG, z - 0.2, x + 0.2, YG + 0.012, z + 0.2, rust ? MAT.xGullyRust : MAT.xGully, null, false); }
+function xArrow(x, z, ang, len){   // flat arrow on the ground: where the rain water runs
+  var s = new T.Shape(), w = 0.11, L = len || 0.9, h = 0.3;
+  s.moveTo(0, -w / 2); s.lineTo(L - h, -w / 2); s.lineTo(L - h, -w * 1.6); s.lineTo(L, 0); s.lineTo(L - h, w * 1.6); s.lineTo(L - h, w / 2); s.lineTo(0, w / 2); s.closePath();
+  var m = add(new T.ShapeGeometry(s), MAT.xArrow, null, false, false); m.rotation.order = 'YXZ'; m.rotation.y = -ang; m.rotation.x = -Math.PI / 2; m.position.set(x, YG + 0.02, z); m.renderOrder = 5; return m;
+}
+function xPuddle(x, z, rx, rz){ var m = add(new T.CircleGeometry(1, 28), MAT.xPuddle, null, false, false); m.rotation.x = -Math.PI / 2; m.scale.set(rx, rz, 1); m.position.set(x, YG + 0.012, z); m.renderOrder = 4; }
+function xPipe(x1, z1, x2, z2, y, r, mat){ var L = Math.hypot(x2 - x1, z2 - z1), gp = group((x1 + x2) / 2, y, (z1 + z2) / 2, -Math.atan2(z2 - z1, x2 - x1)); return cyl(0, 0, 0, r, L, mat, gp, 'x', 18); }
+function xDash(x1, z1, x2, z2, skip){ var L = Math.hypot(x2 - x1, z2 - z1), n = Math.max(1, Math.round(L / 0.5)), ang = -Math.atan2(z2 - z1, x2 - x1);
+  for (var i = 0; i < n; i++) { var t = (i + 0.5) / n, dx = x1 + (x2 - x1) * t, dz = z1 + (z2 - z1) * t; if (skip && dx > skip.x1 - 0.2 && dx < skip.x2 + 0.2 && dz > skip.z1 - 0.2 && dz < skip.z2 + 0.2) continue; var gp = group(dx, YG + 0.016, dz, ang); var m = add(new T.PlaneGeometry(0.3, 0.07), MAT.xMark, gp, false, false); m.rotation.x = -Math.PI / 2; } }
+
+function buildFront(after){
+  frontMats();
+  var R = MAT.xRender, i;
+  /* ---------- the house ---------- */
+  plane(-16, -8, 22, 26, after && S.under ? -0.9 : YG - 0.03, MAT.ground, 4);
+  box(-0.5, 0, -0.5, 7.83, 6.05, FZ - 0.47, R);                                    // body behind the façade
+  box(-0.5, 0, FZ - 0.46, FXE + 0.5, 6.05, FZ - 0.41, MAT.dark, null, false);      // darkness behind the openings
+  xwall(-0.5, FXE + 0.5, YG - 0.3, 2.36, FZ - 0.40, FZ, [{a: 0.30, b: 2.50, y0: YG - 0.3, y1: 2.0}, {a: 3.45, b: 4.30, y0: YG - 0.3, y1: 2.05}, {a: 5.69, b: 6.31, y0: 1.10, y1: 1.65}], R);
+  xwall(-0.5, FXE + 0.5, 2.36, 6.05, FZ - 0.40, FZ, [{a: 0.70, b: 1.90, y0: 2.42, y1: 4.55}, {a: 4.65, b: 5.95, y0: 2.42, y1: 4.55}], R);
+  // eaves: timber boarding, zinc gutter, tiled roof with a dormer and two flues
+  box(-0.5, 6.05, FZ - 0.05, FXE, 6.50, FZ + 0.30, MAT.xTimber); cyl((FXE - 0.5) / 2, 6.50, FZ + 0.37, 0.07, FXE + 0.5, MAT.xZinc, null, 'x', 14);
+  sloped(-0.5, 7.83, FZ + 0.42, 6.50, 2.9, 8.72, 0.07, MAT.xRoof); sloped(-0.5, 7.83, 2.9, 8.72, -0.9, 6.40, 0.07, MAT.xRoof);
+  [[-0.5, -0.42], [7.75, 7.83]].forEach(function(xx){ var sh = new T.Shape(); sh.moveTo(-FZ, 6.05); sh.lineTo(-2.9, 8.66); sh.lineTo(0.5, 6.05); sh.closePath(); var m = add(new T.ExtrudeGeometry(sh, {depth: xx[1] - xx[0], bevelEnabled: false}), R); m.rotation.y = Math.PI / 2; m.position.set(xx[0], 0, 0); });
+  box(4.9, 7.0, 4.55, 6.2, 7.75, 5.75, MAT.xTimber); box(5.0, 7.12, 5.75, 6.1, 7.6, 5.77, MAT.xWinGlass, null, false); sloped(4.8, 6.3, 5.95, 7.72, 4.4, 7.95, 0.05, MAT.xRoof);
+  cyl(2.3, 7.75, 4.4, 0.07, 0.9, MAT.metal); cyl(3.4, 7.9, 4.0, 0.06, 0.6, MAT.metal);
+  // downpipe at the garage-side corner: zinc, cast-iron foot
+  cyl(-0.38, 3.75, FZ + 0.09, 0.045, 5.5, MAT.xZinc); cyl(-0.38, 0.5, FZ + 0.09, 0.05, 1.06, MAT.xRedIron);
+  // garage door
+  box(0.30, YG, FZ - 0.16, 2.50, 2.0, FZ - 0.12, MAT.xGarage); box(0.16, YG, FZ, 0.30, 2.13, FZ + 0.012, MAT.xBand); box(2.50, YG, FZ, 2.64, 2.13, FZ + 0.012, MAT.xBand); box(0.16, 2.0, FZ, 2.64, 2.13, FZ + 0.012, MAT.xBand);
+  cyl(1.4, 1.0, FZ - 0.11, 0.03, 0.03, MAT.dark, null, 'z', 12); box(2.05, 0.25, FZ - 0.12, 2.38, 0.40, FZ - 0.105, MAT.grey, null, false);
+  box(0.2, YG - 0.02, FZ - 0.12, 2.6, YG + 0.012, FZ + 0.52, MAT.concrete, null, false);
+  // front door with its stone jambs and painted lintel
+  box(3.47, 0.02, FZ - 0.22, 4.28, 2.04, FZ - 0.17, MAT.xDoor); box(3.40, YG - 0.02, FZ - 0.25, 4.35, 0.015, FZ + 0.07, MAT.xStone);
+  for (i = 0; i < 6; i++) { var w1 = i % 2 ? 0.24 : 0.34, w2 = i % 2 ? 0.34 : 0.24, yb = i * 0.342; box(3.45 - w1, yb, FZ - 0.02, 3.45, yb + 0.33, FZ + 0.022, MAT.xStone); box(4.30, yb, FZ - 0.02, 4.30 + w2, yb + 0.33, FZ + 0.022, MAT.xStone); }
+  box(3.08, 2.05, FZ, 4.67, 2.30, FZ + 0.02, MAT.xBand);
+  plane(3.5, FZ + 0.10, 4.25, FZ + 0.58, YG + 0.014, MAT.coir, 0.6);
+  box(4.74, 1.02, FZ, 4.98, 1.36, FZ + 0.10, MAT.black); box(4.75, 0.28, FZ, 4.97, 0.82, FZ + 0.05, MAT.white); box(4.50, 1.26, FZ, 4.56, 1.40, FZ + 0.03, MAT.dark);
+  box(3.16, 2.48, FZ, 3.26, 2.64, FZ + 0.05, MAT.white);
+  // small barred window
+  box(5.69, 1.10, FZ - 0.20, 6.31, 1.65, FZ - 0.19, MAT.xWinGlass, null, false); box(5.69, 1.10, FZ - 0.19, 5.73, 1.65, FZ - 0.15, MAT.white); box(6.27, 1.10, FZ - 0.19, 6.31, 1.65, FZ - 0.15, MAT.white); box(5.69, 1.61, FZ - 0.19, 6.31, 1.65, FZ - 0.15, MAT.white); box(5.69, 1.10, FZ - 0.19, 6.31, 1.14, FZ - 0.15, MAT.white);
+  box(5.52, 1.65, FZ - 0.02, 6.48, 1.84, FZ + 0.025, MAT.xStone); box(5.55, 0.97, FZ - 0.02, 6.45, 1.10, FZ + 0.04, MAT.xStone); box(5.52, 1.10, FZ - 0.02, 5.69, 1.65, FZ + 0.02, MAT.xStone); box(6.31, 1.10, FZ - 0.02, 6.48, 1.65, FZ + 0.02, MAT.xStone);
+  for (i = 0; i < 4; i++) cyl(5.78 + i * 0.148, 1.375, FZ - 0.06, 0.008, 0.55, MAT.iron, null, 'y', 6);
+  cyl(6.0, 1.26, FZ - 0.06, 0.006, 0.62, MAT.iron, null, 'x', 6); cyl(6.0, 1.50, FZ - 0.06, 0.006, 0.62, MAT.iron, null, 'x', 6);
+  xWindow(0.70, 1.90, 2.42, 4.55); xWindow(4.65, 5.95, 2.42, 4.55);
+  plant(6.75, YG, FZ + 0.25, 0.9, MAT.terracotta, false); plant(7.05, YG, FZ + 0.32, 0.7, MAT.potWhite, false);
+  /* ---------- the neighbours: plain volumes with just enough detail to recognise the yard ---------- */
+  box(-8.5, 0, -0.5, -0.5, 5.9, FZ - 0.12, MAT.xYellow); sloped(-8.5, -0.5, FZ + 0.25, 5.95, 2.9, 7.9, 0.07, MAT.xRoof);
+  [[-3.6, -2.7, 2.7, 4.2], [-6.4, -5.5, 2.7, 4.2], [-4.4, -3.5, 0, 2.05]].forEach(function(o){ box(o[0], o[2], FZ - 0.125, o[1], o[3], FZ - 0.11, MAT.xWinGlass, null, false); });
+  box(7.83, 0, -0.5, 12.8, 7.6, FZ, MAT.xCream); box(FXE, 0, FZ, 12.8, 7.6, ZC, MAT.xCream); box(FXE - 0.25, 7.6, -0.5, 13.0, 7.72, ZC + 0.25, MAT.xRoof);
+  box(FXE - 0.012, 1.35, 7.95, FXE, 1.95, 8.50, MAT.xWinGlass, null, false); [[1.22, 1.35, 7.82, 8.63], [1.95, 2.10, 7.82, 8.63], [1.35, 1.95, 7.82, 7.95], [1.35, 1.95, 8.50, 8.63]].forEach(function(s){ box(FXE - 0.03, s[0], s[2], FXE, s[1], s[3], MAT.xStone); });
+  box(FXE - 0.07, 1.05, 9.90, FXE, 1.45, 10.18, MAT.white); box(FXE - 0.07, 1.05, 10.24, FXE, 1.45, 10.52, MAT.white);
+  cyl(FXE - 0.06, 4.3, ZC - 0.08, 0.045, 6.5, MAT.xZinc); cyl(FXE - 0.06, 0.5, ZC - 0.08, 0.05, 1.06, MAT.xRedIron);
+  for (i = 0; i < 9; i++) box(FXE - 0.015, 3.0 + i * 0.5, ZC - (i % 2 ? 0.34 : 0.55), FXE, 3.45 + i * 0.5, ZC, MAT.xStone);
+  // the building opposite is cut low, like the dollhouse walls indoors, so it hides nothing and shades nothing
+  box(1.0, 0, ZS, 12.8, 1.15, ZS + 2.2, [MAT.xGreyWall, MAT.xGreyWall, MAT.xCut, MAT.xGreyWall, MAT.xGreyWall, MAT.xGreyWall]);
+  box(6.1, YG, ZS - 0.02, 7.0, 1.15, ZS, MAT.grey); rbox(3.2, 0.42, ZS - 0.36, 4.1, 1.02, ZS - 0.03, MAT.white, 0.03); cyl(3.52, 0.72, ZS - 0.365, 0.2, 0.012, MAT.dark, null, 'z', 20);
+  cyl(2.5, 0.57, ZS - 0.06, 0.045, 1.15, MAT.xZinc); label('Building opposite, cut low', 8.6, 1.35, ZS + 1.1, 'dim');
+  /* ---------- the ground ---------- */
+  var OLD = MAT.xAsphOld, T6 = 6.4;
+  plane(-8.5, FZ - 0.12, -0.5, 17, YG - 0.004, MAT.concrete, 1.5); plane(-0.5, ZS, 1.0, 17, YG - 0.002, OLD, T6);                 // the impasse, toward the garage side
+  var lane = slopeX(FXE, YG, 13.0, YG + 0.62, ZC, ZS, 0.03, MAT.xAsphOldB); lane.receiveShadow = true;                         // the lane, climbing away
+  box(13.0, YG + 0.55, ZC, 13.3, YG + 0.62, ZS, MAT.dark, null, false);
+  if (!after) {
+    plane(-0.5, FZ, FXE, ZS, YG, OLD, T6);
+    // light channel grating along the façade, garage to front door
+    box(0.10, YG, FZ + 0.555, 4.50, YG + 0.012, FZ + 0.685, MAT.xGrate, null, false);
+    // sandbags against the garage door
+    for (i = 0; i < 5; i++) rbox(0.33 + i * 0.44, YG, FZ + 0.03, 0.75 + i * 0.44, YG + 0.13, FZ + 0.30, MAT.potWhite, 0.05);
+    xGully(-0.25, FZ + 0.95); xGully(5.0, FZ + 3.2); xGully(7.0, FZ + 1.4, true); xGully(6.6, FZ + 5.9);
+    label('Old asphalt, cracked and patched', 3.2, 0.25, FZ + 4.4, 'dim'); label('Light channel grating', 1.3, 0.3, FZ + 0.62); label('Sandbags at the garage door', 1.4, 0.75, FZ + 0.2, 'dim');
+    label('Low spot: water stands here', 3.0, 0.3, FZ + 1.9);
+  } else {
+    var NEW = MAT.xAsphNewP, T2 = 1.5, yN = YG + 0.004, pit = S.under ? {x1: 3.3, x2: 5.7, z1: 8.1, z2: 9.9} : null;
+    plane(-0.5, NEWZ, FXE, ZS, YG, OLD, T6);                                                                                 // the strip beyond the new surface stays as it is
+    if (pit) { plane(-0.5, FZ, pit.x1, NEWZ, yN, NEW, T2); plane(pit.x2, FZ, FXE, NEWZ, yN, NEW, T2); plane(pit.x1, FZ, pit.x2, pit.z1, yN, NEW, T2); plane(pit.x1, pit.z2, pit.x2, NEWZ, yN, NEW, T2); }
+    else plane(-0.5, FZ, FXE, NEWZ, yN, NEW, T2);
+    box(-0.5, YG, NEWZ - 0.012, FXE, YG + 0.008, NEWZ + 0.012, MAT.dark, null, false); box(-0.512, YG, FZ, -0.488, YG + 0.008, NEWZ, MAT.dark, null, false);   // saw-cut joints
+    // reinforced channel drain in front of the garage, set in concrete (3 m)
+    box(-0.10, YG, FZ + 0.44, 2.90, YG + 0.010, FZ + 0.80, MAT.concrete, null, false); box(-0.06, YG, FZ + 0.52, 2.86, YG + 0.016, FZ + 0.72, MAT.xGrate, null, false);
+    // hand-built masonry gutter in front of the door (3 m): a dished concrete channel
+    box(2.90, YG, FZ + 0.42, 5.90, YG + 0.010, FZ + 0.82, MAT.concrete, null, false); box(2.90, YG, FZ + 0.54, 5.90, YG + 0.013, FZ + 0.70, MAT.grey, null, false);
+    xGully(-0.25, FZ + 0.95); xGully(5.0, FZ + 3.2); xGully(7.0, FZ + 1.4); xGully(6.6, FZ + 5.9);
+    // rainwater pipe, underground: marked on the surface as a dashed line (7 m)
+    xDash(6.6, FZ + 5.9, 5.0, FZ + 3.2, pit); xDash(5.0, FZ + 3.2, 3.0, FZ + 1.45, pit); xDash(2.9, FZ + 0.62, 3.0, FZ + 1.45);
+    label('New asphalt, 42 m²: 7 cm on 40 cm of crushed stone', 2.2, 0.25, FZ + 4.2);
+    label('Reinforced channel drain, 3 m', 1.4, 0.3, FZ + 0.62); label('Masonry gutter, 3 m', 4.9, 0.3, FZ + 0.62); label('PVC 125 rainwater pipe, 7 m, underground', 5.9, 0.3, FZ + 4.6);
+    label('Old surface stays beyond this joint', 1.6, 0.2, NEWZ + 0.7, 'dim');
+    if (pit) {   // cut-away: what the 42 m² are made of, and the pipe in its bed of fine gravel
+      var x1 = pit.x1, x2 = pit.x2, z1 = pit.z1, z2 = pit.z2, L = [[-0.75, -0.565, MAT.xSoil], [-0.565, -0.165, MAT.xG80], [-0.165, -0.095, MAT.xG20], [-0.095, yN - 0.003, MAT.xAsphNew]];
+      box(x1, -0.78, z1, x2, -0.62, z2, MAT.xSoil);                                                         // bottom of the trench
+      box(4.5, -0.62, z1, x2, -0.165, z2, MAT.xG80); box(4.9, -0.165, z1, x2, -0.095, z2, MAT.xG20); box(5.3, -0.095, z1, x2, yN, z2, MAT.xAsphNew);
+      L.forEach(function(l){ box(x1 - 0.03, l[0], z1, x1, l[1], z2, l[2], null, false); box(x1, l[0], z1 - 0.03, x2, l[1], z1, l[2], null, false); box(x1, l[0], z2, x2, l[1], z2 + 0.03, l[2], null, false); });
+      // gully pot and pipe: the pipe leaves the pot toward the manhole
+      box(4.78, -0.62, FZ + 2.98, 5.22, yN, FZ + 3.42, MAT.concrete); xGully(5.0, FZ + 3.2);
+      var px = function(xa){ return FZ + 3.2 - (5.0 - xa) / 2.0 * 1.75; };
+      xPipe(4.78, px(4.78), 3.42, px(3.42), -0.50, 0.0625, MAT.xPipe);
+      var bed = xPipe(4.5, px(4.5), 3.42, px(3.42), -0.585, 0.16, MAT.xG20); bed.scale.set(0.5, 1, 1.4);
+      label('7 cm hot asphalt', 5.5, 0.12, z1 + 0.25, 'dim'); label('0/20 levelling layer', 5.1, 0.0, z1 + 0.6, 'dim'); label('40 cm of 0/80 crushed stone', 4.7, -0.05, z1 + 0.95, 'dim'); label('PVC 125 in fine gravel', 3.45, 0.2, 7.95);
+    }
+  }
+  // manhole
+  cyl(3.0, YG + 0.008, FZ + 1.45, 0.36, 0.016, MAT.xManhole, null, 'y', 32); cyl(3.0, YG + 0.004, FZ + 1.45, 0.42, 0.008, MAT.xIron, null, 'y', 32);
+  /* ---------- rain: where the water goes ---------- */
+  if (S.flood) {
+    var A = function(x, z, deg, len){ xArrow(x, z, deg * Math.PI / 180, len); };
+    A(12.6, 12.4, 184, 1.1); A(11.0, 11.7, 186, 1.1); A(9.4, 12.5, 188, 1.1); A(8.0, 11.9, 200, 1.0);     // down the lane
+    if (!after) {
+      A(6.9, 11.2, 222, 1.0); A(6.0, 10.2, 236, 1.0); A(5.2, 9.0, 244, 1.0); A(4.4, 8.4, 250, 0.9); A(3.9, 10.6, 262, 1.0); A(2.6, 9.6, 270, 1.0); A(1.4, 9.2, 276, 0.9); A(5.9, 7.9, 205, 0.8); A(0.4, 8.4, 290, 0.8);
+      xPuddle(3.0, FZ + 1.45, 1.5, 0.75); xPuddle(0.1, FZ + 1.05, 0.8, 0.5); xPuddle(4.9, FZ + 0.9, 0.9, 0.35); xPuddle(1.6, FZ + 0.9, 1.1, 0.3);
+      label('Rain runs down the lane, across the yard and stands at the door', 4.6, 0.9, FZ + 3.0, 'flood');
+    } else {
+      A(7.25, 11.75, 240, 0.7); A(6.2, 10.4, 300, 0.7); A(5.9, 9.0, 235, 0.8); A(4.2, 9.9, 320, 0.8); A(2.2, 8.2, 280, 0.9); A(1.2, 8.1, 268, 0.9); A(4.6, 7.9, 262, 0.8); A(5.4, 7.7, 268, 0.7); A(0.3, 7.8, 250, 0.6);
+      label('The aim: rain is caught by the gullies, the gutter and the channel before it reaches the door', 4.6, 0.9, FZ + 3.0, 'flood');
+    }
+  }
+  // a car for scale, parked where yours usually stands
+  {
+  var car = group(-4.6, YG, 8.4, 0.03);
+  rbox(-2.0, 0.22, -0.82, 2.0, 0.78, 0.82, MAT.xCar, 0.16, car); rbox(-1.25, 0.74, -0.74, 1.05, 1.36, 0.74, MAT.xCar, 0.2, car); rbox(-1.15, 0.80, -0.75, 0.95, 1.28, 0.75, MAT.xWinGlass, 0.12, car).scale.set(1, 1, 1.004);
+  [[-1.3, -0.8], [1.3, -0.8], [-1.3, 0.8], [1.3, 0.8]].forEach(function(wh){ cyl(wh[0], 0.31, wh[1], 0.31, 0.22, MAT.dark, car, 'z', 20); cyl(wh[0], 0.31, wh[1] + (wh[1] > 0 ? 0.115 : -0.115), 0.18, 0.01, MAT.metal, car, 'z', 16); });
+  }
+  label('Your façade', 3.4, 5.2, FZ + 0.1, 'room', 'garage · front door · hall window'); label('Neighbour’s wall', FXE, 3.2, 8.9, 'dim'); label('The lane climbs away here', 10.2, 1.2, 12.1, 'dim'); label('Manhole', 3.0, 0.2, FZ + 1.45, 'dim');
+}
+
 
 /* =====================================================================
    BUILD
@@ -3175,7 +3414,11 @@ function build(){
   MAT.shade.emissiveIntensity = S.lamps ? 0.9 : 0;
   var lvl = S.level || 'ground';
   if (lvl === 'both') { S.ceiling = false; S.cut = true; }
-  if (lvl !== 'first') {
+  if (lvl === 'front') {
+    ROOT = new T.Group(); scene.add(ROOT); ROOTS.push(ROOT); GROUND = true; LABEL_DY = 0;
+    buildFront(S.yard === 'after');
+  }
+  if (lvl !== 'first' && lvl !== 'front') {
     ROOT = new T.Group(); scene.add(ROOT); ROOTS.push(ROOT); GROUND = true; LABEL_DY = 0;
     var after = S.scene !== 'before';
     buildShell(after); buildFloors(after); buildCeiling(); buildStairs(); buildDoors(after); buildRadiator();
@@ -3184,7 +3427,7 @@ function build(){
     if (S.flood) buildFlood(after);
     if (S.build) label('BA13 hydro: first course 1.20 m', 7.2, 0.9, 3.4, 'dim', 'green board, laid horizontally');
   }
-  if (lvl !== 'ground') {
+  if (lvl !== 'ground' && lvl !== 'front') {
     GROUND = false; OBJN = {};
     var g1 = new T.Group(); g1.position.y = Y1 + (lvl === 'both' ? EXPLODE : 0); scene.add(g1); ROOTS.push(g1); ROOT = g1; LABEL_DY = g1.position.y;
     if (lvl === 'first') {
@@ -3195,8 +3438,9 @@ function build(){
     buildFirst();
     LABEL_DY = 0; GROUND = true;
   }
-  (function(c){ var b = lvl === 'ground' ? 8.5 : 12.5; c.left = -b; c.right = b; c.top = b; c.bottom = -b; c.updateProjectionMatrix(); })(sun.shadow.camera);
-  sun.target.position.set(4, lvl === 'ground' ? 0 : 3, 3);
+  (function(c){ var b = lvl === 'ground' ? 8.5 : lvl === 'front' ? 17 : 12.5; c.left = -b; c.right = b; c.top = b; c.bottom = -b; c.updateProjectionMatrix(); })(sun.shadow.camera);
+  sun.target.position.set(4, lvl === 'ground' ? 0 : 3, lvl === 'front' ? 8.5 : 3);
+  if (lvl === 'front') sun.position.set(-7.5, 18, 23); else sun.position.set(12.5, 15, 16);
   // lights quality
   sun.shadow.mapSize.set(S.hq ? 2048 : 1024, S.hq ? 2048 : 1024); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, S.hq ? 2 : 1.25));
@@ -3289,6 +3533,15 @@ var VIEWS_FIRST = {
   upstairs: {pos: [3.94, Y1 + 1.62, 5.65], tgt: [3.94, Y1 + 2.05, 3.2], eye: true},
   plan: {pos: [3.7, Y1 + 15.5, 2.38], tgt: [3.7, Y1, 2.36], plan: true}
 };
+var VIEWS_FRONT = {
+  overview: {pos: [-5.8, 9.2, 20.6], tgt: [3.6, 1.4, 8.6]},
+  facade: {pos: [3.4, 3.3, 17.9], tgt: [3.4, 3.0, 6.3]},
+  door: {pos: [5.3, 1.62, 10.6], tgt: [3.4, 1.2, 6.3], eye: true},
+  lane: {pos: [12.2, 2.5, 12.1], tgt: [3.6, 0.2, 8.2], eye: true},
+  drains: {pos: [-2.6, 3.6, 10.6], tgt: [2.9, 0, 7.5]},
+  cut: {pos: [1.9, 5.3, 12.4], tgt: [4.5, -0.35, 9.0]},
+  plan: {pos: [3.4, 27, 9.82], tgt: [3.4, 0, 9.8], plan: true}
+};
 var VIEWS_BOTH = {
   overview: {pos: [13.0, 13.8, 14.2], tgt: [3.8, 3.0, 2.9]},
   plan: {pos: [3.7, Y1 + EXPLODE + 15.5, 2.38], tgt: [3.7, Y1 + EXPLODE, 2.36], plan: true}
@@ -3296,9 +3549,10 @@ var VIEWS_BOTH = {
 var VIEW_SETS = {
   ground: [['overview', 'Overview'], ['door', 'Front door'], ['fromstairs', 'From stairs'], ['corner', 'Window corner'], ['wardrobe', 'Wardrobe'], ['stairs', 'Under stairs'], ['plan', 'Plan']],
   first: [['overview', 'Overview'], ['arrive', 'Top of stairs'], ['kitchen', 'Kitchen'], ['kback', 'Kitchen · back wall'], ['kpen', 'Kitchen · from dining'], ['dining', 'Dining'], ['living', 'Living room'], ['sofa', 'From the sofa'], ['upstairs', 'Upper stairs'], ['plan', 'Plan']],
-  both: [['overview', 'Overview'], ['plan', 'Plan']]
+  both: [['overview', 'Overview'], ['plan', 'Plan']],
+  front: [['overview', 'Overview'], ['facade', 'Façade'], ['door', 'At the door'], ['lane', 'From the lane'], ['drains', 'Drains'], ['cut', 'Cut-away'], ['plan', 'Plan']]
 };
-function viewsFor(){ return S.level === 'first' ? VIEWS_FIRST : S.level === 'both' ? VIEWS_BOTH : VIEWS; }
+function viewsFor(){ return S.level === 'first' ? VIEWS_FIRST : S.level === 'both' ? VIEWS_BOTH : S.level === 'front' ? VIEWS_FRONT : VIEWS; }
 function renderViews(){
   var host = $('#views'); host.innerHTML = '';
   VIEW_SETS[S.level || 'ground'].forEach(function(v){ var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-view', v[0]); b.textContent = v[1]; host.appendChild(b); });
@@ -3317,6 +3571,7 @@ function setEyeMode(eye){
 function applyView(name, instant){
   var VS = viewsFor();
   if (!VS[name]) name = 'overview';
+  if (S.level === 'front' && name === 'cut' && !(S.yard === 'after' && S.under)) { S.yard = 'after'; S.under = true; build(); }
   var v = (S.level === 'ground' && name === 'wardrobe' && WARDROBE_VIEW[S.scene]) ? Object.assign({}, VIEWS.wardrobe, WARDROBE_VIEW[S.scene]) : VS[name];
   S.view = name;
   var wantCeil = !!v.eye, wantCut = !v.eye;
@@ -3357,7 +3612,7 @@ window.addEventListener('keydown', function(e){
   if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].indexOf(e.code) >= 0) {
     keys[e.code] = true; if (e.code.indexOf('Arrow') === 0) e.preventDefault();
   }
-  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey) { if (S.level === 'first') setKitchen(S.kitchen === 'today' ? 'stage1' : S.kitchen === 'stage1' ? 'ikea' : 'today'); else setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
+  if (e.code === 'KeyB' && !e.metaKey && !e.ctrlKey) { if (S.level === 'front') setYard(S.yard === 'after' ? 'before' : 'after'); else if (S.level === 'first') setKitchen(S.kitchen === 'today' ? 'stage1' : S.kitchen === 'stage1' ? 'ikea' : 'today'); else setScene(S.scene === 'before' ? (S.lastAfter || 'E') : 'before'); }
 });
 window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 window.addEventListener('blur', function(){ keys = {}; padHeld = null; });
@@ -3477,10 +3732,14 @@ INFO.stage1 = {h: '1st floor: kitchen, stage 1', rows: [['New, back wall', 'base
   note: 'The kitchen after the first order, built yourselves. The new wall cabinets hang where the finished kitchen needs them, so they meet today\'s tiles a little differently. The 60 cm above the gas hob stays empty: a hood must sit 65 cm above gas. Steps and cart check are on the kitchen page, S-1.'};
 INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Side wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
   note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
+INFO.frontBefore = {h: 'Outside: the forecourt today', rows: [['Surface', 'old asphalt, cracked and patched'], ['At the façade', 'a light channel grating, garage to front door'], ['Low spot', 'around the manhole, in front of the door'], ['Water comes from', 'the lane, which runs down into the yard'], ['Garage', 'sandbags at the threshold']],
+  note: 'From your photos and video of May to November 2026. Nobody has measured the yard, so sizes outside are ±30 cm. Tick “Rain” to see where the water goes, and switch to “After the works”.'};
+INFO.frontAfter = {h: 'Outside: after the forecourt works', rows: [['Re-surfaced', '42 m², dug out 30–40 cm and rebuilt'], ['Build-up', '40 cm of 0/80 crushed stone, a 0/20 levelling layer, 7 cm of hot asphalt'], ['Rainwater pipe', 'PVC 125, 7 m, in fine gravel'], ['Channel drain', '3 m, reinforced, set in concrete'], ['Masonry gutter', '3 m, built by hand'], ['Source', 'the contractor\'s quote of March 2026']],
+  note: 'The quantities are the quote\'s. The quote gives no positions, so the layout here is my reading: the channel drain in front of the garage, the gutter in front of the door, and the pipe from the yard gullies to the manhole. Ask the contractor to mark the real positions and the falls on the ground before work starts. Tick “Cut-away” to see the layers and the pipe.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
 function updateInfo(){
-  var I = S.level === 'first' ? (S.kitchen === 'ikea' ? INFO.ikea : S.kitchen === 'stage1' ? INFO.stage1 : INFO.first) : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
+  var I = S.level === 'front' ? (S.yard === 'after' ? INFO.frontAfter : INFO.frontBefore) : S.level === 'first' ? (S.kitchen === 'ikea' ? INFO.ikea : S.kitchen === 'stage1' ? INFO.stage1 : INFO.first) : S.level === 'both' ? INFO.both : INFO[S.scene], el = $('#info');
   el.innerHTML = '<h3></h3><dl></dl><p class="hint"></p>';
   el.querySelector('h3').textContent = I.h;
   var dl = el.querySelector('dl');
@@ -3490,13 +3749,19 @@ function updateInfo(){
 function pressed(sel, attr, val){ document.querySelectorAll(sel + ' [data-' + attr + ']').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-' + attr) === val ? 'true' : 'false'); }); }
 function syncUI(){
   pressed('#levels', 'level', S.level); syncObjUI();
-  $('#sec-scene').style.display = S.level === 'first' ? 'none' : '';
-  $('#sec-kitchen').style.display = S.level === 'ground' ? 'none' : ''; pressed('#kitchens', 'kitchen', S.kitchen);
-  ['t-flood', 't-build', 't-open'].forEach(function(id){ $('#' + id).disabled = S.level === 'first'; });
+  var out = S.level === 'front';
+  $('#sec-scene').style.display = S.level === 'first' || out ? 'none' : '';
+  $('#sec-kitchen').style.display = S.level === 'ground' || out ? 'none' : ''; pressed('#kitchens', 'kitchen', S.kitchen);
+  $('#sec-yard').style.display = out ? '' : 'none'; pressed('#yards', 'yard', S.yard);
+  ['t-flood', 't-build', 't-open'].forEach(function(id){ $('#' + id).disabled = S.level === 'first' || (out && id !== 't-flood'); });
+  ['t-ceiling', 't-cut', 't-lamps'].forEach(function(id){ $('#' + id).disabled = out; });
+  $('#lab-flood').textContent = out ? 'Rain: where the water goes' : 'Flood 50 cm + barrier';
+  $('#row-under').style.display = out ? '' : 'none'; $('#t-under').checked = !!S.under; $('#t-under').disabled = S.yard !== 'after';
+  $('#sec-objects').style.display = out ? 'none' : ''; $('#sec-fin').style.display = out ? 'none' : '';
   pressed('#scenes', 'scene', S.scene); pressed('#views', 'view', S.view); pressed('#fronts', 'front', S.front);
   pressed('#floors', 'floor', S.floor); pressed('#paints', 'paint', S.paint);
   [['t-ceiling', 'ceiling'], ['t-cut', 'cut'], ['t-labels', 'labels'], ['t-lamps', 'lamps'], ['t-flood', 'flood'], ['t-build', 'build'], ['t-open', 'open'], ['t-hq', 'hq']].forEach(function(p){ $('#' + p[0]).checked = !!S[p[1]]; });
-  $('#sec-front').style.display = (S.level !== 'first' && (S.scene === 'A' || S.scene === 'B' || S.scene === 'C' || S.scene === 'E')) ? '' : 'none';
+  $('#sec-front').style.display = (S.level !== 'first' && !out && (S.scene === 'A' || S.scene === 'B' || S.scene === 'C' || S.scene === 'E')) ? '' : 'none';
   $('#floors').style.display = S.level === 'first' ? 'none' : '';
   $('#t-open').parentNode.style.opacity = (S.level === 'first' || S.scene === 'before' || S.scene === 'D') ? 0.45 : 1;
 }
@@ -3510,12 +3775,20 @@ function setScene(sc){
 document.querySelectorAll('#scenes [data-scene]').forEach(function(b){ b.addEventListener('click', function(){ setScene(b.getAttribute('data-scene')); }); });
 $('#views').addEventListener('click', function(e){ var b = e.target.closest('[data-view]'); if (b) applyView(b.getAttribute('data-view')); });
 function setLevel(l){
+  if ((S.level === 'front') !== (l === 'front')) S.flood = false;   // rain outdoors and the flood indoors share one tick box
   S.level = l; renderViews(); if (l === 'both') { S.ceiling = false; S.cut = true; }
   build(); applyView('overview'); syncUI(); persist();
-  try { history.replaceState(null, '', l === 'first' && S.kitchen === 'ikea' ? '#kitchen' : l === 'first' && S.kitchen === 'stage1' ? '#stage1' : '#' + l); } catch (e) {}
-  toast(l === 'first' ? '1st floor' : l === 'both' ? 'Both floors' : 'Ground floor');
+  try { history.replaceState(null, '', l === 'first' && S.kitchen === 'ikea' ? '#kitchen' : l === 'first' && S.kitchen === 'stage1' ? '#stage1' : l === 'front' && S.yard === 'after' ? '#front-after' : '#' + l); } catch (e) {}
+  toast(l === 'first' ? '1st floor' : l === 'both' ? 'Both floors' : l === 'front' ? 'Outside' : 'Ground floor');
 }
 document.querySelectorAll('#levels [data-level]').forEach(function(b){ b.addEventListener('click', function(){ setLevel(b.getAttribute('data-level')); }); });
+function setYard(y){
+  S.yard = y === 'after' ? 'after' : 'before'; if (S.yard === 'before') S.under = false; build(); syncUI(); persist();
+  try { history.replaceState(null, '', S.yard === 'after' ? '#front-after' : '#front'); } catch (e) {}
+  toast(S.yard === 'after' ? 'After the works' : 'Today');
+}
+document.querySelectorAll('#yards [data-yard]').forEach(function(b){ b.addEventListener('click', function(){ setYard(b.getAttribute('data-yard')); }); });
+$('#t-under').addEventListener('change', function(e){ S.under = e.target.checked; build(); syncUI(); persist(); if (S.under) applyView('cut'); });
 function setKitchen(k){
   S.kitchen = k === 'ikea' || k === 'stage1' ? k : 'today'; build(); syncUI(); persist();
   try { history.replaceState(null, '', S.level === 'first' ? (S.kitchen === 'ikea' ? '#kitchen' : S.kitchen === 'stage1' ? '#stage1' : '#first') : '#' + S.level); } catch (e) {}
@@ -3539,7 +3812,7 @@ $('#shot').addEventListener('click', function(){
   renderer.render(scene, camera);
   try {
     var url = canvas.toDataURL('image/png'), a = document.createElement('a');
-    a.href = url; a.download = 'house-' + (S.level === 'first' ? '1st-floor' + (S.kitchen === 'ikea' ? '-ikea-kitchen' : S.kitchen === 'stage1' ? '-kitchen-stage-1' : '') : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
+    a.href = url; a.download = 'house-' + (S.level === 'front' ? 'outside-' + S.yard : S.level === 'first' ? '1st-floor' + (S.kitchen === 'ikea' ? '-ikea-kitchen' : S.kitchen === 'stage1' ? '-kitchen-stage-1' : '') : (S.level === 'both' ? 'both-floors-' : 'ground-') + (S.scene === 'before' ? 'before' : 'option-' + S.scene)) + '.png';
     document.body.appendChild(a); a.click(); a.remove(); toast('Picture saved');
   } catch (e) { toast('This viewer blocks downloads. Open the file in a browser to save pictures.'); }
 });
@@ -3584,7 +3857,7 @@ syncUI();
 applyView(viewsFor()[S.view] ? S.view : 'overview', true);
 $('#loading').remove();
 requestAnimationFrame(frame);
-window.__hall = {S: S, build: build, applyView: applyView, setScene: setScene, setLevel: setLevel, setKitchen: setKitchen, camera: camera, controls: controls, renderer: renderer, scene: scene,
+window.__hall = {S: S, build: build, applyView: applyView, setScene: setScene, setLevel: setLevel, setKitchen: setKitchen, setYard: setYard, camera: camera, controls: controls, renderer: renderer, scene: scene,
   objs: function(){ return OBJS; }, hideObj: hideObj, restoreObj: restoreObj, setRmMode: setRmMode, objAt: objAt};
 })();
 
