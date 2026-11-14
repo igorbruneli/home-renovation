@@ -3346,7 +3346,7 @@ function buildFront(after){
     box(0.10, YG, FZ + 0.555, 4.50, YG + 0.012, FZ + 0.685, MAT.xGrate, null, false);
     // sandbags against the garage door
     for (i = 0; i < 5; i++) rbox(0.33 + i * 0.44, YG, FZ + 0.03, 0.75 + i * 0.44, YG + 0.13, FZ + 0.30, MAT.potWhite, 0.05);
-    xGully(-0.25, FZ + 0.95); xGully(5.0, FZ + 3.2); xGully(7.0, FZ + 1.4, true); xGully(6.6, FZ + 5.9);
+    xGully(-0.25, FZ + 0.95); xGully(7.0, FZ + 1.4, true);   // only two gullies today, both by the façade
     label('Old asphalt, cracked and patched', 3.2, 0.25, FZ + 4.4, 'dim'); label('Light channel grating', 1.3, 0.3, FZ + 0.62); label('Sandbags at the garage door', 1.4, 0.75, FZ + 0.2, 'dim');
     label('Low spot: water stands here', 3.0, 0.3, FZ + 1.9);
   } else {
@@ -3359,7 +3359,8 @@ function buildFront(after){
     box(-0.10, YG, FZ + 0.44, 2.90, YG + 0.010, FZ + 0.80, MAT.concrete, null, false); box(-0.06, YG, FZ + 0.52, 2.86, YG + 0.016, FZ + 0.72, MAT.xGrate, null, false);
     // hand-built masonry gutter in front of the door (3 m): a dished concrete channel
     box(2.90, YG, FZ + 0.42, 5.90, YG + 0.010, FZ + 0.82, MAT.concrete, null, false); box(2.90, YG, FZ + 0.54, 5.90, YG + 0.013, FZ + 0.70, MAT.grey, null, false);
-    xGully(-0.25, FZ + 0.95); xGully(5.0, FZ + 3.2); xGully(7.0, FZ + 1.4); xGully(6.6, FZ + 5.9);
+    xGully(-0.25, FZ + 0.95); xGully(7.0, FZ + 1.4); xGully(5.0, FZ + 3.2); xGully(6.6, FZ + 5.9);
+    label('New gully (assumed)', 5.0, 0.3, FZ + 3.2, 'dim'); label('New gully (assumed)', 6.6, 0.3, FZ + 5.9, 'dim');
     // rainwater pipe, underground: marked on the surface as a dashed line (7 m)
     xDash(6.6, FZ + 5.9, 5.0, FZ + 3.2, pit); xDash(5.0, FZ + 3.2, 3.0, FZ + 1.45, pit); xDash(2.9, FZ + 0.62, 3.0, FZ + 1.45);
     label('New asphalt, 42 m²: 7 cm on 40 cm of crushed stone', 2.2, 0.25, FZ + 4.2);
@@ -3732,10 +3733,10 @@ INFO.stage1 = {h: '1st floor: kitchen, stage 1', rows: [['New, back wall', 'base
   note: 'The kitchen after the first order, built yourselves. The new wall cabinets hang where the finished kitchen needs them, so they meet today\'s tiles a little differently. The 60 cm above the gas hob stays empty: a hood must sit 65 cm above gas. Steps and cart check are on the kitchen page, S-1.'};
 INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Side wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
   note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
-INFO.frontBefore = {h: 'Outside: the forecourt today', rows: [['Surface', 'old asphalt, cracked and patched'], ['At the façade', 'a light channel grating, garage to front door'], ['Low spot', 'around the manhole, in front of the door'], ['Water comes from', 'the lane, which runs down into the yard'], ['Garage', 'sandbags at the threshold']],
+INFO.frontBefore = {h: 'Outside: the forecourt today', rows: [['Surface', 'old asphalt, cracked and patched'], ['At the façade', 'a light channel grating, garage to front door'], ['Low spot', 'around the manhole, in front of the door'], ['Gullies', 'two, both against the façade'], ['Water comes from', 'the lane, which runs down into the yard'], ['Garage', 'sandbags at the threshold']],
   note: 'From your photos and video of May to November 2026. Nobody has measured the yard, so sizes outside are ±30 cm. Tick “Rain” to see where the water goes, and switch to “After the works”.'};
 INFO.frontAfter = {h: 'Outside: after the forecourt works', rows: [['Re-surfaced', '42 m², dug out 30–40 cm and rebuilt'], ['Build-up', '40 cm of 0/80 crushed stone, a 0/20 levelling layer, 7 cm of hot asphalt'], ['Rainwater pipe', 'PVC 125, 7 m, in fine gravel'], ['Channel drain', '3 m, reinforced, set in concrete'], ['Masonry gutter', '3 m, built by hand'], ['Source', 'the contractor\'s quote of March 2026']],
-  note: 'The quantities are the quote\'s. The quote gives no positions, so the layout here is my reading: the channel drain in front of the garage, the gutter in front of the door, and the pipe from the yard gullies to the manhole. Ask the contractor to mark the real positions and the falls on the ground before work starts. Tick “Cut-away” to see the layers and the pipe.'};
+  note: 'The quantities are the quote\'s. The quote gives no positions, so the layout here is my reading: the channel drain in front of the garage, the gutter in front of the door, and the pipe from two new gullies in the yard to the manhole. Today the yard has no gullies away from the façade, so those two are an assumption. Ask the contractor to mark the real positions and the falls on the ground before work starts. Tick “Cut-away” to see the layers and the pipe.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
   note: 'The posts and the stairs line up from floor to floor. Switch to one floor to walk through it.'};
 function updateInfo(){
