@@ -101,7 +101,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
   <div id="loading">Building the model…</div>
   <aside id="panel" aria-label="Model controls">
     <div class="p-head">
-      <div><b>MAISON · 3D MODEL</b><span>Ground floor, 1st floor and the front · from the plans and your photos</span></div>
+      <div><b>MAISON · 3D MODEL</b><span>One house, inside and out · from the plans and your photos</span></div>
       <button class="btn" id="collapse" type="button" aria-expanded="true">Hide</button>
     </div>
     <div class="p-body">
@@ -193,7 +193,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
       <div class="sec">
         <div class="lab">Image</div>
         <div class="seg"><button type="button" class="btn" id="shot">Save picture (PNG)</button></div>
-        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or step through the kitchen stages (1st floor).</p>
+        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. Zoom out from a floor to see the whole house from the yard. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or step through the kitchen stages (1st floor).</p>
       </div>
     </div>
   </aside>
@@ -1825,9 +1825,16 @@ function clipped(m){
   var c = CLIPPED.get(m); if (!c) { c = m.clone(); c.clippingPlanes = [CUT_PLANE]; c.clipShadows = true; if (m.envMap) c.envMap = m.envMap; CLIPPED.set(m, c); }
   return c;
 }
+// the house shell (façade, party walls, roof) has its own cut: at the height of the walls when you look inside, gone when you zoom out
+var SHELL_PLANE = new T.Plane(new T.Vector3(0, -1, 0), 100), SHELLMATS = new Map(), SHELLING = false, SHELL = {on: false, h: 100, cutH: 1.25, full: false, far: false, told: false};
+function shellMat(m){
+  if (Array.isArray(m)) return m.map(shellMat);
+  var c = SHELLMATS.get(m); if (!c) { c = m.clone(); c.clippingPlanes = [SHELL_PLANE]; c.clipShadows = true; if (m.envMap) c.envMap = m.envMap; SHELLMATS.set(m, c); }
+  return c;
+}
 function add(geo, mat, parent, cast, receive){
-  if (CLIP) mat = clipped(mat);
-  var m = new T.Mesh(geo, mat); m.castShadow = cast !== false; m.receiveShadow = receive !== false; (parent || OBJ || ROOT).add(m); return m;
+  if (CLIP) mat = clipped(mat); else if (SHELLING) mat = shellMat(mat);
+  var m = new T.Mesh(geo, mat); m.castShadow = cast !== false; m.receiveShadow = receive !== false; if (SHELLING) m.userData.shell = true; (parent || OBJ || ROOT).add(m); return m;
 }
 function box(x1, y1, z1, x2, y2, z2, mat, parent, cast){
   var w = Math.max(1e-4, Math.abs(x2 - x1)), h = Math.max(1e-4, Math.abs(y2 - y1)), d = Math.max(1e-4, Math.abs(z2 - z1));
@@ -1919,7 +1926,7 @@ function buildFloors(after){
   var por = after && S.floor === 'porcelain';
   plane(3.00, 0, 7.33, 5.80, 0, por ? MAT.tilePo : MAT.tileEx, por ? 2.40 : 2.64);
   plane(0, 0, 2.80, 5.80, 0, MAT.concrete, 1.5);
-  plane(-12, -10, 20, 18, -0.02, MAT.ground, 4);
+  if (S.level === 'both') plane(-12, -10, 20, 18, -0.02, MAT.ground, 4);
   if (after && !por) {
     var m = plane(4.85, 3.13, 4.95, 5.80, 0.0015, MAT.tileStrip, 2.64);
     m.receiveShadow = true;
@@ -2657,7 +2664,7 @@ function babyGate(x1, z1, x2, z2, y0){
   cyl(top[0], top[1], top[2], 0.012, L - 0.04, MAT.white, null, alongX ? 'x' : 'z', 8); cyl(bot[0], bot[1], bot[2], 0.012, L - 0.04, MAT.white, null, alongX ? 'x' : 'z', 8);
   for (var i = 1; i < n; i++) { var q = at(i * L / n, y0 + h / 2); cyl(q[0], q[1], q[2], 0.006, h - 0.05, MAT.white, null, 'y', 6); }
 }
-function frenchWindow(x1, x2, yB, h, tag){
+function frenchWindow(x1, x2, yB, h, tag, outside){   // outside: drawn by the house shell for a storey that isn't built (dark glass, no curtains)
   var zf1 = 6.00, zf2 = 6.07, f = 0.06, mid = (x1 + x2) / 2;
   box(x1, yB, zf1, x1 + f, yB + h, zf2, MAT.white); box(x2 - f, yB, zf1, x2, yB + h, zf2, MAT.white); box(x1, yB + h - f, zf1, x2, yB + h, zf2, MAT.white);
   box(x1, yB, zf1, x2, yB + 0.03, 6.10, MAT.white);
@@ -2665,19 +2672,20 @@ function frenchWindow(x1, x2, yB, h, tag){
     var a = lf[0], b = lf[1], fw = 0.075;
     box(a, yB + 0.03, 5.99, a + fw, yB + h - f, 6.06, MAT.white); box(b - fw, yB + 0.03, 5.99, b, yB + h - f, 6.06, MAT.white);
     box(a, yB + 0.03, 5.99, b, yB + 0.16, 6.06, MAT.white); box(a, yB + h - f - fw, 5.99, b, yB + h - f, 6.06, MAT.white);
-    var gl = box(a + fw, yB + 0.16, 6.02, b - fw, yB + h - f - fw, 6.03, MAT.glass, null, false); gl.renderOrder = 2;
-    if (i === 0) { box(b - 0.05, yB + 1.05, 5.965, b - 0.03, yB + 1.20, 5.99, MAT.white); box(b - 0.12, yB + 1.10, 5.955, b - 0.03, yB + 1.12, 5.965, MAT.white); }
+    var gl = box(a + fw, yB + 0.16, 6.02, b - fw, yB + h - f - fw, 6.03, outside ? MAT.xWinGlass : MAT.glass, null, false); if (!outside) gl.renderOrder = 2;
+    if (i === 0 && !outside) { box(b - 0.05, yB + 1.05, 5.965, b - 0.03, yB + 1.20, 5.99, MAT.white); box(b - 0.12, yB + 1.10, 5.955, b - 0.03, yB + 1.12, 5.965, MAT.white); }
   });
-  // balconnet (wrought iron) on the façade
-  var bx1 = x1 - 0.06, bx2 = x2 + 0.06, bz = 6.36;
+  // balconnet (wrought iron) in the window reveal, as in the façade photos
+  var bx1 = x1 + 0.015, bx2 = x2 - 0.015, bz = 6.26;
   box(bx1, yB + 0.98, bz - 0.02, bx2, yB + 1.01, bz + 0.02, MAT.iron); box(bx1, yB + 0.08, bz - 0.015, bx2, yB + 0.10, bz + 0.015, MAT.iron);
   for (var x = bx1 + 0.02; x <= bx2; x += 0.11) cyl(x, yB + 0.54, bz, 0.007, 0.9, MAT.iron, null, 'y', 6);
   for (var k = 0; k < Math.floor((bx2 - bx1) / 0.22); k++) { var tor = add(new T.TorusGeometry(0.045, 0.006, 6, 18, Math.PI * 1.5), MAT.iron); tor.position.set(bx1 + 0.13 + k * 0.22, yB + 0.80, bz); }
   [[bx1, bz], [bx2, bz]].forEach(function(p){ cyl(p[0], yB + 0.5, p[1] - 0.03, 0.012, 1.0, MAT.iron); });
-  // flower boxes on the railing
-  beginObj('Window boxes (' + tag + ')');
+  // flower boxes hung on the railing
+  if (!outside) beginObj('Window boxes (' + tag + ')');
   [x1 + 0.05, mid + 0.06].forEach(function(fx){ box(fx, yB + 0.78, bz + 0.03, fx + 0.48, yB + 0.95, bz + 0.2, MAT.terracotta);
     for (var j = 0; j < 6; j++) { var lf = add(new T.SphereGeometry(0.05, 8, 6), j % 2 ? MAT.leaf : MAT.geranium); lf.position.set(fx + 0.05 + j * 0.075, yB + 1.0, bz + 0.11); } });
+  if (outside) return;
   endObj();
   // curtains + rod + hanging plants
   beginObj('Curtains + plants (' + tag + ')');
@@ -2978,7 +2986,7 @@ function buildFirstInner(){
     {x1: BW.x2, x2: 7.83, z1: BW.s2, z2: ZK, t: 'stone', yb: -0.24},
     {x1: 3.11, x2: XT2, z1: BW.s3, z2: ZL - 0.40, t: 'stone', outer: 1, yb: -0.24},                                      // step in the party wall (the "A" walls)
     {x1: -0.5, x2: XT2, z1: ZL - 0.40, z2: ZL, t: 'stone', outer: 5, yb: -0.24},                                           // living-room back wall
-    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: L0 + 2.10}, {a: 4.65, b: 5.95, y0: 0, y1: 2.15}]},   // dining window: position and width from the façade photos
+    {x1: -0.5, x2: 7.83, z1: 5.90, z2: 6.30, t: 'stone', outer: 4, yb: -0.24, ops: [{a: 0.70, b: 1.90, y0: L0, y1: 2.15}, {a: 4.65, b: 5.95, y0: 0, y1: 2.15}]},   // dining window: position and width from the façade photos
     {x1: -0.5, x2: -0.10, z1: ZL - 0.40, z2: 5.90, t: 'stone', outer: 1, yb: -0.24},
     {x1: 7.68, x2: 7.83, z1: ZK - 0.53, z2: 5.90, t: 'stone', outer: 0, yb: -0.24},
     {x1: 7.43, x2: 7.68, z1: ZK, z2: 5.90, t: 'stone', yb: -0.24, ops: [{a: 2.85, b: 3.45, y0: 0.95, y1: 1.75}]},
@@ -3110,7 +3118,7 @@ function buildFirstInner(){
   O('Dyson vacuum', function(){ box(SX2 + 0.16, 0.95, SZB + 0.04, SX2 + 0.19, 1.12, SZB + 0.12, MAT.grey); cyl(SX2 + 0.26, 1.05, SZB + 0.08, 0.05, 0.22, MAT.purple); cyl(SX2 + 0.26, 0.9, SZB + 0.08, 0.055, 0.08, MAT.orange); cyl(SX2 + 0.26, 0.45, SZB + 0.08, 0.01, 0.8, MAT.grey); });
 
   /* ---- living room: 3.49 × 5.25 m, one step up ---- */
-  frenchWindow(0.70, 1.90, L0, 2.10, 'living room'); radiatorZ(0.02, 0.62, L0 + 0.15, L0 + 0.75);
+  frenchWindow(0.70, 1.90, L0, 2.15 - L0, 'living room'); radiatorZ(0.02, 0.62, L0 + 0.15, L0 + 0.75);
   O('Sofa', function(){ sofaL(L0); });
   O('Beige rug', function(){ plane(0.98, 2.65, 2.85, 4.45, L0 + 0.004, MAT.beigeRug, 1); });
   O('Play mat', function(){ plane(0.60, 4.50, 1.95, 5.60, L0 + 0.005, MAT.playmat, 1.4); });
@@ -3175,13 +3183,20 @@ function buildFirstInner(){
 }
 
 /* =====================================================================
-   OUTSIDE: the front of the house and the forecourt, before and after the surfacing and drainage works.
-   Built from six photos, a rainy-day video and the contractor's quote: 42 m² dug out and rebuilt (40 cm of 0/80,
-   a levelling layer of 0/20, 7 cm of hot asphalt), 7 m of PVC 125 rainwater pipe, 3 m of hand-built masonry gutter,
-   3 m of reinforced channel drain. The quote gives quantities, not positions: the layout of the drains is a reading.
-   x runs as indoors (garage side → neighbour's wall), z grows away from the façade, y = 0 at the doorstep.
+   THE HOUSE FROM OUTSIDE, AND THE FORECOURT
+   One shell for every view: façade, party walls, roof, neighbours and yard. In a floor view, the storey you are in
+   is the real model and the shell only wraps it (render skin, stone surrounds, shutters, sills, garage door, downpipe);
+   the other storeys are drawn whole from outside. Zoomed in, the shell is cut at the height of the walls; zoomed out,
+   the house is whole. Heights follow the rooms inside: ground floor 0–2.50, 1st floor at 2.74, 2nd floor at 5.40.
+   The yard: six photos, a rainy-day video and the contractor's quote (42 m² dug out and rebuilt: 40 cm of 0/80,
+   a 0/20 levelling layer, 7 cm of hot asphalt; 7 m of PVC 125 pipe; 3 m of masonry gutter; 3 m of channel drain).
+   The quote gives quantities, not positions: the layout of the drains is a reading.
+   x runs as indoors (garage side → neighbour's wall), z grows away from the back walls, y = 0 at the hall floor.
    ===================================================================== */
-var FZ = 6.30, FXE = 7.33, ZS = 13.3, ZC = 10.9, YG = -0.03, NEWZ = 11.66;   // façade plane, neighbour's wall, building opposite, neighbour's corner, yard level, edge of the new surface
+var FZ = 6.32, FXE = 7.33, ZS = 13.3, ZC = 10.9, YG = -0.03, NEWZ = 11.66;   // façade face, neighbour's wall, building opposite, neighbour's corner, yard level, edge of the new surface
+var HX1 = -0.52, HX2 = 7.85, HZB = -1.33, GT = 2.50, F2 = 5.40, EAV = 6.45;   // envelope: garage side, neighbour side, back; top of the ground storey, 2nd floor, top of the façade wall
+var RZ = 2.9, RY = 9.12, RFZ = FZ + 0.42, RFY = 6.90, RBZ = -1.45, RBY = 6.47;   // roof: ridge, front eave, back eave
+function roofY(z){ return z >= RZ ? RY - (z - RZ) * (RY - RFY) / (RFZ - RZ) : RY - (RZ - z) * (RY - RBY) / (RZ - RBZ); }
 var FRONT_READY = false;
 function frontMats(){
   if (FRONT_READY) return; FRONT_READY = true;
@@ -3263,20 +3278,6 @@ function slopeX(x1, y1, x2, y2, z1, z2, h, mat){   // slab rising along x
   var L = Math.hypot(x2 - x1, y2 - y1), gm = new T.BoxGeometry(L, h, z2 - z1); boxUV(gm, L, h, z2 - z1, mat);
   var m = add(gm, mat, null, false); m.rotation.z = Math.atan2(y2 - y1, x2 - x1); m.position.set((x1 + x2) / 2, (y1 + y2) / 2 - h / 2, (z1 + z2) / 2); return m;
 }
-function xWindow(a, b, y0, y1){   // french window seen from outside: painted surround, white frames, railing, flower boxes, shutters folded back
-  var mid = (a + b) / 2, zf = FZ - 0.17, sw = (b - a) / 2 + 0.015, f = 0.065;
-  box(a - 0.13, y0, FZ, a, y1, FZ + 0.012, MAT.xBand); box(b, y0, FZ, b + 0.13, y1, FZ + 0.012, MAT.xBand); box(a - 0.17, y1, FZ, b + 0.17, y1 + 0.30, FZ + 0.015, MAT.xBand); box(a - 0.13, y0 - 0.05, FZ - 0.02, b + 0.13, y0, FZ + 0.06, MAT.xStone);
-  box(a, y0, zf - 0.04, b, y1, zf - 0.03, MAT.xWinGlass, null, false);
-  box(a, y0, zf - 0.03, a + f, y1, zf + 0.03, MAT.white); box(b - f, y0, zf - 0.03, b, y1, zf + 0.03, MAT.white); box(a, y1 - f, zf - 0.03, b, y1, zf + 0.03, MAT.white); box(a, y0, zf - 0.03, b, y0 + 0.09, zf + 0.03, MAT.white);
-  box(mid - 0.05, y0, zf - 0.03, mid + 0.05, y1, zf + 0.04, MAT.white);
-  // railing in the reveal
-  var zr = FZ - 0.03; box(a, y0 + 0.93, zr - 0.012, b, y0 + 0.96, zr + 0.012, MAT.iron, null, false); box(a, y0 + 0.07, zr - 0.01, b, y0 + 0.09, zr + 0.01, MAT.iron, null, false); box(a, y0 + 0.50, zr - 0.008, b, y0 + 0.515, zr + 0.008, MAT.iron, null, false);
-  for (var x = a + 0.06; x < b - 0.02; x += 0.105) cyl(x, y0 + 0.515, zr, 0.006, 0.86, MAT.iron, null, 'y', 6);
-  [[a + 0.04, mid - 0.03], [mid + 0.03, b - 0.04]].forEach(function(fb){ box(fb[0], y0 + 0.80, zr + 0.02, fb[1], y0 + 0.93, zr + 0.17, MAT.dark);
-    for (var j = 0; j * 0.085 < fb[1] - fb[0] - 0.06; j++) { var lf = add(new T.SphereGeometry(0.055, 8, 6), j % 3 === 1 ? MAT.geranium : MAT.leaf); lf.position.set(fb[0] + 0.05 + j * 0.085, y0 + 0.98 + (j % 2) * 0.03, zr + 0.10); } });
-  // shutters, open flat against the wall
-  [[a - 0.14 - sw, a - 0.14], [b + 0.14, b + 0.14 + sw]].forEach(function(s){ box(s[0], y0 + 0.02, FZ + 0.03, s[1], y1 - 0.01, FZ + 0.065, MAT.xShutter); box(s[0] + 0.02, y0 + 1.25, FZ + 0.065, s[0] + 0.24, y0 + 1.28, FZ + 0.075, MAT.iron, null, false); });
-}
 function xGully(x, z, rust){ box(x - 0.2, YG, z - 0.2, x + 0.2, YG + 0.012, z + 0.2, rust ? MAT.xGullyRust : MAT.xGully, null, false); }
 function xArrow(x, z, ang, len){   // flat arrow on the ground: where the rain water runs
   var s = new T.Shape(), w = 0.11, L = len || 0.9, h = 0.3;
@@ -3288,58 +3289,129 @@ function xPipe(x1, z1, x2, z2, y, r, mat){ var L = Math.hypot(x2 - x1, z2 - z1),
 function xDash(x1, z1, x2, z2, skip){ var L = Math.hypot(x2 - x1, z2 - z1), n = Math.max(1, Math.round(L / 0.5)), ang = -Math.atan2(z2 - z1, x2 - x1);
   for (var i = 0; i < n; i++) { var t = (i + 0.5) / n, dx = x1 + (x2 - x1) * t, dz = z1 + (z2 - z1) * t; if (skip && dx > skip.x1 - 0.2 && dx < skip.x2 + 0.2 && dz > skip.z1 - 0.2 && dz < skip.z2 + 0.2) continue; var gp = group(dx, YG + 0.016, dz, ang); var m = add(new T.PlaneGeometry(0.3, 0.07), MAT.xMark, gp, false, false); m.rotation.x = -Math.PI / 2; } }
 
-function buildFront(after){
+var XLAB = true;
+function xlabel(t, x, y, z, c, s){ if (XLAB) label(t, x, y, z, c, s); }
+function sbox(x1, y1, z1, x2, y2, z2, mat, cap){   // a solid block the zoom cut may slice: the part below the cut is drawn whole, with a proper top
+  var h0 = SHELL.cutH;
+  if (!SHELLING || h0 <= y1 || h0 >= y2) return box(x1, y1, z1, x2, y2, z2, mat);
+  SHELLING = false; try { box(x1, y1, z1, x2, h0, z2, [mat, mat, cap, mat, mat, mat]); } finally { SHELLING = true; }
+  return box(x1, h0, z1, x2, y2, z2, mat);
+}
+function gable(x1, x2, pts, mat){   // a wall in the z–y plane, x1..x2 thick, outlined by [z, y] points
+  var sh = new T.Shape(); pts.forEach(function(p, i){ sh[i ? 'lineTo' : 'moveTo'](-p[0], p[1]); }); sh.closePath();
+  var m = add(new T.ExtrudeGeometry(sh, {depth: x2 - x1, bevelEnabled: false}), mat); m.rotation.y = Math.PI / 2; m.position.set(x1, 0, 0); return m;
+}
+
+function buildOutside(lvl, after){   // lvl: 'front' (nothing inside is built), 'ground' or 'first' (that storey is the real model)
   frontMats();
-  var R = MAT.xRender, i;
-  /* ---------- the house ---------- */
-  plane(-16, -8, 22, 26, after && S.under ? -0.9 : YG - 0.03, MAT.ground, 4);
-  box(-0.5, 0, -0.5, 7.83, 6.05, FZ - 0.47, R);                                    // body behind the façade
-  box(-0.5, 0, FZ - 0.46, FXE + 0.5, 6.05, FZ - 0.41, MAT.dark, null, false);      // darkness behind the openings
-  xwall(-0.5, FXE + 0.5, YG - 0.3, 2.36, FZ - 0.40, FZ, [{a: 0.30, b: 2.50, y0: YG - 0.3, y1: 2.0}, {a: 3.45, b: 4.30, y0: YG - 0.3, y1: 2.05}, {a: 5.69, b: 6.31, y0: 1.10, y1: 1.65}], R);
-  xwall(-0.5, FXE + 0.5, 2.36, 6.05, FZ - 0.40, FZ, [{a: 0.70, b: 1.90, y0: 2.42, y1: 4.55}, {a: 4.65, b: 5.95, y0: 2.42, y1: 4.55}], R);
-  // eaves: timber boarding, zinc gutter, tiled roof with a dormer and two flues
-  box(-0.5, 6.05, FZ - 0.05, FXE, 6.50, FZ + 0.30, MAT.xTimber); cyl((FXE - 0.5) / 2, 6.50, FZ + 0.37, 0.07, FXE + 0.5, MAT.xZinc, null, 'x', 14);
-  sloped(-0.5, 7.83, FZ + 0.42, 6.50, 2.9, 8.72, 0.07, MAT.xRoof); sloped(-0.5, 7.83, 2.9, 8.72, -0.9, 6.40, 0.07, MAT.xRoof);
-  [[-0.5, -0.42], [7.75, 7.83]].forEach(function(xx){ var sh = new T.Shape(); sh.moveTo(-FZ, 6.05); sh.lineTo(-2.9, 8.66); sh.lineTo(0.5, 6.05); sh.closePath(); var m = add(new T.ExtrudeGeometry(sh, {depth: xx[1] - xx[0], bevelEnabled: false}), R); m.rotation.y = Math.PI / 2; m.position.set(xx[0], 0, 0); });
-  box(4.9, 7.0, 4.55, 6.2, 7.75, 5.75, MAT.xTimber); box(5.0, 7.12, 5.75, 6.1, 7.6, 5.77, MAT.xWinGlass, null, false); sloped(4.8, 6.3, 5.95, 7.72, 4.4, 7.95, 0.05, MAT.xRoof);
-  cyl(2.3, 7.75, 4.4, 0.07, 0.9, MAT.metal); cyl(3.4, 7.9, 4.0, 0.06, 0.6, MAT.metal);
-  // downpipe at the garage-side corner: zinc, cast-iron foot
-  cyl(-0.38, 3.75, FZ + 0.09, 0.045, 5.5, MAT.xZinc); cyl(-0.38, 0.5, FZ + 0.09, 0.05, 1.06, MAT.xRedIron);
-  // garage door
-  box(0.30, YG, FZ - 0.16, 2.50, 2.0, FZ - 0.12, MAT.xGarage); box(0.16, YG, FZ, 0.30, 2.13, FZ + 0.012, MAT.xBand); box(2.50, YG, FZ, 2.64, 2.13, FZ + 0.012, MAT.xBand); box(0.16, 2.0, FZ, 2.64, 2.13, FZ + 0.012, MAT.xBand);
-  cyl(1.4, 1.0, FZ - 0.11, 0.03, 0.03, MAT.dark, null, 'z', 12); box(2.05, 0.25, FZ - 0.12, 2.38, 0.40, FZ - 0.105, MAT.grey, null, false);
-  box(0.2, YG - 0.02, FZ - 0.12, 2.6, YG + 0.012, FZ + 0.52, MAT.concrete, null, false);
-  // front door with its stone jambs and painted lintel
-  box(3.47, 0.02, FZ - 0.22, 4.28, 2.04, FZ - 0.17, MAT.xDoor); box(3.40, YG - 0.02, FZ - 0.25, 4.35, 0.015, FZ + 0.07, MAT.xStone);
-  for (i = 0; i < 6; i++) { var w1 = i % 2 ? 0.24 : 0.34, w2 = i % 2 ? 0.34 : 0.24, yb = i * 0.342; box(3.45 - w1, yb, FZ - 0.02, 3.45, yb + 0.33, FZ + 0.022, MAT.xStone); box(4.30, yb, FZ - 0.02, 4.30 + w2, yb + 0.33, FZ + 0.022, MAT.xStone); }
-  box(3.08, 2.05, FZ, 4.67, 2.30, FZ + 0.02, MAT.xBand);
-  plane(3.5, FZ + 0.10, 4.25, FZ + 0.58, YG + 0.014, MAT.coir, 0.6);
+  var out = lvl === 'front';
+  XLAB = out; SHELLING = !out;
+  try { houseShell(lvl); } finally { SHELLING = false; }
+  try { frontYard(out, after); } finally { XLAB = true; }
+}
+
+function houseShell(lvl){
+  var R = MAT.xRender, F = MAT.facade, CAP = MAT.capStone, D = MAT.dark, gFull = lvl !== 'ground', fFull = lvl !== 'first', i;
+  var GOPS = [{a: 0.30, b: 2.50, y0: -0.33, y1: 2.05}, {a: 3.45, b: 4.30, y0: -0.33, y1: 2.10}, {a: 5.69, b: 6.31, y0: 1.15, y1: 1.70}];
+  var FOPS = [{a: 0.70, b: 1.90, y0: Y1 + LIV, y1: Y1 + 2.15}, {a: 4.65, b: 5.95, y0: Y1, y1: Y1 + 2.15}];
+  /* ---------- ground storey: garage, front door, hall window ---------- */
+  xwall(HX1, HX2, -0.33, GT, gFull ? 5.80 : FZ - 0.02, FZ, GOPS, R);
+  if (gFull) {   // drawn whole: a solid storey under the 1st floor, with the stairwell going down into it
+    var B0 = [F, F, CAP, F, D, F], x1 = HX1 + 0.005, x2 = HX2 - 0.005, zb = HZB + 0.005;
+    if (lvl === 'first') {
+      var w = {x1: 3.47, x2: 4.40, z1: 1.93, z2: 4.32};
+      box(x1, -0.33, zb, x2, 1.24, 5.76, B0);
+      [[x1, zb, w.x1, 5.76], [w.x2, zb, x2, 5.76], [w.x1, zb, w.x2, w.z1], [w.x1, w.z2, w.x2, 5.76]].forEach(function(r){ box(r[0], 1.24, r[1], r[2], GT, r[3], B0); });
+    } else box(x1, -0.33, zb, x2, GT, 5.76, B0);
+    // the front door and the hall window as seen from the yard (inside the hall model they are its own)
+    box(3.47, 0, 5.84, 4.28, 2.08, 5.89, MAT.xDoor);
+    var wx1 = 5.69, wx2 = 6.31, wy1 = 1.15, wy2 = 1.70, f = 0.055;
+    box(wx1, wy1, 6.02, wx2, wy1 + f, 6.08, MAT.white); box(wx1, wy2 - f, 6.02, wx2, wy2, 6.08, MAT.white); box(wx1, wy1, 6.02, wx1 + f, wy2, 6.08, MAT.white); box(wx2 - f, wy1, 6.02, wx2, wy2, 6.08, MAT.white);
+    box(wx1 + f, wy1 + f, 6.045, wx2 - f, wy2 - f, 6.055, MAT.xWinGlass, null, false);
+    for (var gx = wx1 + 0.1; gx < wx2 - 0.05; gx += 0.105) cyl(gx, (wy1 + wy2) / 2, 6.24, 0.007, wy2 - wy1, MAT.iron);
+  } else {   // the hall is the real model: wrap its walls in the render and fill the space behind its back wall
+    box(HX1, -0.33, -0.52, -0.50, GT + 0.06, FZ - 0.02, F); box(7.83, -0.33, -0.52, HX2, GT + 0.06, FZ - 0.02, F);
+    sbox(HX1, -0.33, HZB, HX2, GT + 0.06, -0.52, F, MAT.xCut);   // not a room: cut grey like the neighbours
+    var dp = add(new T.PlaneGeometry(0.77, 2.045), MAT.xDoor, null, false); dp.position.set(3.875, 1.0325, 5.902);   // the front door's outer face, over the glazed door
+  }
+  // garage: painted surround, the outside of the up-and-over door, a concrete threshold
+  box(0.16, YG, FZ, 0.30, 2.18, FZ + 0.012, MAT.xBand); box(2.50, YG, FZ, 2.64, 2.18, FZ + 0.012, MAT.xBand); box(0.16, 2.05, FZ, 2.64, 2.18, FZ + 0.012, MAT.xBand);
+  box(0.30, YG, 6.11, 2.50, 2.05, 6.14, MAT.xGarage); cyl(1.4, 1.0, 6.15, 0.03, 0.03, MAT.dark, null, 'z', 12); box(2.05, 0.25, 6.14, 2.38, 0.40, 6.155, MAT.grey, null, false);
+  box(0.30, -0.06, 5.80, 2.50, -0.002, 6.11, MAT.concrete, null, false);
+  // front door: stone threshold and jambs, painted lintel, letterbox, bell, lamp
+  box(3.40, YG - 0.02, gFull ? 5.89 : 6.05, 4.35, 0.015, FZ + 0.07, MAT.xStone);
+  for (i = 0; i < 6; i++) { var w1 = i % 2 ? 0.24 : 0.34, w2 = i % 2 ? 0.34 : 0.24, yb = i * 0.35; box(3.45 - w1, yb, FZ - 0.02, 3.45, yb + 0.34, FZ + 0.022, MAT.xStone); box(4.30, yb, FZ - 0.02, 4.30 + w2, yb + 0.34, FZ + 0.022, MAT.xStone); }
+  box(3.08, 2.10, FZ, 4.67, 2.35, FZ + 0.02, MAT.xBand);
   box(4.74, 1.02, FZ, 4.98, 1.36, FZ + 0.10, MAT.black); box(4.75, 0.28, FZ, 4.97, 0.82, FZ + 0.05, MAT.white); box(4.50, 1.26, FZ, 4.56, 1.40, FZ + 0.03, MAT.dark);
-  box(3.16, 2.48, FZ, 3.26, 2.64, FZ + 0.05, MAT.white);
-  // small barred window
-  box(5.69, 1.10, FZ - 0.20, 6.31, 1.65, FZ - 0.19, MAT.xWinGlass, null, false); box(5.69, 1.10, FZ - 0.19, 5.73, 1.65, FZ - 0.15, MAT.white); box(6.27, 1.10, FZ - 0.19, 6.31, 1.65, FZ - 0.15, MAT.white); box(5.69, 1.61, FZ - 0.19, 6.31, 1.65, FZ - 0.15, MAT.white); box(5.69, 1.10, FZ - 0.19, 6.31, 1.14, FZ - 0.15, MAT.white);
-  box(5.52, 1.65, FZ - 0.02, 6.48, 1.84, FZ + 0.025, MAT.xStone); box(5.55, 0.97, FZ - 0.02, 6.45, 1.10, FZ + 0.04, MAT.xStone); box(5.52, 1.10, FZ - 0.02, 5.69, 1.65, FZ + 0.02, MAT.xStone); box(6.31, 1.10, FZ - 0.02, 6.48, 1.65, FZ + 0.02, MAT.xStone);
-  for (i = 0; i < 4; i++) cyl(5.78 + i * 0.148, 1.375, FZ - 0.06, 0.008, 0.55, MAT.iron, null, 'y', 6);
-  cyl(6.0, 1.26, FZ - 0.06, 0.006, 0.62, MAT.iron, null, 'x', 6); cyl(6.0, 1.50, FZ - 0.06, 0.006, 0.62, MAT.iron, null, 'x', 6);
-  xWindow(0.70, 1.90, 2.42, 4.55); xWindow(4.65, 5.95, 2.42, 4.55);
-  plant(6.75, YG, FZ + 0.25, 0.9, MAT.terracotta, false); plant(7.05, YG, FZ + 0.32, 0.7, MAT.potWhite, false);
-  /* ---------- the neighbours: plain volumes with just enough detail to recognise the yard ---------- */
-  box(-8.5, 0, -0.5, -0.5, 5.9, FZ - 0.12, MAT.xYellow); sloped(-8.5, -0.5, FZ + 0.25, 5.95, 2.9, 7.9, 0.07, MAT.xRoof);
-  [[-3.6, -2.7, 2.7, 4.2], [-6.4, -5.5, 2.7, 4.2], [-4.4, -3.5, 0, 2.05]].forEach(function(o){ box(o[0], o[2], FZ - 0.125, o[1], o[3], FZ - 0.11, MAT.xWinGlass, null, false); });
-  box(7.83, 0, -0.5, 12.8, 7.6, FZ, MAT.xCream); box(FXE, 0, FZ, 12.8, 7.6, ZC, MAT.xCream); box(FXE - 0.25, 7.6, -0.5, 13.0, 7.72, ZC + 0.25, MAT.xRoof);
-  box(FXE - 0.012, 1.35, 7.95, FXE, 1.95, 8.50, MAT.xWinGlass, null, false); [[1.22, 1.35, 7.82, 8.63], [1.95, 2.10, 7.82, 8.63], [1.35, 1.95, 7.82, 7.95], [1.35, 1.95, 8.50, 8.63]].forEach(function(s){ box(FXE - 0.03, s[0], s[2], FXE, s[1], s[3], MAT.xStone); });
-  box(FXE - 0.07, 1.05, 9.90, FXE, 1.45, 10.18, MAT.white); box(FXE - 0.07, 1.05, 10.24, FXE, 1.45, 10.52, MAT.white);
-  cyl(FXE - 0.06, 4.3, ZC - 0.08, 0.045, 6.5, MAT.xZinc); cyl(FXE - 0.06, 0.5, ZC - 0.08, 0.05, 1.06, MAT.xRedIron);
-  for (i = 0; i < 9; i++) box(FXE - 0.015, 3.0 + i * 0.5, ZC - (i % 2 ? 0.34 : 0.55), FXE, 3.45 + i * 0.5, ZC, MAT.xStone);
+  box(3.16, 2.53, FZ, 3.26, 2.69, FZ + 0.05, MAT.white);
+  // hall window: stone surround
+  box(5.52, 1.70, FZ - 0.02, 6.48, 1.89, FZ + 0.025, MAT.xStone); box(5.55, 1.02, FZ - 0.02, 6.45, 1.15, FZ + 0.04, MAT.xStone);
+  box(5.52, 1.15, FZ - 0.02, 5.69, 1.70, FZ + 0.02, MAT.xStone); box(6.31, 1.15, FZ - 0.02, 6.48, 1.70, FZ + 0.02, MAT.xStone);
+
+  /* ---------- 1st floor: living-room and dining windows ---------- */
+  xwall(HX1, HX2, GT, F2, fFull ? 5.90 : FZ - 0.02, FZ, FOPS, R);
+  if (fFull) {   // drawn whole, with a dark hole over the stairs that come up from the hall
+    var B1 = [F, F, F, F, D, F], u1 = HX1 + 0.005, u2 = HX2 - 0.005, ub = HZB + 0.005;
+    if (lvl === 'ground') {
+      var hw = {x1: 2.98, x2: 3.87, z1: 2.60, z2: 4.64};
+      [[u1, ub, hw.x1, 5.86], [hw.x2, ub, u2, 5.86], [hw.x1, ub, hw.x2, hw.z1], [hw.x1, hw.z2, hw.x2, 5.86]].forEach(function(r){ box(r[0], GT + 0.03, r[1], r[2], F2, r[3], B1); });
+      box(hw.x1, 3.40, hw.z1, hw.x2, F2, hw.z2, [F, F, F, D, F, F]);
+    } else box(u1, GT + 0.03, ub, u2, F2, 5.86, B1);
+  } else {   // the 1st floor is the real model: skin its outer walls, fill the corner behind the living room
+    box(HX1, GT, 0.23, -0.50, F2, FZ - 0.02, F); box(7.83, GT, HZB, HX2, F2, FZ - 0.02, F); box(3.09, GT, HZB, 7.83, F2, -1.31, F);
+    sbox(HX1, GT, HZB, 3.09, F2, 0.23, F, MAT.xCut);
+    box(3.45, 5.20, 1.65, 4.60, 6.0, 4.62, D);   // the stairs to the 2nd floor go up into the dark: that floor isn't modelled
+  }
+  FOPS.forEach(function(o){
+    var a = o.a, b = o.b, y0 = o.y0, y1 = o.y1, sw = (b - a) / 2 + 0.015;
+    box(a - 0.13, y0, FZ, a, y1, FZ + 0.012, MAT.xBand); box(b, y0, FZ, b + 0.13, y1, FZ + 0.012, MAT.xBand); box(a - 0.17, y1, FZ, b + 0.17, y1 + 0.30, FZ + 0.015, MAT.xBand);
+    box(a - 0.13, y0 - 0.05, FZ - 0.02, b + 0.13, y0, FZ + 0.06, MAT.xStone);
+    [[a - 0.14 - sw, a - 0.14], [b + 0.14, b + 0.14 + sw]].forEach(function(s){ box(s[0], y0 + 0.02, FZ + 0.03, s[1], y1 - 0.01, FZ + 0.065, MAT.xShutter); box(s[0] + 0.02, y0 + 1.25, FZ + 0.065, s[0] + 0.24, y0 + 1.28, FZ + 0.075, MAT.iron, null, false); });
+    if (fFull) frenchWindow(a, b, y0, y1 - y0, null, true);
+  });
+
+  /* ---------- 2nd floor and attic: not modelled inside; a plain wall to the eaves, party walls, the roof ---------- */
+  xwall(HX1, HX2, F2, EAV, 5.90, FZ, [], R);
+  [[HX1, HX1 + 0.2], [HX2 - 0.2, HX2]].forEach(function(xx){ gable(xx[0], xx[1], [[HZB, F2], [5.90, F2], [5.90, EAV], [FZ, EAV], [FZ, roofY(FZ) - 0.05], [RZ, RY - 0.05], [HZB, roofY(HZB) - 0.05]], F); });
+  box(HX1 + 0.2, F2, HZB, HX2 - 0.2, roofY(HZB) - 0.05, HZB + 0.2, F);
+  box(HX1 - 0.02, EAV, FZ - 0.05, HX2 + 0.02, RFY, FZ + 0.30, MAT.xTimber); cyl((HX1 + HX2) / 2, RFY, FZ + 0.37, 0.07, HX2 - HX1 + 0.04, MAT.xZinc, null, 'x', 14);
+  sloped(HX1, HX2, RFZ, RFY, RZ, RY, 0.07, MAT.xRoof); sloped(HX1, HX2, RZ, RY, RBZ, RBY, 0.07, MAT.xRoof);
+  box(4.9, 7.41, 4.55, 6.2, 8.16, 5.75, MAT.xTimber); box(5.0, 7.53, 5.75, 6.1, 8.01, 5.77, MAT.xWinGlass, null, false); sloped(4.8, 6.3, 5.95, 8.13, 4.4, 8.36, 0.05, MAT.xRoof);
+  cyl(2.3, 8.15, 4.4, 0.07, 0.9, MAT.metal); cyl(3.4, 8.3, 4.0, 0.06, 0.6, MAT.metal);
+  // downpipe at the garage-side corner: zinc, cast-iron foot
+  cyl(-0.38, 3.965, FZ + 0.09, 0.045, 5.87, MAT.xZinc); cyl(-0.38, 0.5, FZ + 0.09, 0.05, 1.06, MAT.xRedIron);
+  xlabel('Your façade', 3.4, 5.7, FZ + 0.1, 'room', 'garage · front door · hall window');
+}
+
+function frontYard(out, after){
+  var i, Y = MAT.xYellow, C = MAT.xCream;
+  plane(-16, -8, 22, 26, out && after && S.under ? -0.9 : YG - 0.03, MAT.ground, 4);
+  /* ---------- the neighbours: plain volumes with just enough detail to recognise the yard; cut low when you look inside ---------- */
+  if (out) {
+    box(-8.5, 0, HZB, HX1, 5.9, FZ - 0.12, Y); sloped(-8.5, HX1, FZ + 0.25, 5.95, 2.9, 7.9, 0.07, MAT.xRoof); sloped(-8.5, HX1, 2.9, 7.9, HZB - 0.25, 5.95, 0.07, MAT.xRoof);
+    [[-3.6, -2.7, 2.7, 4.2], [-6.4, -5.5, 2.7, 4.2], [-4.4, -3.5, 0, 2.05]].forEach(function(o){ box(o[0], o[2], FZ - 0.125, o[1], o[3], FZ - 0.11, MAT.xWinGlass, null, false); });
+    box(HX2, 0, HZB, 12.8, 7.6, FZ, C); box(FXE, 0, FZ, 12.8, 7.6, ZC, C); box(HX2, 7.6, HZB, 13.0, 7.72, FZ, MAT.xRoof); box(FXE - 0.25, 7.6, FZ, 13.0, 7.72, ZC + 0.25, MAT.xRoof);
+    box(FXE - 0.012, 1.35, 7.95, FXE, 1.95, 8.50, MAT.xWinGlass, null, false); [[1.22, 1.35, 7.82, 8.63], [1.95, 2.10, 7.82, 8.63], [1.35, 1.95, 7.82, 7.95], [1.35, 1.95, 8.50, 8.63]].forEach(function(s){ box(FXE - 0.03, s[0], s[2], FXE, s[1], s[3], MAT.xStone); });
+    box(FXE - 0.07, 1.05, 9.90, FXE, 1.45, 10.18, MAT.white); box(FXE - 0.07, 1.05, 10.24, FXE, 1.45, 10.52, MAT.white);
+    cyl(FXE - 0.06, 4.3, ZC - 0.08, 0.045, 6.5, MAT.xZinc);
+    for (i = 0; i < 9; i++) box(FXE - 0.015, 3.0 + i * 0.5, ZC - (i % 2 ? 0.34 : 0.55), FXE, 3.45 + i * 0.5, ZC, MAT.xStone);
+  } else {
+    box(-8.5, 0, HZB, HX1, 1.15, FZ - 0.12, [Y, Y, MAT.xCut, Y, Y, Y]); box(-4.4, 0, FZ - 0.125, -3.5, 1.15, FZ - 0.11, MAT.xWinGlass, null, false);
+    box(HX2, 0, HZB, 12.8, 1.15, FZ, [C, C, MAT.xCut, C, C, C]); box(FXE, 0, FZ, 12.8, 1.15, ZC, [C, C, MAT.xCut, C, C, C]);
+  }
+  cyl(FXE - 0.06, 0.5, ZC - 0.08, 0.05, 1.06, MAT.xRedIron);
   // the building opposite is cut low, like the dollhouse walls indoors, so it hides nothing and shades nothing
   box(1.0, 0, ZS, 12.8, 1.15, ZS + 2.2, [MAT.xGreyWall, MAT.xGreyWall, MAT.xCut, MAT.xGreyWall, MAT.xGreyWall, MAT.xGreyWall]);
   box(6.1, YG, ZS - 0.02, 7.0, 1.15, ZS, MAT.grey); rbox(3.2, 0.42, ZS - 0.36, 4.1, 1.02, ZS - 0.03, MAT.white, 0.03); cyl(3.52, 0.72, ZS - 0.365, 0.2, 0.012, MAT.dark, null, 'z', 20);
-  cyl(2.5, 0.57, ZS - 0.06, 0.045, 1.15, MAT.xZinc); label('Building opposite, cut low', 8.6, 1.35, ZS + 1.1, 'dim');
+  cyl(2.5, 0.57, ZS - 0.06, 0.045, 1.15, MAT.xZinc); xlabel('Building opposite, cut low', 8.6, 1.35, ZS + 1.1, 'dim');
   /* ---------- the ground ---------- */
   var OLD = MAT.xAsphOld, T6 = 6.4;
   plane(-8.5, FZ - 0.12, -0.5, 17, YG - 0.004, MAT.concrete, 1.5); plane(-0.5, ZS, 1.0, 17, YG - 0.002, OLD, T6);                 // the alley, toward the garage side
   var lane = slopeX(FXE, YG, 13.0, YG + 0.62, ZC, ZS, 0.03, MAT.xAsphOldB); lane.receiveShadow = true;                         // the lane, climbing away
   box(13.0, YG + 0.55, ZC, 13.3, YG + 0.62, ZS, MAT.dark, null, false);
+  box(0.2, YG - 0.02, FZ - 0.18, 2.6, YG + 0.012, FZ + 0.52, MAT.concrete, null, false);                                       // concrete apron at the garage
+  plane(3.5, FZ + 0.10, 4.25, FZ + 0.58, YG + 0.014, MAT.coir, 0.6);                                                            // door mat
+  plant(6.75, YG, FZ + 0.25, 0.9, MAT.terracotta, false); plant(7.05, YG, FZ + 0.32, 0.7, MAT.potWhite, false);
   if (!after) {
     plane(-0.5, FZ, FXE, ZS, YG, OLD, T6);
     // light channel grating along the façade, garage to front door
@@ -3347,10 +3419,10 @@ function buildFront(after){
     // sandbags against the garage door
     for (i = 0; i < 5; i++) rbox(0.33 + i * 0.44, YG, FZ + 0.03, 0.75 + i * 0.44, YG + 0.13, FZ + 0.30, MAT.potWhite, 0.05);
     xGully(-0.25, FZ + 0.95); xGully(7.0, FZ + 1.4, true);   // only two gullies today, both by the façade
-    label('Old asphalt, cracked and patched', 3.2, 0.25, FZ + 4.4, 'dim'); label('Light channel grating', 1.3, 0.3, FZ + 0.62); label('Sandbags at the garage door', 1.4, 0.75, FZ + 0.2, 'dim');
-    label('Low spot: water stands here', 3.0, 0.3, FZ + 1.9);
+    xlabel('Old asphalt, cracked and patched', 3.2, 0.25, FZ + 4.4, 'dim'); xlabel('Light channel grating', 1.3, 0.3, FZ + 0.62); xlabel('Sandbags at the garage door', 1.4, 0.75, FZ + 0.2, 'dim');
+    xlabel('Low spot: water stands here', 3.0, 0.3, FZ + 1.9);
   } else {
-    var NEW = MAT.xAsphNewP, T2 = 1.5, yN = YG + 0.004, pit = S.under ? {x1: 3.3, x2: 5.7, z1: 8.1, z2: 9.9} : null;
+    var NEW = MAT.xAsphNewP, T2 = 1.5, yN = YG + 0.004, pit = out && S.under ? {x1: 3.3, x2: 5.7, z1: 8.1, z2: 9.9} : null;
     plane(-0.5, NEWZ, FXE, ZS, YG, OLD, T6);                                                                                 // the strip beyond the new surface stays as it is
     if (pit) { plane(-0.5, FZ, pit.x1, NEWZ, yN, NEW, T2); plane(pit.x2, FZ, FXE, NEWZ, yN, NEW, T2); plane(pit.x1, FZ, pit.x2, pit.z1, yN, NEW, T2); plane(pit.x1, pit.z2, pit.x2, NEWZ, yN, NEW, T2); }
     else plane(-0.5, FZ, FXE, NEWZ, yN, NEW, T2);
@@ -3360,12 +3432,12 @@ function buildFront(after){
     // hand-built masonry gutter in front of the door (3 m): a dished concrete channel
     box(2.90, YG, FZ + 0.42, 5.90, YG + 0.010, FZ + 0.82, MAT.concrete, null, false); box(2.90, YG, FZ + 0.54, 5.90, YG + 0.013, FZ + 0.70, MAT.grey, null, false);
     xGully(-0.25, FZ + 0.95); xGully(7.0, FZ + 1.4); xGully(5.0, FZ + 3.2); xGully(6.6, FZ + 5.9);
-    label('New gully (assumed)', 5.0, 0.3, FZ + 3.2, 'dim'); label('New gully (assumed)', 6.6, 0.3, FZ + 5.9, 'dim');
+    xlabel('New gully (assumed)', 5.0, 0.3, FZ + 3.2, 'dim'); xlabel('New gully (assumed)', 6.6, 0.3, FZ + 5.9, 'dim');
     // rainwater pipe, underground: marked on the surface as a dashed line (7 m)
     xDash(6.6, FZ + 5.9, 5.0, FZ + 3.2, pit); xDash(5.0, FZ + 3.2, 3.0, FZ + 1.45, pit); xDash(2.9, FZ + 0.62, 3.0, FZ + 1.45);
-    label('New asphalt, 42 m²: 7 cm on 40 cm of crushed stone', 2.2, 0.25, FZ + 4.2);
-    label('Reinforced channel drain, 3 m', 1.4, 0.3, FZ + 0.62); label('Masonry gutter, 3 m', 4.9, 0.3, FZ + 0.62); label('PVC 125 rainwater pipe, 7 m, underground', 5.9, 0.3, FZ + 4.6);
-    label('Old surface stays beyond this joint', 1.6, 0.2, NEWZ + 0.7, 'dim');
+    xlabel('New asphalt, 42 m²: 7 cm on 40 cm of crushed stone', 2.2, 0.25, FZ + 4.2);
+    xlabel('Reinforced channel drain, 3 m', 1.4, 0.3, FZ + 0.62); xlabel('Masonry gutter, 3 m', 4.9, 0.3, FZ + 0.62); xlabel('PVC 125 rainwater pipe, 7 m, underground', 5.9, 0.3, FZ + 4.6);
+    xlabel('Old surface stays beyond this joint', 1.6, 0.2, NEWZ + 0.7, 'dim');
     if (pit) {   // cut-away: what the 42 m² are made of, and the pipe in its bed of fine gravel
       var x1 = pit.x1, x2 = pit.x2, z1 = pit.z1, z2 = pit.z2, L = [[-0.75, -0.565, MAT.xSoil], [-0.565, -0.165, MAT.xG80], [-0.165, -0.095, MAT.xG20], [-0.095, yN - 0.003, MAT.xAsphNew]];
       box(x1, -0.78, z1, x2, -0.62, z2, MAT.xSoil);                                                         // bottom of the trench
@@ -3376,22 +3448,22 @@ function buildFront(after){
       var px = function(xa){ return FZ + 3.2 - (5.0 - xa) / 2.0 * 1.75; };
       xPipe(4.78, px(4.78), 3.42, px(3.42), -0.50, 0.0625, MAT.xPipe);
       var bed = xPipe(4.5, px(4.5), 3.42, px(3.42), -0.585, 0.16, MAT.xG20); bed.scale.set(0.5, 1, 1.4);
-      label('7 cm hot asphalt', 5.5, 0.12, z1 + 0.25, 'dim'); label('0/20 levelling layer', 5.1, 0.0, z1 + 0.6, 'dim'); label('40 cm of 0/80 crushed stone', 4.7, -0.05, z1 + 0.95, 'dim'); label('PVC 125 in fine gravel', 3.45, 0.2, 7.95);
+      xlabel('7 cm hot asphalt', 5.5, 0.12, z1 + 0.25, 'dim'); xlabel('0/20 levelling layer', 5.1, 0.0, z1 + 0.6, 'dim'); xlabel('40 cm of 0/80 crushed stone', 4.7, -0.05, z1 + 0.95, 'dim'); xlabel('PVC 125 in fine gravel', 3.45, 0.2, 7.95);
     }
   }
   // manhole
   cyl(3.0, YG + 0.008, FZ + 1.45, 0.36, 0.016, MAT.xManhole, null, 'y', 32); cyl(3.0, YG + 0.004, FZ + 1.45, 0.42, 0.008, MAT.xIron, null, 'y', 32);
-  /* ---------- rain: where the water goes ---------- */
-  if (S.flood) {
+  /* ---------- rain: where the water goes (outside view only: indoors the same tick box is the 50 cm flood) ---------- */
+  if (out && S.flood) {
     var A = function(x, z, deg, len){ xArrow(x, z, deg * Math.PI / 180, len); };
     A(12.6, 12.4, 184, 1.1); A(11.0, 11.7, 186, 1.1); A(9.4, 12.5, 188, 1.1); A(8.0, 11.9, 200, 1.0);     // down the lane
     if (!after) {
       A(6.9, 11.2, 222, 1.0); A(6.0, 10.2, 236, 1.0); A(5.2, 9.0, 244, 1.0); A(4.4, 8.4, 250, 0.9); A(3.9, 10.6, 262, 1.0); A(2.6, 9.6, 270, 1.0); A(1.4, 9.2, 276, 0.9); A(5.9, 7.9, 205, 0.8); A(0.4, 8.4, 290, 0.8);
       xPuddle(3.0, FZ + 1.45, 1.5, 0.75); xPuddle(0.1, FZ + 1.05, 0.8, 0.5); xPuddle(4.9, FZ + 0.9, 0.9, 0.35); xPuddle(1.6, FZ + 0.9, 1.1, 0.3);
-      label('Rain runs down the lane, across the yard and stands at the door', 4.6, 0.9, FZ + 3.0, 'flood');
+      xlabel('Rain runs down the lane, across the yard and stands at the door', 4.6, 0.9, FZ + 3.0, 'flood');
     } else {
       A(7.25, 11.75, 240, 0.7); A(6.2, 10.4, 300, 0.7); A(5.9, 9.0, 235, 0.8); A(4.2, 9.9, 320, 0.8); A(2.2, 8.2, 280, 0.9); A(1.2, 8.1, 268, 0.9); A(4.6, 7.9, 262, 0.8); A(5.4, 7.7, 268, 0.7); A(0.3, 7.8, 250, 0.6);
-      label('The aim: rain is caught by the gullies, the gutter and the channel before it reaches the door', 4.6, 0.9, FZ + 3.0, 'flood');
+      xlabel('The aim: rain is caught by the gullies, the gutter and the channel before it reaches the door', 4.6, 0.9, FZ + 3.0, 'flood');
     }
   }
   // a car for scale, parked where yours usually stands
@@ -3400,7 +3472,7 @@ function buildFront(after){
   rbox(-2.0, 0.22, -0.82, 2.0, 0.78, 0.82, MAT.xCar, 0.16, car); rbox(-1.25, 0.74, -0.74, 1.05, 1.36, 0.74, MAT.xCar, 0.2, car); rbox(-1.15, 0.80, -0.75, 0.95, 1.28, 0.75, MAT.xWinGlass, 0.12, car).scale.set(1, 1, 1.004);
   [[-1.3, -0.8], [1.3, -0.8], [-1.3, 0.8], [1.3, 0.8]].forEach(function(wh){ cyl(wh[0], 0.31, wh[1], 0.31, 0.22, MAT.dark, car, 'z', 20); cyl(wh[0], 0.31, wh[1] + (wh[1] > 0 ? 0.115 : -0.115), 0.18, 0.01, MAT.metal, car, 'z', 16); });
   }
-  label('Your façade', 3.4, 5.2, FZ + 0.1, 'room', 'garage · front door · hall window'); label('Neighbour’s wall', FXE, 3.2, 8.9, 'dim'); label('The lane climbs away here', 10.2, 1.2, 12.1, 'dim'); label('Manhole', 3.0, 0.2, FZ + 1.45, 'dim');
+  xlabel('Neighbour’s wall', FXE, 3.2, 8.9, 'dim'); xlabel('The lane climbs away here', 10.2, 1.2, 12.1, 'dim'); xlabel('Manhole', 3.0, 0.2, FZ + 1.45, 'dim');
 }
 
 
@@ -3415,9 +3487,11 @@ function build(){
   MAT.shade.emissiveIntensity = S.lamps ? 0.9 : 0;
   var lvl = S.level || 'ground';
   if (lvl === 'both') { S.ceiling = false; S.cut = true; }
-  if (lvl === 'front') {
+  SHELL.on = lvl === 'ground' || lvl === 'first';
+  SHELL.cutH = lvl === 'first' ? Y1 + (S.cut ? CUT_H : F1H) : (S.cut ? CUT_H : WALL_H);
+  if (lvl !== 'both') {   // one house: the façade, roof, neighbours and yard are there on every floor
     ROOT = new T.Group(); scene.add(ROOT); ROOTS.push(ROOT); GROUND = true; LABEL_DY = 0;
-    buildFront(S.yard === 'after');
+    buildOutside(lvl, S.yard === 'after');
   }
   if (lvl !== 'first' && lvl !== 'front') {
     ROOT = new T.Group(); scene.add(ROOT); ROOTS.push(ROOT); GROUND = true; LABEL_DY = 0;
@@ -3431,17 +3505,11 @@ function build(){
   if (lvl !== 'ground' && lvl !== 'front') {
     GROUND = false; OBJN = {};
     var g1 = new T.Group(); g1.position.y = Y1 + (lvl === 'both' ? EXPLODE : 0); scene.add(g1); ROOTS.push(g1); ROOT = g1; LABEL_DY = g1.position.y;
-    if (lvl === 'first') {
-      var fm = [MAT.facade, MAT.facade, MAT.capStone, MAT.facade, MAT.facade, MAT.facade];
-      box(-0.5, -Y1 - 0.02, 0.25, 3.11, -0.24, 6.30, fm); box(3.11, -Y1 - 0.02, ZK - 0.53, 7.83, -0.24, 6.30, fm);
-      plane(-12, -10, 20, 18, -Y1 - 0.02, MAT.ground, 4);
-    }
     buildFirst();
     LABEL_DY = 0; GROUND = true;
   }
-  (function(c){ var b = lvl === 'ground' ? 8.5 : lvl === 'front' ? 17 : 12.5; c.left = -b; c.right = b; c.top = b; c.bottom = -b; c.updateProjectionMatrix(); })(sun.shadow.camera);
-  sun.target.position.set(4, lvl === 'ground' ? 0 : 3, lvl === 'front' ? 8.5 : 3);
   if (lvl === 'front') sun.position.set(-7.5, 18, 23); else sun.position.set(12.5, 15, 16);
+  updateShell(0, true); shadowFit();
   // lights quality
   sun.shadow.mapSize.set(S.hq ? 2048 : 1024, S.hq ? 2048 : 1024); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, S.hq ? 2 : 1.25));
@@ -3471,6 +3539,32 @@ sun.position.set(12.5, 15, 16); sun.target.position.set(4, 0, 3); scene.add(sun)
 sun.castShadow = true; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.025;
 (function(c){ c.left = -8.5; c.right = 8.5; c.top = 8.5; c.bottom = -8.5; c.near = 1; c.far = 60; })(sun.shadow.camera);
 
+function shadowFit(){
+  var lvl = S.level, wide = lvl === 'front' || (SHELL.on && SHELL.full), b = lvl === 'front' ? 17 : wide ? 13.5 : lvl === 'ground' ? 8.5 : 12.5, c = sun.shadow.camera;
+  c.left = -b; c.right = b; c.top = b; c.bottom = -b; c.updateProjectionMatrix();
+  sun.target.position.set(4, lvl === 'ground' && !wide ? 0 : 3, lvl === 'front' ? 8.5 : wide ? 4 : 3);
+  renderer.shadowMap.needsUpdate = true;
+}
+// zoomed out past ~15 m (more on a narrow screen), or walking through the rooms: the whole house; otherwise cut like the walls
+function aspectF(){ var a = camera.aspect || 1.5; return a < 1.25 ? Math.min(2.4, 1.25 / a) : 1; }
+var SHELL_TOP = 10.8;
+function updateShell(dt, snap){
+  if (!SHELL.on) { SHELL.full = SHELL.far = false; if (SHELL_PLANE.constant !== 100) { SHELL_PLANE.constant = SHELL.h = 100; renderer.shadowMap.needsUpdate = true; return true; } return false; }
+  var f = aspectF(), d = camera.position.distanceTo(controls.target), walking = eyeMode && !S.cut;
+  var far = SHELL.far ? d > 13.8 * f : d > 15 * f, full = far || walking;
+  SHELL.far = far;
+  if (full !== SHELL.full) {
+    SHELL.full = full; shadowFit(); dirty = true;
+    if (far && !snap && !SHELL.told) { SHELL.told = true; toast('The whole house · zoom in to look inside'); }
+  }
+  var tgt = full ? SHELL_TOP : SHELL.cutH, h = Math.min(SHELL.h, SHELL_TOP);
+  if (snap || !(dt > 0)) h = tgt; else if (h !== tgt) h = h < tgt ? Math.min(tgt, h + dt * 16) : Math.max(tgt, h - dt * 16);
+  SHELL.h = h;
+  var c = h >= SHELL_TOP ? 100 : h;
+  if (c === SHELL_PLANE.constant) return false;
+  SHELL_PLANE.constant = c; renderer.shadowMap.needsUpdate = true; return true;
+}
+
 /* =====================================================================
    LABELS
    ===================================================================== */
@@ -3487,7 +3581,8 @@ function makeLabels(){
 }
 var v3 = new T.Vector3();
 function placeLabels(){
-  labelHost.style.display = S.labels ? '' : 'none'; if (!S.labels) return;
+  var house = SHELL.on && SHELL.far;   // zoomed out: the rooms are behind the façade
+  labelHost.style.display = S.labels && !house ? '' : 'none'; if (!S.labels || house) return;
   var w = canvas.clientWidth, h = canvas.clientHeight, placed = [], dir = new T.Vector3();
   LABELS.forEach(function(L, i){
     var el = labelEls[i];
@@ -3516,7 +3611,8 @@ var VIEWS = {
   corner: {pos: [7.02, 1.62, 5.45], tgt: [4.6, 1.2, 2.7], eye: true},
   wardrobe: {pos: [6.1, 1.45, 5.05], tgt: [6.1, 1.25, 2.9], eye: true},
   stairs: {pos: [4.40, 1.30, 4.72], tgt: [3.45, 0.70, 3.1], eye: true},
-  plan: {pos: [4.0, 15.5, 3.27], tgt: [4.0, 0, 3.25], plan: true}
+  house: {pos: [10.6, 8.2, 20.2], tgt: [3.6, 3.4, 3.4]},
+  plan: {pos: [4.0, 13.2, 3.27], tgt: [4.0, 0, 3.25], plan: true}
 };
 var WARDROBE_VIEW = {
   B: {pos: [4.75, 1.45, 3.8], tgt: [7.2, 1.25, 3.8]}, C: {pos: [6.0, 1.45, 4.8], tgt: [6.5, 1.2, 2.8]},
@@ -3532,11 +3628,12 @@ var VIEWS_FIRST = {
   living: {pos: [3.05, Y1 + 1.75, 1.3], tgt: [0.6, Y1 + 0.85, 5.4], eye: true},
   sofa: {pos: [0.5, Y1 + 1.15, 3.35], tgt: [3.39, Y1 + 1.2, 3.03], eye: true},
   upstairs: {pos: [3.94, Y1 + 1.62, 5.65], tgt: [3.94, Y1 + 2.05, 3.2], eye: true},
-  plan: {pos: [3.7, Y1 + 15.5, 2.38], tgt: [3.7, Y1, 2.36], plan: true}
+  house: {pos: [10.6, 8.2, 20.2], tgt: [3.6, 3.4, 3.4]},
+  plan: {pos: [3.7, Y1 + 13.2, 2.38], tgt: [3.7, Y1, 2.36], plan: true}
 };
 var VIEWS_FRONT = {
   overview: {pos: [-5.8, 9.2, 20.6], tgt: [3.6, 1.4, 8.6]},
-  facade: {pos: [3.4, 3.3, 17.9], tgt: [3.4, 3.0, 6.3]},
+  facade: {pos: [3.4, 4.0, 19.6], tgt: [3.4, 3.6, 6.3]},
   door: {pos: [5.3, 1.62, 10.6], tgt: [3.4, 1.2, 6.3], eye: true},
   lane: {pos: [12.2, 2.5, 12.1], tgt: [3.6, 0.2, 8.2], eye: true},
   drains: {pos: [-2.6, 3.6, 10.6], tgt: [2.9, 0, 7.5]},
@@ -3548,8 +3645,8 @@ var VIEWS_BOTH = {
   plan: {pos: [3.7, Y1 + EXPLODE + 15.5, 2.38], tgt: [3.7, Y1 + EXPLODE, 2.36], plan: true}
 };
 var VIEW_SETS = {
-  ground: [['overview', 'Overview'], ['door', 'Front door'], ['fromstairs', 'From stairs'], ['corner', 'Window corner'], ['wardrobe', 'Wardrobe'], ['stairs', 'Under stairs'], ['plan', 'Plan']],
-  first: [['overview', 'Overview'], ['arrive', 'Top of stairs'], ['kitchen', 'Kitchen'], ['kback', 'Kitchen · back wall'], ['kpen', 'Kitchen · from dining'], ['dining', 'Dining'], ['living', 'Living room'], ['sofa', 'From the sofa'], ['upstairs', 'Upper stairs'], ['plan', 'Plan']],
+  ground: [['overview', 'Overview'], ['house', 'Whole house'], ['door', 'Front door'], ['fromstairs', 'From stairs'], ['corner', 'Window corner'], ['wardrobe', 'Wardrobe'], ['stairs', 'Under stairs'], ['plan', 'Plan']],
+  first: [['overview', 'Overview'], ['house', 'Whole house'], ['arrive', 'Top of stairs'], ['kitchen', 'Kitchen'], ['kback', 'Kitchen · back wall'], ['kpen', 'Kitchen · from dining'], ['dining', 'Dining'], ['living', 'Living room'], ['sofa', 'From the sofa'], ['upstairs', 'Upper stairs'], ['plan', 'Plan']],
   both: [['overview', 'Overview'], ['plan', 'Plan']],
   front: [['overview', 'Overview'], ['facade', 'Façade'], ['door', 'At the door'], ['lane', 'From the lane'], ['drains', 'Drains'], ['cut', 'Cut-away'], ['plan', 'Plan']]
 };
@@ -3628,7 +3725,7 @@ var ray = new T.Raycaster(), ndc = new T.Vector2(), lastTap = 0, rmMode = false;
 function zoomAt(clientX, clientY){
   var r = canvas.getBoundingClientRect(); ndc.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ndc, camera);
-  var hits = ray.intersectObjects(ROOTS, true).filter(function(h){ return h.object.material !== MAT.water && h.object.material !== MAT.glass && h.object.visible; });
+  var hits = ray.intersectObjects(ROOTS, true).filter(function(h){ return h.object.material !== MAT.water && h.object.material !== MAT.glass && h.object.visible && !(h.object.userData.shell && h.point.y > SHELL_PLANE.constant); });
   if (!hits.length) return;
   var p = hits[0].point, back = new T.Vector3().subVectors(camera.position, p);
   var d = Math.max(0.45, Math.min(back.length() * 0.45, 1.6)); back.normalize().multiplyScalar(d);
@@ -3650,7 +3747,7 @@ function objAt(clientX, clientY){
   var hits = ray.intersectObjects(ROOTS, true);
   for (var i = 0; i < hits.length; i++) {
     var o = hits[i].object;
-    if (o.material === MAT.water || o.material === MAT.glass || o.material === MAT.ghost || !shownChain(o)) continue;
+    if (o.material === MAT.water || o.material === MAT.glass || o.material === MAT.ghost || !shownChain(o) || (o.userData.shell && hits[i].point.y > SHELL_PLANE.constant)) continue;
     for (var q = o; q; q = q.parent) if (q.userData && q.userData.key) return q;
     return null;
   }
@@ -3728,13 +3825,13 @@ var INFO = {
     note: 'Nothing stands on the floor, which makes it the easiest layout to clean after a flood.'}
 };
 INFO.first = {h: '1st floor: as measured', rows: [['Living room', '3.49 × 5.25 m, one step up'], ['TV wall', '1.22 opening · 2.33 wall · 1.70 opening'], ['Kitchen + dining', '22.58 m², 1.43 m deeper'], ['Kitchen', 'as photographed · switch to stage 1 or the IKEA plan above'], ['Sofa', '2.80 × 2.10 × 1.02 m'], ['Table', '1.91 × 1.13 m, 77 cm high'], ['Stair foot', 'raised to living-room level'], ['Floor', '33 cm tiles, tiled skirting']],
-  note: 'Your measurements, the diagnostic plan, IKEA\'s kitchen survey and your photos. Sizes nobody measured are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet.'};
+  note: 'Your measurements, the diagnostic plan, IKEA\'s kitchen survey and your photos. Sizes nobody measured are ±10–20 cm. The 2nd floor and the attic aren\'t modelled yet. Zoom out, or pick Whole house, to see the house from the yard.'};
 INFO.stage1 = {h: '1st floor: kitchen, stage 1', rows: [['New, back wall', 'base 2 + 3, worktop, wall 11 + 12'], ['New, side wall', 'wall cabinets 13 · 15 · 16 · 17'], ['Stays', 'today\'s base units, gas hob, sink, tiles'], ['Waits', 'cabinet 14 + hood, until the hob is induction'], ['Wall cabinets', 'bottom at 1.42 m, top at 2.22 m'], ['Microwave', 'moves onto the new worktop']],
   note: 'The kitchen after the first order, built yourselves. The new wall cabinets hang where the finished kitchen needs them, so they meet today\'s tiles a little differently. The 60 cm above the gas hob stays empty: a hood must sit 65 cm above gas. Steps and cart check are on the kitchen page, S-1.'};
 INFO.ikea = {h: '1st floor: IKEA kitchen plan', rows: [['Fronts', 'BODBYN off-white, steel bar handles'], ['Worktop', 'oak, 3.8 cm thick, 92 cm high'], ['Side wall', '40 drawers · 60 hob + oven · 20 pull-out · corner'], ['Peninsula', '80 sink unit + your dishwasher'], ['Back wall', 'new: 2 × 60 base + 2 × 60 wall units'], ['Wall units', '80 cm high, top at 2.22 m'], ['Niche', '3 oak shelves, LED strips'], ['Kept', 'fridge, dishwasher, oven, low tiled wall']],
   note: 'Drawn from IKEA\'s survey and list of December 2025. The plan hangs the two back-wall cabinets 8 cm higher than the others; here they line up. The wall behind the worktop is left bare: no splashback is in the quotes. The kitchen page has the list, the costs and the open points.'};
 INFO.frontBefore = {h: 'Outside: the forecourt today', rows: [['Surface', 'old asphalt, cracked and patched'], ['At the façade', 'a light channel grating, garage to front door'], ['Low spot', 'around the manhole, in front of the door'], ['Gullies', 'two, both against the façade'], ['Water comes from', 'the lane, which runs down into the yard'], ['Garage', 'sandbags at the threshold']],
-  note: 'From your photos and video of May to November 2026. Nobody has measured the yard, so sizes outside are ±30 cm. Tick “Rain” to see where the water goes, and switch to “After the works”.'};
+  note: 'From your photos and video of May to November 2026. Nobody has measured the yard, so sizes outside are ±30 cm. The heights follow the rooms inside, which puts the 1st-floor windows about 30 cm higher than the photos suggest: a measured hall ceiling would settle it. Tick “Rain” to see where the water goes, and switch to “After the works”.'};
 INFO.frontAfter = {h: 'Outside: after the forecourt works', rows: [['Re-surfaced', '42 m², dug out 30–40 cm and rebuilt'], ['Build-up', '40 cm of 0/80 crushed stone, a 0/20 levelling layer, 7 cm of hot asphalt'], ['Rainwater pipe', 'PVC 125, 7 m, in fine gravel'], ['Channel drain', '3 m, reinforced, set in concrete'], ['Masonry gutter', '3 m, built by hand'], ['Source', 'the contractor\'s quote of March 2026']],
   note: 'The quantities are the quote\'s. The quote gives no positions, so the layout here is my reading: the channel drain in front of the garage, the gutter in front of the door, and the pipe from two new gullies in the yard to the manhole. Today the yard has no gullies away from the façade, so those two are an assumption. Ask the contractor to mark the real positions and the falls on the ground before work starts. Tick “Cut-away” to see the layers and the pipe.'};
 INFO.both = {h: 'Both floors', rows: [['Ground floor', 'the option selected below'], ['1st floor', 'as photographed'], ['Gap', 'lifted 2.6 m so you can see inside']],
@@ -3833,7 +3930,7 @@ var dirty = true, last = performance.now();
 controls.addEventListener('change', function(){ dirty = true; });
 function resize(){
   var w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
-  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); controls.maxDistance = 30 * aspectF(); dirty = true;
 }
 window.addEventListener('resize', resize);
 function frame(now){
@@ -3847,6 +3944,7 @@ function frame(now){
   }
   if (walk(dt)) active = true;
   if (controls.update()) active = true;
+  if (updateShell(dt)) active = true;
   if (active || dirty) { renderer.render(scene, camera); placeLabels(); dirty = false; }
 }
 
@@ -3859,7 +3957,7 @@ applyView(viewsFor()[S.view] ? S.view : 'overview', true);
 $('#loading').remove();
 requestAnimationFrame(frame);
 window.__hall = {S: S, build: build, applyView: applyView, setScene: setScene, setLevel: setLevel, setKitchen: setKitchen, setYard: setYard, camera: camera, controls: controls, renderer: renderer, scene: scene,
-  objs: function(){ return OBJS; }, hideObj: hideObj, restoreObj: restoreObj, setRmMode: setRmMode, objAt: objAt};
+  shell: SHELL, objs: function(){ return OBJS; }, hideObj: hideObj, restoreObj: restoreObj, setRmMode: setRmMode, objAt: objAt};
 })();
 
 </script>
