@@ -30,11 +30,14 @@
   --scene:#141D20; --label-bg:rgba(23,34,37,.92); --label-ink:#E2EAE8; color-scheme:dark;}
 *{box-sizing:border-box}
 html,body{height:100%; margin:0}
+html{touch-action:manipulation}
 body{background:var(--scene); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.45; overflow:hidden}
 #app{position:fixed; inset:0}
 #c{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; outline:none}
 #labels{position:absolute; inset:0; pointer-events:none; overflow:hidden}
-@media (min-width:761px){#c,#labels{left:364px; width:calc(100% - 364px)} #loading{left:364px}}
+@media (min-width:761px){#c,#labels{left:364px; width:calc(100% - 364px)} #loading{left:364px}
+  #app.sheet-closed #c,#app.sheet-closed #labels{left:0; width:100%} #app.sheet-closed #loading{left:0}
+  #panel.collapsed{bottom:auto; width:auto; max-width:340px}}
 .lbl{position:absolute; transform:translate(-50%,-50%); background:var(--label-bg); color:var(--label-ink); border:1px solid var(--rule);
   font-family:var(--f-display); font-stretch:85%; font-weight:700; font-size:12px; letter-spacing:.04em; padding:2px 6px; white-space:nowrap; border-radius:2px}
 .lbl.dim{font-family:var(--f-mono); font-weight:600; letter-spacing:0; font-size:11.5px}
@@ -74,7 +77,10 @@ body{background:var(--scene); color:var(--ink); font-family:var(--f-body); font-
 .hint kbd{font-family:var(--f-mono); font-size:11px; border:1px solid var(--rule); padding:0 3px; border-radius:2px; background:var(--paper)}
 .rec{font-family:var(--f-display); font-stretch:80%; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--hydro-ink); background:var(--hydro-pale); border:1px solid var(--hydro); padding:0 4px; margin-left:4px}
 .seg button[aria-pressed="true"] .rec{color:var(--hydro-pale); background:transparent; border-color:var(--hydro-pale)}
-#collapse{display:none}
+#collapse{flex:none; white-space:nowrap}
+#panel.collapsed .p-body{display:none}
+#panel.collapsed .p-head{border-bottom:0; align-items:center}
+#panel.collapsed .p-head span{display:none}
 #pad{position:absolute; right:max(14px,env(safe-area-inset-right,0px)); bottom:max(14px,env(safe-area-inset-bottom,0px)); display:grid; grid-template-columns:repeat(3,44px); grid-template-rows:repeat(2,44px); gap:4px; z-index:4}
 #pad button{font:inherit; font-size:18px; border:1px solid var(--rule); background:var(--sheet); color:var(--ink); border-radius:4px; cursor:pointer; touch-action:none; user-select:none; -webkit-user-select:none}
 #pad .up{grid-column:2; grid-row:1} #pad .left{grid-column:1; grid-row:2} #pad .down{grid-column:2; grid-row:2} #pad .right{grid-column:3; grid-row:2}
@@ -85,9 +91,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
 @media (max-width:760px){
   #panel{top:auto; left:0; right:0; bottom:0; width:auto; max-height:52vh; border-left:0; border-right:0; border-bottom:0;
     padding-bottom:env(safe-area-inset-bottom,0px); padding-left:env(safe-area-inset-left,0px); padding-right:env(safe-area-inset-right,0px)}
-  #panel.collapsed .p-body{display:none}
   #app:not(.sheet-closed) #c,#app:not(.sheet-closed) #labels{height:48vh; bottom:auto}
-  #collapse{display:inline-block}
   #pad{bottom:calc(52vh + 10px)}
   #panel.collapsed ~ #pad{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 }
@@ -102,9 +106,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
   <aside id="panel" aria-label="Model controls">
     <div class="p-head">
       <div><b>MAISON · 3D MODEL</b><span>One house, inside and out · from the plans and your photos</span></div>
-      <button class="btn" id="collapse" type="button" aria-expanded="true">Hide</button>
+      <button class="btn" id="collapse" type="button" aria-expanded="true" aria-controls="panel-body" title="Hide or show this panel (H)">Hide panel</button>
     </div>
-    <div class="p-body">
+    <div class="p-body" id="panel-body">
       <div class="sec">
         <div class="lab">Floor</div>
         <div class="seg" id="levels">
@@ -193,7 +197,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--water); outline
       <div class="sec">
         <div class="lab">Image</div>
         <div class="seg"><button type="button" class="btn" id="shot">Save picture (PNG)</button></div>
-        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. Zoom out from a floor to see the whole house from the yard. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or step through the kitchen stages (1st floor).</p>
+        <p class="hint"><b>Mouse:</b> drag to orbit, scroll to zoom, right-drag to pan, <b>double-click</b> any spot to zoom in on it. Zoom out from a floor to see the whole house from the yard. <b>Touch:</b> one finger orbits, two fingers zoom and pan, double-tap to zoom in. <b>Walk:</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys, <kbd>Q</kbd>/<kbd>E</kbd> to turn, <kbd>B</kbd> to flip before/after (ground floor) or step through the kitchen stages (1st floor), <kbd>H</kbd> to hide or show this panel.</p>
       </div>
     </div>
   </aside>
@@ -3714,14 +3718,18 @@ window.addEventListener('keydown', function(e){
 });
 window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 window.addEventListener('blur', function(){ keys = {}; padHeld = null; });
+var padPtr = null;
 document.querySelectorAll('#pad [data-move]').forEach(function(b){
-  var on = function(e){ e.preventDefault(); padHeld = b.getAttribute('data-move'); };
-  var off = function(){ padHeld = null; };
-  b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+  var on = function(e){ e.preventDefault(); padHeld = b.getAttribute('data-move'); padPtr = e.pointerId; };
+  var off = function(){ padHeld = null; padPtr = null; };
+  b.addEventListener('pointerdown', on); ['pointerup', 'pointerleave', 'pointercancel', 'lostpointercapture'].forEach(function(t){ b.addEventListener(t, off); });
+  b.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 });
+['pointerup', 'pointercancel'].forEach(function(t){ window.addEventListener(t, function(e){ if (e.pointerId === padPtr) { padHeld = null; padPtr = null; } }); });
+document.addEventListener('visibilitychange', function(){ if (document.hidden) { keys = {}; padHeld = null; } });
 
-/* double-click / double-tap: zoom to a spot */
-var ray = new T.Raycaster(), ndc = new T.Vector2(), lastTap = 0, rmMode = false;
+/* double-click (mouse) or double-tap (one finger): zoom to a spot */
+var ray = new T.Raycaster(), ndc = new T.Vector2(), rmMode = false;
 function zoomAt(clientX, clientY){
   var r = canvas.getBoundingClientRect(); ndc.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ndc, camera);
@@ -3732,11 +3740,31 @@ function zoomAt(clientX, clientY){
   flyTo(p.clone().add(back).toArray(), p.toArray(), 700);
   setEyeMode(true);
 }
-canvas.addEventListener('dblclick', function(e){ if (!rmMode) zoomAt(e.clientX, e.clientY); });
-canvas.addEventListener('pointerup', function(e){
-  if (e.pointerType !== 'touch' || rmMode) return; var now = performance.now();
-  if (now - lastTap < 300) { zoomAt(e.clientX, e.clientY); lastTap = 0; } else lastTap = now;
+// A pinch or a two-finger pan lifts two fingers almost together: that must never read as a double tap (it did on iPad,
+// so every pinch ended with an extra zoom). A tap is one finger, down and up within 350 ms, moved less than 10 px.
+var lastPtr = 'mouse', touchIds = {}, touchN = 0, multiTouch = false, tap = null, lastTap = null;
+canvas.addEventListener('pointerdown', function(e){
+  lastPtr = e.pointerType; if (e.pointerType === 'mouse') return;
+  if (!touchIds[e.pointerId]) { touchIds[e.pointerId] = true; touchN++; }
+  if (touchN > 1) { multiTouch = true; tap = null; lastTap = null; }
+  else tap = multiTouch ? null : {id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now()};
 });
+canvas.addEventListener('pointermove', function(e){ if (tap && e.pointerId === tap.id && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 10) tap = null; });
+function touchEnd(e){
+  if (e.pointerType === 'mouse') return;
+  if (touchIds[e.pointerId]) { delete touchIds[e.pointerId]; touchN--; }
+  var isTap = e.type === 'pointerup' && tap && tap.id === e.pointerId && performance.now() - tap.t < 350;
+  tap = null;
+  if (touchN <= 0) { touchN = 0; touchIds = {}; if (multiTouch) { multiTouch = false; lastTap = null; return; } }
+  if (!isTap || rmMode) { lastTap = null; return; }
+  var now = performance.now();
+  if (lastTap && now - lastTap.t < 350 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 40) { lastTap = null; zoomAt(e.clientX, e.clientY); }
+  else lastTap = {t: now, x: e.clientX, y: e.clientY};
+}
+canvas.addEventListener('pointerup', touchEnd); canvas.addEventListener('pointercancel', touchEnd);
+canvas.addEventListener('dblclick', function(e){ if (!rmMode && lastPtr === 'mouse') zoomAt(e.clientX, e.clientY); });   // iPad Safari can send dblclick for taps too
+// Safari's own pinch-zoom of the page: never on the model
+['gesturestart', 'gesturechange', 'gestureend'].forEach(function(t){ canvas.addEventListener(t, function(e){ e.preventDefault(); }, {passive: false}); });
 
 /* remove objects: click or tap a piece of furniture to hide it; undo / put back from the panel */
 var rmStack = [], downXY = null, pickEl = null, hoverReq = 0, hoverXY = null;
@@ -3786,7 +3814,7 @@ function syncObjUI(){
   });
   list.style.display = keys.length ? '' : 'none';
 }
-canvas.addEventListener('pointerdown', function(e){ downXY = [e.clientX, e.clientY, performance.now()]; });
+canvas.addEventListener('pointerdown', function(e){ downXY = e.pointerType !== 'mouse' && touchN > 1 ? null : [e.clientX, e.clientY, performance.now()]; });
 canvas.addEventListener('pointerup', function(e){
   if (!rmMode || !downXY || e.button > 0) return;
   var dx = e.clientX - downXY[0], dy = e.clientY - downXY[1], dt = performance.now() - downXY[2]; downXY = null;
@@ -3903,9 +3931,17 @@ $('#t-labels').addEventListener('change', function(e){ S.labels = e.target.check
 $('#rm-mode').addEventListener('click', function(){ setRmMode(!rmMode); if (rmMode) toast(coarse ? 'Tap a piece of furniture to remove it' : 'Click a piece of furniture to remove it'); });
 $('#rm-undo').addEventListener('click', function(){ while (rmStack.length) { var k = rmStack.pop(); if (S.hidden[k]) { restoreObj(k); break; } } });
 $('#rm-all').addEventListener('click', function(){ levelKeys().forEach(function(k){ delete S.hidden[k]; }); rmStack = []; OBJS.forEach(function(g){ if (!S.hidden[g.userData.key]) g.visible = true; }); persist(); refreshScene(); syncObjUI(); });
-$('#collapse').addEventListener('click', function(){
-  var p = $('#panel'), c = p.classList.toggle('collapsed'); $('#app').classList.toggle('sheet-closed', c); this.textContent = c ? 'Show' : 'Hide'; this.setAttribute('aria-expanded', c ? 'false' : 'true'); setTimeout(resize, 50);
+function setSheet(closed, quiet){
+  $('#panel').classList.toggle('collapsed', closed); $('#app').classList.toggle('sheet-closed', closed);
+  var b = $('#collapse'); b.textContent = closed ? 'Show panel' : 'Hide panel'; b.setAttribute('aria-expanded', closed ? 'false' : 'true');
+  S.sheetClosed = closed; if (!quiet) { persist(); resize(); setTimeout(resize, 60); }
+}
+$('#collapse').addEventListener('click', function(){ setSheet(!S.sheetClosed); });
+window.addEventListener('keydown', function(e){
+  if (e.code !== 'KeyH' || e.metaKey || e.ctrlKey || e.altKey || (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))) return;
+  setSheet(!S.sheetClosed); if (!S.sheetClosed) { var b = $('#collapse'); if (b) b.focus(); }
 });
+setSheet(!!S.sheetClosed, true);
 $('#shot').addEventListener('click', function(){
   renderer.render(scene, camera);
   try {
@@ -3930,7 +3966,16 @@ var dirty = true, last = performance.now();
 controls.addEventListener('change', function(){ dirty = true; });
 function resize(){
   var w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
-  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); controls.maxDistance = 30 * aspectF(); dirty = true;
+  var f0 = aspectF();
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); controls.maxDistance = 30 * aspectF();
+  // narrow screens sit further back (applyView); when the canvas changes shape (panel hidden, iPad turned), keep the same framing
+  var k = aspectF() / f0;
+  if (Math.abs(k - 1) > 1e-3 && !eyeMode) {
+    var sc = function(p, t){ p.sub(t).multiplyScalar(k).add(t); };
+    sc(camera.position, controls.target); if (tween) { sc(tween.p0, tween.t0); sc(tween.p1, tween.t1); }
+    controls.update();
+  }
+  dirty = true;
 }
 window.addEventListener('resize', resize);
 function frame(now){
