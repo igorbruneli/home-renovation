@@ -3337,7 +3337,7 @@ function buildFront(after){
   cyl(2.5, 0.57, ZS - 0.06, 0.045, 1.15, MAT.xZinc); label('Building opposite, cut low', 8.6, 1.35, ZS + 1.1, 'dim');
   /* ---------- the ground ---------- */
   var OLD = MAT.xAsphOld, T6 = 6.4;
-  plane(-8.5, FZ - 0.12, -0.5, 17, YG - 0.004, MAT.concrete, 1.5); plane(-0.5, ZS, 1.0, 17, YG - 0.002, OLD, T6);                 // the impasse, toward the garage side
+  plane(-8.5, FZ - 0.12, -0.5, 17, YG - 0.004, MAT.concrete, 1.5); plane(-0.5, ZS, 1.0, 17, YG - 0.002, OLD, T6);                 // the alley, toward the garage side
   var lane = slopeX(FXE, YG, 13.0, YG + 0.62, ZC, ZS, 0.03, MAT.xAsphOldB); lane.receiveShadow = true;                         // the lane, climbing away
   box(13.0, YG + 0.55, ZC, 13.3, YG + 0.62, ZS, MAT.dark, null, false);
   if (!after) {
