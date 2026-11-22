@@ -298,6 +298,34 @@ ul.parts .a{font-family:var(--f-mono); font-size:.78rem; color:var(--ink-2); whi
 .k-old{fill:none; stroke:var(--ink-3); stroke-width:1.2; stroke-dasharray:5 4} .k-hob{fill:var(--ink-2)} .k-nichebg{fill:var(--paper); stroke:var(--ink-3); stroke-width:1}
 .k-beam{stroke:var(--warn); stroke-width:2; stroke-dasharray:8 5; fill:none} .k-warn{fill:var(--warn)} .k-bad{fill:var(--bad)} .k-b{font-weight:600} .k-dimr{stroke:var(--bad); stroke-width:1.2; fill:none}
 @media print{.gstep{display:grid !important; break-inside:avoid} #gnav{display:none}}
+
+/* 3D step viewer */
+.g3d{display:grid; gap:.45rem; margin:.1rem 0 .35rem}
+.g3d-stage{position:relative; width:100%; aspect-ratio:16/10; max-height:min(64vh,560px); background:var(--paper); border:1px solid var(--rule); overflow:hidden; touch-action:none}
+.g3d-c{position:absolute; inset:0; width:100%; height:100%; display:block; outline:none; cursor:grab}
+.g3d-ls{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+.g3d-l{position:absolute; transform:translate(-50%,-100%); background:rgba(255,255,255,.93); color:#1b2a2e; border:1px solid #b9c4c1; font-family:var(--f-body); font-weight:700; font-size:11.5px; line-height:1.2; padding:2px 6px; border-radius:2px; white-space:nowrap}
+.g3d-l.hot{border-color:#e8772e; color:#8f3608}
+.g3d-l.dim{font-weight:400; color:#3f4d51}
+.g3d-l.dimv{background:#1f6fd0; color:#fff; border-color:#1f6fd0; font-family:var(--f-mono); font-weight:600}
+.g3d-hint{position:absolute; left:8px; bottom:8px; font-size:11px; color:var(--ink-2); background:var(--sheet); padding:2px 6px; border:1px solid var(--rule); transition:opacity .4s; pointer-events:none}
+.g3d-hint.gone{opacity:0}
+.g3d-cap{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:.6rem; align-items:start; border-left:3px solid var(--hydro); background:var(--hydro-pale); padding:.45rem .6rem}
+.g3d-n{font-family:var(--f-mono); font-weight:600; font-size:.85rem; padding-top:.1rem; white-space:nowrap}
+.g3d-t{margin:0; font-size:.95rem; min-height:2.6em}
+.g3d-done{white-space:nowrap; font-size:.85rem; display:flex; gap:.3rem; align-items:center; cursor:pointer}
+.g3d-done input{accent-color:var(--hydro); width:1.05rem; height:1.05rem; margin:0}
+.g3d-bar{display:flex; flex-wrap:wrap; gap:.35rem; align-items:center}
+.g3d-bar .g3d-play{min-width:6.5rem}
+.g3d-dots{display:flex; flex-wrap:wrap; gap:.2rem; flex:1 1 8rem}
+.g3d-dot{font-family:var(--f-mono); font-weight:600; font-size:.75rem; min-width:1.75rem; height:1.75rem; border:1px solid var(--rule); background:var(--sheet); color:var(--ink-2); cursor:pointer; border-radius:2px; padding:0}
+.g3d-dot[aria-current="step"]{background:var(--hydro); color:#fff; border-color:var(--hydro)}
+ol.gs > li{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.35rem; align-items:start}
+.g3go{font-family:var(--f-mono); font-size:.72rem; font-weight:600; border:1px solid var(--rule); background:var(--sheet); color:var(--hydro-ink); padding:.3rem .45rem; cursor:pointer; border-radius:2px; white-space:nowrap; margin-top:.15rem}
+.g3go:hover{border-color:var(--hydro)}
+ol.gs > li.g3cur > label{border-color:var(--hydro); box-shadow:inset 3px 0 0 var(--hydro)}
+@media (max-width:560px){.g3d-stage{aspect-ratio:4/3; max-height:58vh} .g3d-cap{grid-template-columns:auto minmax(0,1fr)} .g3d-done{grid-column:2} .g3go{padding:.3rem .35rem}}
+@media print{.g3d,.g3go{display:none !important}}
 </style>
 </head>
 <body>
@@ -1461,6 +1489,7 @@ function openGuide(id, scroll){
   arts.forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-gid') === id); });
   $$('#gnav button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-g') === id ? 'true' : 'false'); });
   $$('svg [data-g]').forEach(function(n){ n.classList.toggle('sel', n.getAttribute('data-g') === id); });
+  if (window.Steps3D) window.Steps3D.open(id);
   if (scroll) { var t = document.getElementById('gs-' + id); if (t) t.scrollIntoView({block: 'nearest'}); if (t && t.getBoundingClientRect().top < 110) window.scrollBy(0, t.getBoundingClientRect().top - 130); }
 }
 function guideInit(){
@@ -1492,6 +1521,16 @@ var bi = $('#budget'); if (bi) bi.addEventListener('input', function(){ ST.budge
 nav(); refLinks(); renderParts(); guideInit(); s1Render(); renderChoices(); renderList(); bindTicks();
 if (typeof window.kitchenPlan === 'function') window.kitchenPlan(D);
 openGuide(ST.guide || 'prep');
+// the animated 3D steps: three.js loads only once the guide comes near the screen
+(function(){
+  var g = document.getElementById('guide'); if (!g) return;
+  var files = ['../lib/three.min.js', '../lib/OrbitControls.js', 'steps3d.js?v=202611221501'], started = false;
+  function next(i){ if (i >= files.length) return; var s = document.createElement('script'); s.src = files[i]; s.onload = function(){ next(i + 1); }; document.head.appendChild(s); }
+  function go(){ if (started) return; started = true; next(0); }
+  if (!('IntersectionObserver' in window)) { go(); return; }
+  var io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); go(); } }, {rootMargin: '800px 0px'});
+  io.observe(g);
+})();
 window.__kitchen = {S: ST, D: D, goods: goodsTotal, eff: effGroups, orderText: orderText, works: worksTotal};
 })();
 
