@@ -74,6 +74,7 @@ function cy(x, y, z, r, h, mat, parent, axis, seg, r2){
   m.position.set(x, y, z); if (axis === 'x') m.rotation.z = PI / 2; else if (axis === 'z') m.rotation.x = PI / 2;
   m.castShadow = true; m.receiveShadow = true; if (parent) parent.add(m); return m;
 }
+function wallPlane(x1, y1, x2, y2, z, mat, period, parent){ var pg = new T.PlaneGeometry(x2 - x1, y2 - y1), uv = pg.attributes.uv; for (var i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * (x2 - x1) / period, uv.getY(i) * (y2 - y1) / period); var m = new T.Mesh(pg, mat); m.position.set((x1 + x2) / 2, (y1 + y2) / 2, z); m.receiveShadow = true; if (parent) parent.add(m); return m; }
 function grp(x, y, z, parent){ var g = new T.Group(); g.position.set(x || 0, y || 0, z || 0); if (parent) parent.add(g); return g; }
 function flat(x1, z1, x2, z2, y, mat, parent){ var pg = new T.PlaneGeometry(x2 - x1, z2 - z1), uv = pg.attributes.uv; for (var i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * (x2 - x1) / 0.33, uv.getY(i) * (z2 - z1) / 0.33); var m = new T.Mesh(pg, mat); m.rotation.x = -PI / 2; m.position.set((x1 + x2) / 2, y, (z1 + z2) / 2); m.receiveShadow = true; if (parent) parent.add(m); return m; }
 function textTex(txt, w, h, bg, fg, size){
@@ -177,7 +178,9 @@ function roomSide(S, o){
     bx(0.66, 0.84, 0, 3.35, 0.88, 0.63, M.granite, g);
     bx(1.135, 0.88, 0.04, 1.715, 0.886, 0.56, M.hob, g);
   }
-  if (o.tiles !== false) bx(0.66, 0.88, -0.006, 3.35, o.tileTop || 1.45, 0, M.tiles, g);
+  if (o.tiles !== false) wallPlane(0.66, 0.88, 3.35, o.tileTop || 1.45, 0.001, M.tiles, 0.6, g);
+  if (o.beams !== false) for (var k = 0; k < 8; k++) bx(0.14 + k * 0.5, 2.24, 0, 0.3 + k * 0.5, 2.42, 0.7, M.beam, g).castShadow = false;
+  bx(-0.3, 2.42, -0.3, 4.6, 2.43, 0, M.cap, g);
 }
 
 /* ---------- the player ---------- */
@@ -229,6 +232,7 @@ Player.prototype.apply = function(act, p){
       if (q.dr) s.r.add(V(q.dr).multiplyScalar(e));
       break;
     case 'rot': s.r.add(V(q.dr).multiplyScalar(e)); break;
+    case 'fade': if (p > 0) s.o = s.o + (q.o - s.o) * e; break;
     case 'spin': var ax = q.ax || 'z'; s.r[ax] += (q.n || 3) * 2 * PI * p; break;
     case 'hl': if (p > 0 && p < 1) s.hl = Math.max(s.hl, 0.5 - 0.5 * Math.cos(p * PI * 2 * (q.n || 2))); else if (p >= 1 && q.keep) s.hl = 0.6; break;
     case 'draw': if (p > 0) { s.dr = e; s.o = 1; } break;
@@ -660,6 +664,234 @@ STEPS.doors = {
       var t = visit(a, 'drill', [[0.682, 0.711, 0.645], [0.682, 0.839, 0.645]], 0.9, 1.0, [0, 0, -0.03]); a.push(['out', 'drill', t, t + 0.3]); a.push(['out', 'tpl', t, t + 0.3]); a.push(['out', 'block', t, t + 0.3]); a.push(['in', 'h3', t + 0.3, t + 0.7, {from: [0, 0, 0.15]}]); return a; })()},
     {cam: [[1.1, 0.9, 1.6], [0.35, 0.5, 0.3]], acts: [['rot', 'd2', 0, 0.8, {dr: [0, -1.6, 0]}], ['out', 'h2', 0, 0.2], ['in', 'shelf', 0.8, 1.6, {from: [0, 0, 0.6]}], ['in', 'caps', 1.6, 2.0], ['hl', 'caps', 2.0, 2.8], ['rot', 'd2', 3.0, 3.8, {dr: [0, 1.6, 0]}], ['in', 'h2', 3.6, 3.9]]},
     {cam: [[1.9, 0.7, 1.5], [0.75, 0.15, 0.4]], acts: [['in', 'plinth', 0, 1.0, {from: [0, 0, 0.35]}], ['hl', 'plinth', 1.0, 2.0]]}
+  ]
+};
+
+/* ---- steps_c.js ---- */
+/* ---------- side wall pieces ---------- */
+var SIDE = {x13: 0.725, x14: 1.125, x15: 1.726, x16: 2.526, x17: 2.928, end: 3.329, yb: 1.424, rail: 2.164};
+P.oldUnit = function(w, h){ var g = grp(); bx(0, 0, 0, w, h, 0.33, M.oldWhite, g); return g; };
+P.oldDoor = function(w, h){ var g = grp(); bx(0, 0, 0, w, h, 0.018, M.oldWhite, g); bx(0.03, 0.03, 0.018, w - 0.03, h - 0.03, 0.02, M.oldBlue, g); bx(0.05, 0.05, 0.02, w - 0.05, h - 0.05, 0.022, M.oldWhite, g); return g; };
+P.hood = function(){ var g = grp(); bx(0, 0, 0, 0.52, 0.07, 0.3, M.steel, g); bx(0, -0.012, 0.26, 0.52, 0.0, 0.3, M.steel, g); bx(0.03, -0.004, 0.02, 0.49, 0.0, 0.24, M.grey, g); cy(0.26, 0.12, 0.12, 0.075, 0.1, M.zinc, g, null, 20); return g; };
+P.socket = function(){ var g = grp(); bx(-0.04, -0.04, 0, 0.04, 0.04, 0.012, M.white, g); cy(-0.01, 0, 0.013, 0.004, 0.004, M.black, g, 'z', 8); cy(0.01, 0, 0.013, 0.004, 0.004, M.black, g, 'z', 8); return g; };
+P.led = function(w){ var g = grp(); bx(0, 0, 0, w, 0.008, 0.012, new T.MeshBasicMaterial({color: 0xfff3d6}), g); return g; };
+
+function sideBuilt(S, o){
+  if (o.rail) { S.add('railA', P.rail(2.0), {on: true, pos: [SIDE.x13, SIDE.rail, 0]}); S.add('railB', P.rail(0.6), {on: true, pos: [SIDE.x13 + 2.0, SIDE.rail, 0]}); }
+  if (o.cabs) {
+    S.add('c13', P.carcass(0.4, 0.8, 0.37), {on: true, pos: [SIDE.x13, SIDE.yb, 0.015]});
+    S.add('c15', P.carcass(0.8, 0.8, 0.37), {on: true, pos: [SIDE.x15, SIDE.yb, 0.015]});
+    S.add('c16', P.carcass(0.4, 0.8, 0.37), {on: true, pos: [SIDE.x16, SIDE.yb, 0.015]});
+    S.add('c17', P.carcass(0.4, 0.8, 0.37), {on: true, pos: [SIDE.x17, SIDE.yb, 0.015]});
+    S.add('pn13', P.panel(0.39, 0.86), {on: true, pos: [SIDE.x13 - 0.018, SIDE.yb - 0.06, 0.015]});
+    S.add('pn17', P.panel(0.39, 0.86), {on: true, pos: [SIDE.end, SIDE.yb - 0.06, 0.015]});
+  }
+  if (o.doors) {
+    S.add('dd13', P.door(0.396, 0.796), {on: true, pos: [SIDE.x13 + 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd15a', P.door(0.396, 0.796, false, true), {on: true, pos: [SIDE.x15 + 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd15b', P.door(0.396, 0.796, true, true), {on: true, pos: [SIDE.x16 - 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd16', P.door(0.396, 0.796, true), {on: true, pos: [SIDE.x17 - 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd17', P.door(0.396, 0.796, true), {on: true, pos: [SIDE.end - 0.002, SIDE.yb + 0.002, 0.387]});
+  }
+}
+
+/* ---------- 8 · Today's wall cabinets and hood come down ---------- */
+STEPS.strip = {
+  cam: [[2.4, 1.7, 3.2], [1.9, 1.4, 0.2]], sun: [3, 4.5, 3.5, 1.9],
+  build: function(S){
+    roomSide(S, {}); var Y0 = 1.45, H = 0.7;
+    var units = [['oA', 0.72, 0.4], ['oB', 1.73, 0.8], ['oC', 2.53, 0.8]];
+    units.forEach(function(u){ S.add(u[0], P.oldUnit(u[2], H), {on: true, pos: [u[1], Y0, 0], label: u[0] === 'oB' ? "today's wall cabinets" : null, lp: [0.4, 0.8, 0.2]});
+      var n = u[2] > 0.5 ? 2 : 1; for (var i = 0; i < n; i++) S.add(u[0] + 'd' + i, P.oldDoor(u[2] / n - 0.004, H - 0.004), {on: true, pos: [u[1] + i * u[2] / n + 0.002, Y0 + 0.002, 0.33]}); });
+    S.add('oHc', P.oldUnit(0.6, 0.4), {on: true, pos: [1.125, 1.75, 0]}); S.add('oHcd', P.oldDoor(0.596, 0.396), {on: true, pos: [1.127, 1.752, 0.33]});
+    S.add('oHood', (function(){ var g = grp(); bx(0, 0, 0, 0.6, 0.16, 0.48, M.oldWhite, g); bx(0.02, -0.01, 0.42, 0.58, 0.0, 0.48, M.grey, g); return g; })(), {on: true, pos: [1.125, 1.59, 0], label: "today's hood: it comes down too", lp: [0.3, 0.25, 0.3], lc: 'hot'});
+    S.add('cu', (function(){ var g = grp(); bx(-0.12, -0.09, 0, 0.12, 0.09, 0.05, M.white, g); for (var i = 0; i < 5; i++) bx(-0.1 + i * 0.045, -0.03, 0.05, -0.07 + i * 0.045, 0.03, 0.06, M.grey, g); return g; })(), {pos: [0.32, 2.05, 0.005], label: 'kitchen circuits OFF at the consumer unit', lp: [0, 0.14, 0], lc: 'hot'});
+    S.add('cuT', (function(){ var g = grp(); bx(-0.012, -0.004, 0, 0.012, 0.03, 0.02, M.red, g); return g; })(), {pos: [0.32 + 0.045 * 2 - 0.085, 2.05, 0.06]});
+    S.add('plug', (function(){ var g = grp(); bx(-0.02, -0.025, 0, 0.02, 0.025, 0.035, M.white, g); cy(0, 0, 0.12, 0.004, 0.17, M.white, g, 'z', 6); return g; })(), {on: true, pos: [1.5, 2.2, 0.01], label: 'unplug · if wired in, tester first', lp: [0, 0.07, 0.1]});
+    S.add('sock', P.socket(), {on: true, pos: [1.5, 2.2, 0]});
+    S.add('blanket', (function(){ var g = grp(); bx(0.66, 0.885, 0, 3.35, 0.9, 0.64, std(0x7c8f9e, 0.95), g); return g; })(), {label: 'cover the hob and worktop', lp: [1.4, 0.95, 0.4], lc: 'dim'});
+    S.add('duct', (function(){ var g = grp(); cy(0, 0, 0.002, 0.065, 0.004, M.black, g, 'z', 24); cy(0, 0, 0.004, 0.075, 0.003, M.grey, g, 'z', 24); return g; })(), {pos: [1.425, 1.9, 0.0], label: 'a duct to the outside? keep it', lp: [0, 0.12, 0.05], lc: 'hot'});
+    S.add('holes', (function(){ var g = grp(); [[0.8, 2.1], [1.05, 2.1], [1.2, 2.1], [1.65, 2.1], [1.85, 2.1], [2.45, 2.1], [2.6, 2.1], [3.25, 2.1]].forEach(function(q){ cy(q[0], q[1], 0.001, 0.006, 0.002, M.black, g, 'z', 8); }); return g; })(), {label: 'fill the old holes', lp: [2.0, 2.2, 0], lc: 'dim'});
+    S.add('dTile', P.dim([0.5, 0.88, 0.05], [0.5, 1.45, 0.05]), {label: 'note where the tiles stop', lp: [0.1, 0.3, 0], lc: 'dimv'});
+    S.add('paint', (function(){ var g = grp(); bx(0.64, 1.45, 0.001, 0.72, 2.24, 0.004, M.orange, g); bx(3.35, 1.45, 0.001, 3.63, 2.24, 0.004, M.orange, g); return g; })(), {label: 'paint only where the wall will show', lp: [3.5, 2.3, 0], lc: 'hot'});
+  },
+  subs: [
+    {cam: [[2.1, 1.6, 2.6], [1.4, 1.65, 0.2]], acts: [['hl', 'oHood', 0.2, 1.4], ['hl', 'oHc', 0.6, 1.8]]},
+    {cam: [[1.4, 1.9, 2.0], [0.9, 2.05, 0]], acts: [['in', 'cu', 0, 0.4], ['in', 'cuT', 0, 0.4], ['rot', 'cuT', 0.6, 1.0, {dr: [-1.2, 0, 0]}], ['hl', 'cu', 1.0, 1.8], ['mv', 'plug', 1.8, 2.6, {dp: [0, -0.1, 0.25]}], ['out', 'plug', 2.6, 2.9]]},
+    {cam: [[2.4, 1.7, 3.0], [1.9, 1.1, 0.2]], acts: [['out', 'cu', 0, 0.3], ['out', 'cuT', 0, 0.3], ['in', 'blanket', 0.3, 1.2, {from: [0, 0.3, 0.2]}]]},
+    {cam: [[2.4, 1.7, 3.2], [1.9, 1.5, 0.2]], acts: (function(){ var a = [], t = 0, ds = ['oAd0', 'oHcd', 'oBd0', 'oBd1', 'oCd0', 'oCd1'];
+      ds.forEach(function(d, i){ a.push(['out', d, t + i * 0.25, t + i * 0.25 + 0.6, {to: [0, -0.2, 0.5]}]); });
+      t = 2.0; ['oA', 'oHood', 'oHc', 'oB', 'oC'].forEach(function(u, i){ a.push(['hl', u, t, t + 0.4]); a.push(['out', u, t + 0.4, t + 1.2, {to: [0, -0.45, 0.8]}]); t += 0.9; }); return a; })()},
+    {cam: [[1.9, 1.7, 1.6], [1.42, 1.85, 0]], acts: [['in', 'duct', 0, 0.5], ['hl', 'duct', 0.5, 1.8]]},
+    {cam: [[2.4, 1.6, 3.2], [1.9, 1.5, 0.1]], acts: [['out', 'duct', 0, 0.3], ['draw', 'dTile', 0.2, 1.0], ['in', 'holes', 0.8, 1.1], ['out', 'holes', 1.6, 2.4], ['in', 'paint', 2.2, 2.8, {o: 0.7}], ['hl', 'paint', 2.8, 3.6]]}
+  ]
+};
+
+/* ---------- 9 · Side wall: wall cabinets 13 · 15 · 16 · 17 ---------- */
+STEPS.walls = {
+  cam: [[2.5, 1.8, 3.6], [1.9, 1.6, 0.2]], sun: [3, 4.5, 3.5, 1.9],
+  build: function(S){
+    roomSide(S, {});
+    S.add('hi', P.pin(), {pos: [2.2, 0, 0.75], label: 'highest spot along this wall', lp: [0, 0.16, 0], lc: 'hot'});
+    S.add('d216', P.dim([2.2, 0, 0.7], [2.2, SIDE.rail, 0.7]), {label: '216.4 cm', lp: [0.1, 1.5, 0], lc: 'dimv'});
+    S.add('line', P.line([SIDE.x13, SIDE.rail, 0.002], [SIDE.end, SIDE.rail, 0.002], M.pencil, 0.003), {label: 'one level line, the whole way', lp: [2.6, 0.05, 0], lc: 'dim'});
+    var marks = [[SIDE.x13, '72.5'], [SIDE.x14, '112.5'], [1.725, '172.5'], [SIDE.x16, '252.6'], [SIDE.x17, '292.8'], [SIDE.end, '332.9']];
+    marks.forEach(function(m, i){ S.add('mk' + i, P.line([m[0], SIDE.rail - 0.1, 0.002], [m[0], SIDE.rail + 0.04, 0.002], M.pencil, 0.004), {label: m[1], lp: [0, 0.2, 0], lc: 'dimv'}); });
+    S.add('gap', (function(){ var g = grp(); bx(SIDE.x14, SIDE.yb, 0.001, 1.725, 2.224, 0.004, M.orange, g); return g; })(), {label: 'the gap for cabinet 14', lp: [1.425, 2.3, 0], lc: 'hot'});
+    S.add('tileTop', (function(){ var g = grp(); bx(0.66, 1.3, 0.0, 3.35, 1.45, 0.004, M.orange, g); return g; })(), {label: 'tiles above 142 cm? chisel off the top row, or pack out the rail', lp: [2.0, 0.1, 0], lc: 'hot'});
+    [0.9, 1.6, 2.3, 3.0].forEach(function(x, i){ S.add('pk' + i, P.packer(), {pos: [x, SIDE.rail + 0.02, -0.002]}); });
+    S.add('railA', P.rail(2.0), {pos: [SIDE.x13, SIDE.rail, 0], label: '2 m length', lp: [1.0, 0.08, 0]});
+    S.add('railB', P.rail(0.6), {pos: [SIDE.x13 + 2.0, SIDE.rail, 0], label: '+ the 60 cm piece from the base rail', lp: [0.3, 0.08, 0], lc: 'dim'});
+    S.add('drill', P.drill(), {pos: [0.8, SIDE.rail + 0.025, 0.3]});
+    var hs = [0.78, 1.08, 1.38, 1.68, 1.98, 2.28, 2.58, 2.7, 2.75, 3.05, 3.3];
+    hs.forEach(function(x, i){ S.add('rs' + i, P.screw(0.05), {pos: [x, SIDE.rail + 0.025, 0.017 - 0.05]}); });
+    S.add('c15', P.carcass(0.8, 0.8, 0.37), {pos: [SIDE.x15, SIDE.yb, 0.015], label: '15', lp: [0.4, 0.88, 0.2]});
+    S.add('c16', P.carcass(0.4, 0.8, 0.37), {pos: [SIDE.x16, SIDE.yb, 0.015], label: '16', lp: [0.2, 0.88, 0.2]});
+    S.add('c17', P.carcass(0.4, 0.8, 0.37), {pos: [SIDE.x17, SIDE.yb, 0.015], label: '17', lp: [0.2, 0.88, 0.2]});
+    S.add('c13', P.carcass(0.4, 0.8, 0.37), {pos: [SIDE.x13, SIDE.yb, 0.015], label: '13', lp: [0.2, 0.88, 0.2]});
+    S.add('batten', (function(){ var g = grp(); bx(SIDE.x14, 1.75, 0.3, SIDE.x15, 1.79, 0.34, M.wood, g); return g; })(), {label: 'batten cut to 60.1 cm: 14 will fit', lp: [1.425, 1.85, 0.32], lc: 'hot'});
+    S.add('pn13', P.panel(0.39, 0.86), {pos: [SIDE.x13 - 0.018, SIDE.yb - 0.06, 0.015], label: 'panel on the fridge side', lp: [0, 0.95, 0.2]});
+    S.add('pn17', P.panel(0.39, 0.86), {pos: [SIDE.end, SIDE.yb - 0.06, 0.015], label: 'panel on the far side', lp: [0, 0.95, 0.2]});
+    S.add('dd13', P.door(0.396, 0.796), {pos: [SIDE.x13 + 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd15a', P.door(0.396, 0.796, false, true), {pos: [SIDE.x15 + 0.002, SIDE.yb + 0.002, 0.387], label: 'glass doors on 15', lp: [0.4, 0.9, 0.05]});
+    S.add('dd15b', P.door(0.396, 0.796, true, true), {pos: [SIDE.x16 - 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd16', P.door(0.396, 0.796, true), {pos: [SIDE.x17 - 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('dd17', P.door(0.396, 0.796, true), {pos: [SIDE.end - 0.002, SIDE.yb + 0.002, 0.387]});
+    S.add('leds', (function(){ var g = grp(); [[SIDE.x13, 0.4], [SIDE.x15, 0.8], [SIDE.x16, 0.4], [SIDE.x17, 0.4]].forEach(function(q){ var l = P.led(q[1] - 0.06); l.position.set(q[0] + 0.03, SIDE.yb - 0.009, 0.27); g.add(l); }); bx(2.0, 2.224, 0.05, 2.18, 2.26, 0.15, M.white, g); return g; })(), {label: 'LED strips under the cabinets · driver on top, needs a socket', lp: [2.0, 2.33, 0.1], lc: 'dim'});
+  },
+  subs: [
+    {cam: [[2.6, 1.4, 3.9], [2.0, 1.15, 0.2]], acts: [['in', 'hi', 0, 0.5, {from: [0, 0.3, 0]}], ['draw', 'd216', 0.6, 1.8], ['draw', 'line', 1.8, 3.4]]},
+    {cam: [[2.3, 1.9, 3.0], [1.9, 1.95, 0]], acts: (function(){ var a = [['out', 'hi', 0, 0.3], ['out', 'd216', 0, 0.3]]; for (var i = 0; i < 6; i++) a.push(['draw', 'mk' + i, 0.3 + i * 0.35, 0.6 + i * 0.35]); a.push(['in', 'gap', 2.5, 2.9, {o: 0.45}]); a.push(['hl', 'gap', 2.9, 3.8]); return a; })(), show: ['mk0', 'mk1', 'mk2', 'mk3', 'mk4', 'mk5']},
+    {cam: [[2.3, 1.6, 2.7], [1.9, 1.55, 0]], acts: [['out', 'gap', 0, 0.3], ['in', 'tileTop', 0.2, 0.6, {o: 0.6}], ['hl', 'tileTop', 0.6, 1.6], ['in', 'pk0', 1.6, 1.9, {from: [0, 0.1, 0.1]}], ['in', 'pk1', 1.7, 2.0, {from: [0, 0.1, 0.1]}], ['in', 'pk2', 1.8, 2.1, {from: [0, 0.1, 0.1]}], ['in', 'pk3', 1.9, 2.2, {from: [0, 0.1, 0.1]}]]},
+    {cam: [[2.4, 2.0, 2.8], [1.95, 2.1, 0]], acts: (function(){ var a = [['out', 'tileTop', 0, 0.3], ['in', 'railA', 0.2, 1.0, {from: [0, -0.3, 0.5]}], ['in', 'railB', 0.8, 1.4, {from: [0.2, -0.3, 0.5]}], ['in', 'drill', 1.4, 1.7]];
+      var t = visit(a, 'drill', hs().map(function(x){ return [x, SIDE.rail + 0.025, 0.03]; }), 1.7, 0.55, [0, 0, -0.02], function(i, tt){ a.push(['in', 'rs' + i, tt, tt + 0.3, {from: [0, 0, 0.05]}]); });
+      a.push(['out', 'drill', t, t + 0.3]); a.push(['hl', 'railA', t + 0.3, t + 1.3]); a.push(['hl', 'railB', t + 0.3, t + 1.3]); return a;
+      function hs(){ return [0.78, 1.08, 1.38, 1.68, 1.98, 2.28, 2.58, 2.7, 2.75, 3.05, 3.3]; } })()},
+    {cam: [[2.9, 1.9, 3.1], [2.5, 1.75, 0.2]], acts: [['in', 'c15', 0, 1.1, {from: [0, -0.35, 0.6]}], ['in', 'c16', 1.1, 2.1, {from: [0, -0.35, 0.6]}], ['in', 'c17', 2.1, 3.1, {from: [0, -0.35, 0.6]}]]},
+    {cam: [[1.9, 1.8, 2.6], [1.3, 1.75, 0.2]], acts: [['in', 'c13', 0, 1.1, {from: [0, -0.35, 0.6]}], ['in', 'batten', 1.2, 1.8, {from: [0, 0, 0.4]}], ['hl', 'batten', 1.8, 2.8]]},
+    {cam: [[2.4, 1.8, 3.3], [1.9, 1.7, 0.2]], acts: [['out', 'batten', 0, 0.3], ['in', 'pn13', 0.2, 1.0, {from: [-0.3, 0, 0.3]}], ['in', 'pn17', 0.8, 1.6, {from: [0.3, 0, 0.3]}]]},
+    {cam: [[2.4, 1.7, 3.4], [1.9, 1.6, 0.2]], acts: [['in', 'dd13', 0, 0.5, {from: [0, 0, 0.3]}], ['in', 'dd15a', 0.4, 0.9, {from: [0, 0, 0.3]}], ['in', 'dd15b', 0.6, 1.1, {from: [0, 0, 0.3]}], ['in', 'dd16', 0.9, 1.4, {from: [0, 0, 0.3]}], ['in', 'dd17', 1.2, 1.7, {from: [0, 0, 0.3]}], ['in', 'leds', 1.9, 2.4]]}
+  ]
+};
+
+/* ---------- 10 · Cabinet 14 and the hood (the hob is induction now) ---------- */
+STEPS.later = {
+  cam: [[2.2, 1.6, 2.9], [1.45, 1.5, 0.2]], sun: [3, 4.5, 3.5, 1.5],
+  build: function(S){
+    roomSide(S, {}); sideBuilt(S, {rail: true, cabs: true, doors: true});
+    S.add('c14', P.carcass(0.6, 0.8, 0.37), {pos: [SIDE.x14, SIDE.yb, 0.015], label: 'cabinet 14: follow the UNDERVERK pages of its leaflet', lp: [0.3, 0.88, 0.2]});
+    S.actors.c14.atF = [1.3 - SIDE.x14, 0.005 - SIDE.yb, 1.3 - 0.015];
+    S.add('sd', P.screwdriver(), {pos: [1.2, 1.6, 0.12], rot: [0, PI / 2, 0], label: 'join to 13 and 15', lp: [0, 0.1, 0]});
+    [[0.25, 0.1], [0.65, 0.1]].forEach(function(q, i){ S.add('js' + i, P.screw(0.035), {pos: [SIDE.x14 - 0.017, SIDE.yb + q[0], q[1]], rot: [0, PI / 2, 0]}); });
+    S.add('hood', P.hood(), {pos: [SIDE.x14 + 0.04, SIDE.yb - 0.03, 0.04], label: 'hood into the bottom of 14, as its leaflet shows', lp: [0.26, -0.08, 0.3], lc: 'hot'});
+    S.add('ductF', (function(){ var g = grp(); cy(SIDE.x14 + 0.3, SIDE.yb + 0.25, 0.16, 0.075, 0.32, M.silver, g, null, 20); bx(SIDE.x14 + 0.04, SIDE.yb + 0.4, 0.05, SIDE.x14 + 0.56, SIDE.yb + 0.418, 0.36, M.carc, g); bx(SIDE.x14 + 0.18, SIDE.yb + 0.418, 0.07, SIDE.x14 + 0.42, SIDE.yb + 0.47, 0.32, M.black, g); return g; })(), {label: 'short duct · NYTTIG FIL 500 charcoal filter: it recirculates', lp: [SIDE.x14 + 0.3, SIDE.yb + 0.55, 0.2], lc: 'hot'});
+    S.add('sock', P.socket(), {pos: [1.45, 2.32, 0], label: 'socket at about 2 m: ask the electrician if there is none', lp: [0, 0.07, 0.05], lc: 'hot'});
+    S.add('cable', P.line([1.42, 2.224, 0.25], [1.45, 2.3, 0.012], M.black, 0.006), {});
+    S.add('d50', P.dim([1.425, 0.886, 0.3], [1.425, SIDE.yb - 0.042, 0.3]), {label: 'at least 50 cm above the hob (plan: 50.4)', lp: [0.1, 0.27, 0], lc: 'dimv'});
+    S.add('d14', P.door(0.596, 0.796), {pos: [SIDE.x14 + 0.002, SIDE.yb + 0.002, 0.387], label: 'door, hinges, handle', lp: [0.3, 0.86, 0]});
+  },
+  prep: function(S){ var a = S.actors.c14; S.def.subs[0].acts.forEach(function(act){ if (act[1] === 'c14' && act[0] === 'in') act[4] = {at: a.atF, from: [0, 0.3, 0]}; }); },
+  subs: [
+    {cam: [[2.4, 1.3, 3.2], [1.5, 0.6, 1.2]], acts: [['in', 'c14', 0, 0.8, {at: null}], ['hl', 'c14', 0.8, 1.8]]},
+    {cam: [[2.2, 1.7, 2.7], [1.45, 1.75, 0.2]], acts: (function(){ var a = [['mv', 'c14', 0, 0.7, {dp: [0, 1.0, 0]}], ['mv', 'c14', 0.7, 2.0, {home: true}], ['in', 'sd', 2.0, 2.3]];
+      var t = visit(a, 'sd', [[SIDE.x14 + 0.04, SIDE.yb + 0.25, 0.1], [SIDE.x14 + 0.04, SIDE.yb + 0.65, 0.1]], 2.3, 0.9, [-0.012, 0, 0], function(i, tt){ a.push(['in', 'js' + i, tt, tt + 0.3]); }); a.push(['out', 'sd', t, t + 0.3]); return a; })()},
+    {cam: [[2.0, 1.0, 2.3], [1.42, 1.35, 0.2]], acts: [['in', 'hood', 0, 1.4, {from: [0, -0.35, 0.25]}], ['hl', 'hood', 1.4, 2.4]]},
+    {cam: [[2.0, 1.75, 2.0], [1.42, 1.7, 0.2]], acts: [['fade', 'c14', 0, 0.5, {o: 0.3}], ['in', 'ductF', 0.5, 1.3], ['hl', 'ductF', 1.3, 2.3], ['fade', 'c14', 2.6, 3.0, {o: 1}]]},
+    {cam: [[1.9, 2.1, 1.9], [1.45, 2.2, 0]], acts: [['in', 'sock', 0, 0.4], ['draw', 'cable', 0.4, 1.2], ['hl', 'sock', 1.2, 2.0]]},
+    {cam: [[2.3, 1.3, 2.6], [1.45, 1.2, 0.3]], acts: [['draw', 'd50', 0, 1.0], ['in', 'd14', 1.4, 2.0, {from: [0, 0, 0.3]}]]}
+  ]
+};
+
+/* ---- steps_d.js ---- */
+/* ---------- 11 · Bonus: niche shelves from the worktop offcut ---------- */
+STEPS.niche = {
+  cam: [[2.6, 1.6, 2.4], [1.8, 1.2, -0.1]], sun: [2.5, 4.5, 3.5, 1.8],
+  build: function(S){
+    roomBack(S, {}); backBuilt(S, {base: true, top: true, wall: true});
+    S.add('oldSh', (function(){ var g = grp(); [0.95, 1.45].forEach(function(y){ bx(1.37, y, -0.41, 2.29, y + 0.02, 0, M.wood, g); }); return g; })(), {on: true, label: "today's shelves: they can stay until then", lp: [1.83, 1.6, -0.2], lc: 'dim'});
+    S.add('dw1', P.dim([1.37, 1.15, -0.1], [2.29, 1.15, -0.1]), {label: '≈ 92 cm here…', lp: [0.46, 0.03, 0], lc: 'dimv'});
+    S.add('dw2', P.dim([1.37, 1.65, -0.1], [2.29, 1.65, -0.1]), {label: '…and here: cut each 3 mm short', lp: [0.46, 0.03, 0], lc: 'dimv'});
+    S.add('tr1', P.trestle(), {pos: [1.2, 0, 1.4]}); S.add('tr2', P.trestle(), {pos: [2.4, 0, 1.4]});
+    S.add('off', P.slab(1.182, 0.635, 0.038), {pos: [1.8, 0.559, 1.4], label: 'the offcut, ≈ 118 × 63 cm', lp: [0, 0.06, 0]});
+    S.add('cutL', P.line([2.3, 0.579, 1.08], [2.3, 0.579, 1.72], M.diag, 0.006), {label: '1 · cut the length', lp: [0, 0.04, 0.6], lc: 'hot'});
+    S.add('cutM', P.line([1.21, 0.579, 1.4], [2.3, 0.579, 1.4], M.diag, 0.006), {label: '2 · split it: two shelves ≈ 31 cm deep', lp: [0.5, 0.04, 0], lc: 'hot'});
+    S.add('sh1', P.slab(0.917, 0.31, 0.038), {pos: [1.83, 0.95 + 0.019, -0.22], label: 'factory edge at the front', lp: [0, 0.06, 0.12]});
+    S.add('sh2', P.slab(0.917, 0.31, 0.038), {pos: [1.83, 1.45 + 0.019, -0.22]});
+    S.actors.sh1.atT = [1.8 - 1.83, 0.559 - 0.969, 1.243 - (-0.22)]; S.actors.sh2.atT = [1.8 - 1.83, 0.559 - 1.469, 1.557 - (-0.22)];
+    S.add('ang', (function(){ var g = grp(); [0.95, 1.45].forEach(function(y){ bx(1.37, y - 0.03, -0.39, 1.4, y, -0.03, M.alu, g); bx(2.26, y - 0.03, -0.39, 2.29, y, -0.03, M.alu, g); }); return g; })(), {label: 'aluminium angle 30 × 30 each side, level', lp: [1.38, 1.0, -0.2], lc: 'hot'});
+    S.add('sh3', P.slab(0.917, 0.31, 0.038), {pos: [1.83, 1.95 + 0.019, -0.22], label: 'the third shelf: from the next worktop', lp: [0, 0.06, 0.1], lc: 'dim'});
+  },
+  prep: function(S){ S.def.subs[1].acts.forEach(function(act){ if ((act[1] === 'sh1' || act[1] === 'sh2') && act[0] === 'in') act[4] = {at: S.actors[act[1]].atT}; }); },
+  subs: [
+    {cam: [[2.4, 1.5, 1.8], [1.83, 1.35, -0.2]], acts: [['out', 'oldSh', 0, 0.6, {to: [0, 0, 0.4]}], ['draw', 'dw1', 0.6, 1.4], ['draw', 'dw2', 1.4, 2.2]]},
+    {cam: [[2.9, 1.6, 3.0], [1.8, 0.55, 1.4]], acts: [['out', 'dw1', 0, 0.3], ['out', 'dw2', 0, 0.3], ['in', 'tr1', 0, 0.4], ['in', 'tr2', 0, 0.4], ['in', 'off', 0.3, 0.8], ['draw', 'cutL', 1.0, 1.8], ['draw', 'cutM', 1.9, 2.9],
+      ['out', 'off', 3.1, 3.4], ['out', 'cutL', 3.1, 3.4], ['out', 'cutM', 3.1, 3.4], ['in', 'sh1', 3.2, 3.5, {at: null}], ['in', 'sh2', 3.2, 3.5, {at: null}]]},
+    {cam: [[2.6, 1.3, 2.6], [1.8, 0.55, 1.4]], acts: [['hl', 'sh1', 0, 1.2], ['hl', 'sh2', 0, 1.2]]},
+    {cam: [[2.4, 1.5, 1.6], [1.83, 1.2, -0.2]], acts: [['in', 'ang', 0, 0.8, {from: [0, 0, 0.3]}], ['hl', 'ang', 0.8, 1.8]]},
+    {cam: [[2.5, 1.6, 2.0], [1.83, 1.3, -0.2]], acts: [['out', 'tr1', 0, 0.3], ['out', 'tr2', 0, 0.3], ['mv', 'sh1', 0, 1.4, {home: true}], ['mv', 'sh2', 0.4, 1.8, {home: true}], ['in', 'sh3', 2.0, 2.5, {o: 0.35}]], show: ['sh1']}
+  ]
+};
+
+/* ---------- 2 · Delivery day ---------- */
+STEPS.delivery = {
+  cam: [[2.6, 1.8, 3.2], [1.1, 0.4, 1.0]], sun: [2.5, 4.5, 3.5, 1.0],
+  build: function(S){
+    roomBack(S, {nicheShelves: true});
+    var oc = grp(); bx(0, 0, 0, 0.6, 0.7, 0.33, M.oldWhite, oc); bx(0.03, 0.03, 0.33, 0.57, 0.67, 0.335, M.oldBlue, oc); S.add('oldCab', oc, {on: true, pos: [0.0, 1.45, 0.0], label: 'nothing old comes down yet', lp: [0.3, 0.8, 0.2], lc: 'hot'});
+    var mt = grp(); bx(0.0, 0.72, 0, 0.8, 0.75, 0.5, M.wood, mt); [[0.02, 0.02], [0.75, 0.02], [0.02, 0.45], [0.75, 0.45]].forEach(function(q){ bx(q[0], 0, q[1], q[0] + 0.03, 0.72, q[1] + 0.03, M.wood, mt); }); bx(0.15, 0.75, 0.08, 0.6, 1.03, 0.43, M.black, mt);
+    S.add('mwt', mt, {on: true, pos: [0.15, 0, 0.03]});
+    // frame boxes, numbered in build order, and the long worktop box on three battens
+    var order = ['11', '12', '2', '3', '13', '15', '16', '17'];
+    order.forEach(function(n, i){ var big = n === '2' || n === '3'; S.add('bx' + n, P.box(big ? 0.62 : 0.42, 0.1, big ? 0.82 : 0.82, n), {pos: [0.35 + i * 0.32, 0.0, 1.5], label: i === 0 ? 'numbered, stacked in build order' : null, lp: [0, 0.2, 0], lc: 'hot'}); });
+    S.add('pile', (function(){ var g = grp(); for (var i = 0; i < 6; i++) { var b = P.box(0.6, 0.12, 0.8); b.position.set(0.6 + (i % 3) * 0.66, (i / 3 | 0) * 0.125, 1.3); b.rotation.y = (i * 0.37) % 0.3 - 0.15; g.add(b); } return g; })(), {label: 'count against the delivery note, today', lp: [1.2, 0.4, 1.3], lc: 'hot'});
+    S.add('battens', (function(){ var g = grp(); [0.4, 1.4, 2.4].forEach(function(x){ bx(x, 0, 2.15, x + 0.05, 0.04, 2.85, M.wood, g); }); return g; })(), {label: 'three battens: flat, off the floor', lp: [1.4, 0.06, 2.5], lc: 'dim'});
+    S.add('wtBox', P.box(2.5, 0.06, 0.66, 'WORKTOP'), {pos: [1.43, 0.04, 2.5], label: 'worktop', lp: [0, 0.12, 0]});
+    S.add('bx14', P.box(0.62, 0.1, 0.82, '14'), {pos: [2.55, 0.0, 1.5], label: 'box 14 and its door: set aside, closed', lp: [0, 0.2, 0], lc: 'hot'});
+  },
+  subs: [
+    {acts: [['in', 'pile', 0, 1.0, {from: [0, 0.6, 0]}], ['hl', 'pile', 1.0, 2.2]]},
+    {cam: [[2.8, 1.5, 4.2], [1.4, 0.1, 2.3]], acts: [['in', 'battens', 0, 0.6], ['in', 'wtBox', 0.6, 1.6, {from: [0, 0.5, 0]}], ['hl', 'battens', 1.6, 2.4]]},
+    {cam: [[2.4, 1.6, 3.4], [1.5, 0.1, 1.5]], acts: (function(){ var a = [['out', 'pile', 0, 0.5]]; ['11', '12', '2', '3', '13', '15', '16', '17'].forEach(function(n, i){ a.push(['in', 'bx' + n, 0.4 + i * 0.25, 0.8 + i * 0.25, {from: [0, 0.3, 0]}]); }); return a; })(), show: ['bx11']},
+    {cam: [[3.2, 1.4, 3.1], [2.4, 0.1, 1.5]], acts: [['in', 'bx14', 0, 0.5, {from: [0, 0.3, 0]}], ['mv', 'bx14', 0.6, 1.6, {dp: [0, 0, -1.1]}], ['hl', 'bx14', 1.6, 2.4]]},
+    {cam: [[1.9, 1.6, 2.6], [0.5, 1.0, 0.3]], acts: [['hl', 'oldCab', 0, 1.2], ['hl', 'mwt', 0.4, 1.6]], show: ['oldCab']}
+  ]
+};
+
+/* ---------- 1 · Tools, and the test hole that tells you which wall fixing ---------- */
+P.section = function(kind){   // a wall cut open: what the drill finds behind the paint
+  var g = grp();
+  if (kind === 'stone') { bx(-0.25, -0.2, -0.3, 0.25, 0.2, 0, std(0x8d8a84, 0.95), g); }
+  if (kind === 'brick') { bx(-0.25, -0.2, -0.22, 0.25, 0.2, 0, std(0xb2553a, 0.9), g); for (var i = 0; i < 3; i++) bx(-0.2 + i * 0.15, -0.15, -0.17, -0.1 + i * 0.15, 0.15, -0.05, std(0x1c1c1c, 1), g); }
+  if (kind === 'board') { bx(-0.25, -0.2, -0.013, 0.25, 0.2, 0, std(0xf2f0ea, 0.9), g); bx(-0.25, -0.2, -0.33, 0.25, 0.2, -0.06, std(0x8d8a84, 0.95), g); }
+  return g;
+};
+P.plug = function(len, col){ var g = grp(); cy(0, 0, -len / 2, 0.005, len, col || std(0xdedede, 0.6), g, 'z', 10); return g; };
+STEPS.prep = {
+  cam: [[1.3, 1.3, 1.6], [0.6, 0.85, 0.3]], sun: [2.5, 4.5, 3.5, 0.6],
+  build: function(S){
+    roomBack(S, {nicheShelves: true});
+    var tools = [['drill', P.drill(), [0.25, 0.88, 0.45], [PI / 2, 0, 0.3], 'drill-driver, hammer setting · bits 3–8 mm'], ['det', P.detector(), [0.55, 0.81, 0.5], [-PI / 2, 0, 0], 'cable and pipe detector'], ['lvl', P.level(0.8), [0.9, 0.74, 0.25], [0, 0, 0], 'level, 80 cm or more'],
+      ['tape', P.tapeCase(), [0.25, 0.74, 0.7], [0, 0.4, 0], 'tape, pencil, square'], ['saw', P.hacksaw(), [0.7, 0.75, 0.75], [-PI / 2, 0, 0], 'hacksaw for the rails'], ['clamp', P.clamp(), [1.05, 0.88, 0.62], [PI / 2, 0, 0], 'clamps · saw + guide for the worktop'], ['ham', P.hammer(), [1.25, 0.75, 0.35], [0, 0, PI / 2], 'hammer, mallet']];
+    S.add('bench', (function(){ var g = grp(); bx(0.05, 0.7, 0.15, 1.45, 0.74, 0.9, M.ply, g); [[0.1, 0.2], [1.38, 0.2], [0.1, 0.82], [1.38, 0.82]].forEach(function(q){ bx(q[0], 0, q[1], q[0] + 0.04, 0.7, q[1] + 0.04, M.wood, g); }); return g; })(), {on: true});
+    tools.forEach(function(t){ S.add(t[0], t[1], {pos: t[2], rot: t[3], label: t[4], lp: [0, 0.1, 0]}); });
+    S.add('scr', (function(){ var g = grp(); for (var i = 0; i < 8; i++) { var s = P.screw(0.05); s.rotation.set(-PI / 2, 0, i * 0.7); s.position.set(1.15 + (i % 4) * 0.03, 0.745, 0.8 + (i / 4 | 0) * 0.04); g.add(s); } return g; })(), {label: '≈ 25 wall screws + plugs: not in any IKEA box', lp: [1.2, 0.84, 0.82], lc: 'hot'});
+    // three walls, cut open
+    [['stone', 0.4], ['brick', 1.1], ['board', 1.8]].forEach(function(w){ S.add('w_' + w[0], P.section(w[0]), {pos: [w[1], 1.4, 1.9]}); });
+    S.add('pS', P.plug(0.05), {pos: [0.4, 1.4, 1.9], label: 'grey, hard, steady: stone or concrete → 8 mm nylon plug, 5 × 50 screw', lp: [0, 0.27, 0], lc: 'hot'});
+    S.add('pB', P.plug(0.12, std(0x3b6fb6, 0.6)), {pos: [1.1, 1.4, 1.9], label: 'red dust, then a hollow: hollow brick → long plugs or resin', lp: [0, 0.27, 0], lc: 'hot'});
+    S.add('pD', P.plug(0.14, std(0xd8b43a, 0.6)), {pos: [1.8, 1.4, 1.9], label: 'white dust, then a gap: plasterboard → long frame fixing into the masonry', lp: [0, 0.27, 0], lc: 'hot'});
+    S.add('drill2', P.drill(), {pos: [0.4, 1.4, 2.3]});
+  },
+  subs: [
+    {text: 'Have the tools ready before delivery: a drill-driver with a hammer setting and bits, a cable and pipe detector, a long level, tape, pencil and square, a hacksaw for the rails, a saw with a straight guide and clamps for the worktop, a hammer and a mallet. Wall screws and plugs are not in any IKEA box.',
+      acts: [['in', 'drill', 0, 0.4, {from: [0, 0.3, 0]}], ['in', 'det', 0.3, 0.7, {from: [0, 0.3, 0]}], ['in', 'lvl', 0.6, 1.0, {from: [0, 0.3, 0]}], ['in', 'tape', 0.9, 1.3, {from: [0, 0.3, 0]}], ['in', 'saw', 1.2, 1.6, {from: [0, 0.3, 0]}], ['in', 'clamp', 1.5, 1.9, {from: [0, 0.3, 0]}], ['in', 'ham', 1.8, 2.2, {from: [0, 0.3, 0]}], ['in', 'scr', 2.1, 2.5, {from: [0, 0.3, 0]}]],
+      show: ['drill', 'det', 'lvl', 'tape', 'saw', 'clamp', 'ham', 'scr']},
+    {text: 'Which fixing? Drill one 6 mm test hole where a cabinet will hide it, and look at the dust. Grey, hard and steady all the way: stone or concrete. Use 8 mm nylon plugs with 5 × 50 mm screws. If a plug spins in a mortar joint, move a few centimetres: the rail has holes all along.',
+      cam: [[0.9, 1.6, 3.2], [0.45, 1.35, 1.8]], acts: [['in', 'w_stone', 0, 0.4], ['in', 'drill2', 0.3, 0.6], ['mv', 'drill2', 0.6, 1.4, {dp: [0, 0, -0.38]}], ['mv', 'drill2', 1.4, 2.0, {dp: [0, 0, 0.38]}], ['out', 'drill2', 2.0, 2.3], ['in', 'pS', 2.2, 2.8, {from: [0, 0, 0.3]}]]},
+    {text: 'Red dust, then the bit suddenly drops into a hollow: hollow brick. Use long plugs made for hollow brick, or injection resin with a sleeve.',
+      cam: [[1.5, 1.6, 3.2], [1.1, 1.35, 1.8]], acts: [['in', 'w_brick', 0, 0.4], ['in', 'pB', 0.8, 1.6, {from: [0, 0, 0.35]}]]},
+    {text: 'White soft dust, then a gap: a plasterboard lining stands in front of the wall. The fixing has to reach the masonry behind, with long frame fixings. Plasterboard anchors alone will not hold kitchen cabinets.',
+      cam: [[2.2, 1.6, 3.2], [1.8, 1.35, 1.8]], acts: [['in', 'w_board', 0, 0.4], ['in', 'pD', 0.8, 1.6, {from: [0, 0, 0.35]}]]}
   ]
 };
 
