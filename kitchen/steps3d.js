@@ -514,6 +514,155 @@ STEPS.base = {
   ]
 };
 
+/* ---- steps_b.js ---- */
+/* ---------- shared pieces for the back wall once things are built ---------- */
+P.circSaw = function(){ var g = grp(); bx(-0.15, 0, -0.1, 0.15, 0.008, 0.12, M.grey, g); var d = cy(0, 0.03, 0, 0.085, 0.003, M.silver, g, 'x', 28); d.position.x = 0.0; bx(-0.09, 0.008, -0.08, 0.06, 0.12, 0.1, M.blue, g); bx(-0.05, 0.12, -0.05, 0.03, 0.2, 0.08, M.black, g); return g; };
+P.slab = function(L, d, t){ var g = grp(); bx(-L / 2, -t / 2, -d / 2, L / 2, t / 2, d / 2, M.oak, g); return g; };
+P.hinge = function(){ var g = grp(); cy(0, 0, 0, 0.0175, 0.012, M.silver, g, null, 18); bx(-0.012, 0.004, 0.0, 0.012, 0.014, 0.075, M.silver, g); return g; };
+P.plate = function(){ var g = grp(); bx(0, -0.025, 0, 0.004, 0.025, 0.045, M.silver, g); return g; };
+P.arrow = function(len, col){ var g = grp(); var c = new T.Mesh(new T.CylinderGeometry(0.006, 0.006, len, 8), col || M.orange); c.position.y = len / 2; g.add(c); var h = new T.Mesh(new T.ConeGeometry(0.018, 0.04, 12), col || M.orange); h.position.y = len + 0.02; g.add(h); return g; };
+P.blanket = function(w, d){ var g = grp(); bx(0, 0, 0, w, 0.012, d, std(0x7c8f9e, 0.95), g); return g; };
+
+// the back wall as far as it is built: o = {base, top, wall, doors, panelW}
+function backBuilt(S, o){
+  if (o.base) {
+    S.add('rail', P.rail(1.2), {on: true, pos: [0.05, 0.82, 0]});
+    S.add('cab2', P.carcass(0.6, 0.8, 0.6, {base: true, legs: true}), {on: true, pos: [0.05, 0.08, 0.015]});
+    S.add('cab3', P.carcass(0.6, 0.8, 0.6, {base: true, legs: true}), {on: true, pos: [0.65, 0.08, 0.015]});
+    S.add('pan', P.panel(0.62, 0.8), {on: true, pos: [1.25, 0.08, 0.015]});
+  }
+  if (o.top) S.add('wt', P.worktop(1.275, 0.635), {on: true, pos: [0.004, 0.88, 0.002]});
+  if (o.wall) {
+    S.add('railW', P.rail(1.2), {on: true, pos: [0.05, 2.164, 0]});
+    S.add('w11', P.carcass(0.6, 0.8, 0.37), {on: true, pos: [0.05, 1.424, 0.015]});
+    S.add('w12', P.carcass(0.6, 0.8, 0.37), {on: true, pos: [0.65, 1.424, 0.015]});
+    S.add('panW', P.panel(0.39, 0.86), {on: true, pos: [1.25, 1.364, 0.015]});
+  }
+}
+
+/* ---------- 5 · Worktop ---------- */
+STEPS.top = {
+  cam: [[2.2, 1.6, 2.4], [0.9, 0.7, 0.6]], sun: [2.5, 4, 3.5, 0.9],
+  build: function(S){
+    roomBack(S, {nicheShelves: true}); backBuilt(S, {base: true});
+    S.add('dmB', P.dim([0, 0.9, 0.06], [1.268, 0.9, 0.06]), {label: 'at the back: corner wall → panel', lp: [0.64, 0.03, 0], lc: 'dimv'});
+    S.add('dmF', P.dim([0, 0.9, 0.6], [1.268, 0.9, 0.6]), {label: 'at the front · use the longer, + 1.5 cm ≈ 127.5 cm', lp: [0.64, 0.03, 0], lc: 'dimv'});
+    S.add('tr1', P.trestle(), {pos: [0.6, 0, 1.25]}); S.add('tr2', P.trestle(), {pos: [2.0, 0, 1.25]});
+    var L = 1.275, d = 0.635, t = 0.038;
+    S.add('wtK', P.slab(L, d, t), {pos: [0.004 + L / 2, 0.88 + t / 2, 0.002 + d / 2], label: 'the piece you keep', lp: [0, 0.06, 0]});
+    S.actors.wtK.atT = [1.185 + L / 2 - (0.004 + L / 2), 0.559 - (0.88 + t / 2), 1.25 - (0.002 + d / 2)];
+    S.add('wtO', P.slab(1.182, d, t), {pos: [0.591, 0.559, 1.25], label: 'offcut ≈ 118 × 63 cm', lp: [0, 0.06, 0]});
+    S.add('endCut', P.pin(M.orange), {pos: [1.185, 0.6, 1.6], label: 'this end is cut: it goes against the corner wall', lp: [0, 0.14, 0], lc: 'hot'});
+    S.add('endF', P.pin(M.green), {pos: [2.45, 0.6, 1.6], label: 'factory end: faces the niche', lp: [0, 0.14, 0]});
+    S.add('tape', (function(){ var g = grp(); bx(-0.025, 0, -0.33, 0.025, 0.002, 0.33, M.white, g); return g; })(), {pos: [1.185, 0.579, 1.25], label: 'masking tape, line on it', lp: [0, 0.03, -0.3], lc: 'dim'});
+    S.add('guide', (function(){ var g = grp(); bx(-0.03, 0, -0.45, 0.03, 0.02, 0.45, M.alu, g); return g; })(), {pos: [1.37, 0.578, 1.25], label: 'straight guide, clamped', lp: [0, 0.04, 0.4], lc: 'dim'});
+    S.add('csaw', P.circSaw(), {pos: [1.185, 0.578, 1.72], label: 'one steady pass', lp: [0, 0.25, 0]});
+    S.add('seal', (function(){ var g = grp(); bx(-L / 2 - 0.002, -t / 2, -d / 2, -L / 2 + 0.001, t / 2, d / 2, M.orange, g); return g; })(), {parent: 'wtK', label: 'seal the cut end', lp: [-0.6, 0.06, 0], lc: 'hot'});
+    S.add('gapL', P.dim([0.0, 0.93, 0.3], [0.004, 0.93, 0.3]), {label: '3–5 mm to the wall', lp: [0.05, 0.02, 0], lc: 'dimv'});
+    [0.2, 0.5, 0.8, 1.1].forEach(function(x, i){ S.add('ts' + i, P.screw(0.04), {pos: [x, 0.902, 0.565], rot: [PI / 2, 0, 0]}); });
+    S.add('sd', P.screwdriver(), {pos: [0.2, 0.75, 0.565], rot: [PI / 2, 0, 0], label: 'up through the top rails · max 25 mm into the top', lp: [0, -0.05, 0]});
+  },
+  prep: function(S){ var a = S.actors.wtK; S.def.subs[1].acts.forEach(function(act){ if (act[1] === 'wtK' && act[0] === 'in') act[4] = {at: a.atT}; }); },
+  subs: [
+    {cam: [[1.5, 1.7, 1.9], [0.65, 0.85, 0.3]], acts: [['draw', 'dmB', 0, 1.2], ['draw', 'dmF', 1.2, 2.4], ['hl', 'pan', 2.4, 3.2]]},
+    {cam: [[2.6, 1.6, 3.2], [1.3, 0.55, 1.2]], acts: [['out', 'dmB', 0, 0.3], ['out', 'dmF', 0, 0.3], ['in', 'tr1', 0, 0.4], ['in', 'tr2', 0, 0.4], ['in', 'wtK', 0.3, 0.9, {at: null}], ['in', 'wtO', 0.3, 0.9],
+      ['in', 'endCut', 1.0, 1.4, {from: [0, 0.2, 0]}], ['in', 'endF', 1.4, 1.8, {from: [0, 0.2, 0]}], ['hl', 'wtK', 1.8, 2.8]]},
+    {cam: [[2.4, 1.5, 2.9], [1.25, 0.55, 1.25]], acts: [['out', 'endCut', 0, 0.3], ['out', 'endF', 0, 0.3],
+      ['mv', 'wtK', 0.3, 0.8, {dp: [0, 0.25, 0]}], ['mv', 'wtO', 0.3, 0.8, {dp: [0, 0.25, 0]}], ['rot', 'wtK', 0.8, 1.8, {dr: [PI, 0, 0]}], ['rot', 'wtO', 0.8, 1.8, {dr: [PI, 0, 0]}],
+      ['mv', 'wtK', 1.8, 2.3, {dp: [0, -0.25, 0]}], ['mv', 'wtO', 1.8, 2.3, {dp: [0, -0.25, 0]}], ['in', 'tape', 2.4, 2.8], ['in', 'guide', 2.8, 3.3, {from: [0, 0.2, 0]}]]},
+    {cam: [[2.2, 1.3, 2.4], [1.25, 0.6, 1.25]], acts: [['in', 'csaw', 0, 0.4], ['mv', 'csaw', 0.4, 2.4, {dp: [0, 0, -0.95]}], ['out', 'csaw', 2.4, 2.7], ['out', 'tape', 2.4, 2.7], ['out', 'guide', 2.4, 2.7], ['mv', 'wtO', 2.6, 3.2, {dp: [-0.08, 0, 0]}]]},
+    {cam: [[1.9, 1.0, 1.8], [1.2, 0.55, 1.25]], acts: [['in', 'seal', 0, 0.6], ['hl', 'seal', 0.6, 1.8]]},
+    {cam: [[1.6, 1.5, 2.1], [0.6, 0.85, 0.3]], acts: [['out', 'seal', 0, 0.3], ['mv', 'wtK', 0.2, 0.7, {dp: [0, 0.3, 0]}], ['mv', 'wtK', 0.7, 2.2, {home: true}], ['draw', 'gapL', 2.2, 2.6], ['hl', 'wtK', 2.6, 3.4]]},
+    {cam: [[0.95, 0.22, 2.0], [0.62, 0.78, 0.35]], acts: (function(){ var a = [['out', 'gapL', 0, 0.3], ['in', 'sd', 0.2, 0.5]];
+      var t = visit(a, 'sd', [[0.2, 0.85, 0.565], [0.5, 0.85, 0.565], [0.8, 0.85, 0.565], [1.1, 0.85, 0.565]], 0.5, 0.9, [0, 0.012, 0], function(i, tt){ a.push(['in', 'ts' + i, tt, tt + 0.3]); });
+      a.push(['out', 'sd', t, t + 0.3]); return a; })()},
+    {cam: [[2.6, 1.4, 2.9], [1.5, 0.3, 1.3]], acts: [['out', 'tr1', 0.9, 1.2], ['out', 'tr2', 0.9, 1.2], ['mv', 'wtO', 0, 1.4, {p: [2.0, 0.03, 1.55]}], ['hl', 'wtO', 1.4, 2.4]], show: ['wtO']}
+  ]
+};
+
+/* ---------- 6 · Wall cabinets 11 + 12 ---------- */
+STEPS.wallb = {
+  cam: [[2.0, 1.9, 2.6], [0.65, 1.5, 0.2]], sun: [2.5, 4.5, 3.5, 0.7],
+  build: function(S){
+    roomBack(S, {nicheShelves: true}); backBuilt(S, {base: true, top: true});
+    S.add('hi', P.pin(), {on: true, pos: [0.85, 0, 0.1], label: 'the same high spot', lp: [0, 0.16, 0], lc: 'hot'});
+    S.add('d216', P.dim([0.85, 0, 0.02], [0.85, 2.164, 0.02]), {label: '216.4 cm', lp: [0.09, 1.6, 0], lc: 'dimv'});
+    S.add('wl', P.level(0.8), {pos: [0.45, 2.164, 0.016]});
+    S.add('line216', P.line([0.05, 2.164, 0.002], [1.25, 2.164, 0.002], M.pencil, 0.003), {label: 'lower edge of the wall rail', lp: [0.95, 0.05, 0], lc: 'dim'});
+    S.add('ghost', P.carcass(0.6, 0.8, 0.37), {pos: [0.05, 1.424, 0.015], label: 'hold a frame up: does it clear the beam?', lp: [0.3, 0.88, 0.2]});
+    S.add('dAbove', P.dim([0.35, 0.918, 0.42], [0.35, 1.424, 0.42]), {label: '50.6 cm above the worktop', lp: [0.1, 0.26, 0], lc: 'dimv'});
+    S.add('beamHL', (function(){ var g = grp(); bx(-0.3, 2.235, 0.165, 2.8, 2.425, 0.335, M.orange, g); return g; })(), {label: 'beam', lp: [1.0, 0.25, 0.25], lc: 'hot'});
+    S.add('det', P.detector(), {pos: [0.1, 2.24, 0.003], label: 'detector along the line', lp: [0, 0.12, 0]});
+    S.add('railW', P.rail(1.2), {pos: [0.05, 2.164, 0], label: 'rail 1.20 m, 5 cm from the corner', lp: [0.6, 0.08, 0]});
+    S.add('drill', P.drill(), {pos: [0.1, 2.189, 0.25]});
+    [0.1, 0.4, 0.7, 1.0, 1.2].forEach(function(x, i){ S.add('rs' + i, P.screw(0.05), {pos: [x, 2.189, 0.017 - 0.05]}); });
+    S.add('pull', (function(){ var g = grp(); var a1 = P.arrow(0.25); a1.rotation.x = PI / 2; a1.position.set(0.3, 2.19, 0.05); g.add(a1); var a2 = P.arrow(0.25); a2.rotation.x = PI / 2; a2.position.set(0.9, 2.19, 0.05); g.add(a2); return g; })(), {label: 'pull hard with both hands', lp: [0.6, 2.32, 0.2], lc: 'hot'});
+    S.add('w11', P.carcass(0.6, 0.8, 0.37), {pos: [0.05, 1.424, 0.015], label: '11', lp: [0.3, 0.88, 0.2]});
+    S.add('w12', P.carcass(0.6, 0.8, 0.37), {pos: [0.65, 1.424, 0.015], label: '12', lp: [0.3, 0.88, 0.2]});
+    S.add('clamp', P.clamp(), {pos: [0.6, 1.58, 0.37]});
+    S.add('sd', P.screwdriver(), {pos: [0.5, 1.6, 0.12], rot: [0, -PI / 2, 0], label: 'join, level with the fittings, tighten', lp: [0, 0.1, 0]});
+    [[0.25, 0.1], [0.25, 0.3], [0.65, 0.1], [0.65, 0.3]].forEach(function(q, i){ S.add('js' + i, P.screw(0.035), {pos: [0.667, 1.424 + q[0], q[1]], rot: [0, -PI / 2, 0]}); });
+    S.add('panW', P.panel(0.39, 0.86), {pos: [1.25, 1.364, 0.015], label: 'cover panel 39 × 86 on the niche side', lp: [0.01, 0.95, 0.2]});
+    var fs = grp(); bx(0, 0, 0, 0.047, 0.8, 0.018, M.door, fs); S.add('filler', fs, {pos: [0.002, 1.424, 0.387], label: 'filler strip at the corner wall', lp: [0.02, 0.88, 0], lc: 'hot'});
+  },
+  subs: [
+    {cam: [[2.4, 1.45, 3.1], [0.7, 1.15, 0.1]], acts: [['draw', 'd216', 0, 1.6], ['in', 'wl', 1.6, 1.9], ['draw', 'line216', 1.9, 3.3], ['mv', 'wl', 1.9, 3.3, {dp: [0.38, 0, 0]}], ['out', 'wl', 3.4, 3.7]]},
+    {cam: [[1.8, 1.7, 2.2], [0.5, 1.75, 0.2]], acts: [['out', 'd216', 0, 0.3], ['out', 'hi', 0, 0.3], ['in', 'ghost', 0.2, 0.9, {o: 0.45, from: [0, -0.3, 0.4]}], ['draw', 'dAbove', 1.0, 1.8], ['in', 'beamHL', 1.8, 2.2, {o: 0.55}], ['hl', 'beamHL', 2.2, 3.2], ['out', 'beamHL', 3.4, 3.7]]},
+    {cam: [[1.3, 2.0, 1.5], [0.6, 2.1, 0]], acts: (function(){ var a = [['out', 'ghost', 0, 0.4], ['out', 'dAbove', 0, 0.3], ['in', 'det', 0.2, 0.5], ['mv', 'det', 0.5, 1.8, {dp: [1.1, 0, 0]}], ['out', 'det', 1.8, 2.1], ['in', 'railW', 2.0, 2.8, {from: [0, -0.3, 0.5]}], ['in', 'drill', 2.8, 3.1]];
+      var t = visit(a, 'drill', [[0.1, 2.189, 0.03], [0.4, 2.189, 0.03], [0.7, 2.189, 0.03], [1.0, 2.189, 0.03], [1.2, 2.189, 0.03]], 3.1, 0.9, [0, 0, -0.02], function(i, tt){ a.push(['in', 'rs' + i, tt, tt + 0.4, {from: [0, 0, 0.05]}]); a.push(['spin', 'rs' + i, tt, tt + 0.4, {n: 3}]); });
+      a.push(['out', 'drill', t, t + 0.3]); return a; })()},
+    {cam: [[1.4, 1.9, 1.6], [0.6, 2.1, 0]], acts: [['in', 'pull', 0, 0.4], ['mv', 'pull', 0.4, 0.7, {dp: [0, 0, 0.04]}], ['mv', 'pull', 0.7, 1.0, {dp: [0, 0, -0.04]}], ['mv', 'pull', 1.0, 1.3, {dp: [0, 0, 0.04]}], ['mv', 'pull', 1.3, 1.6, {dp: [0, 0, -0.04]}], ['hl', 'railW', 0.4, 1.8], ['out', 'pull', 1.9, 2.2]]},
+    {cam: [[1.9, 1.8, 2.3], [0.65, 1.7, 0.2]], acts: [['in', 'w11', 0, 1.2, {from: [0, -0.35, 0.6]}], ['in', 'w12', 1.3, 2.5, {from: [0.1, -0.35, 0.6]}]]},
+    {cam: [[1.7, 1.8, 1.9], [0.65, 1.8, 0.2]], acts: (function(){ var a = [['in', 'clamp', 0, 0.4, {from: [0, -0.2, 0.2]}], ['in', 'sd', 0.4, 0.7]];
+      var t = visit(a, 'sd', [[0.62, 1.674, 0.1], [0.62, 1.674, 0.3], [0.62, 2.074, 0.1], [0.62, 2.074, 0.3]], 0.7, 0.8, [0.012, 0, 0], function(i, tt){ a.push(['in', 'js' + i, tt, tt + 0.3]); });
+      a.push(['out', 'sd', t, t + 0.3]); a.push(['out', 'clamp', t, t + 0.4]); a.push(['hl', 'w11', t + 0.3, t + 1.2]); a.push(['hl', 'w12', t + 0.3, t + 1.2]); return a; })()},
+    {cam: [[1.6, 1.7, 2.0], [0.7, 1.7, 0.2]], acts: [['in', 'panW', 0, 1.0, {from: [0.45, 0, 0.3]}], ['in', 'filler', 1.0, 2.0, {from: [0, 0, 0.4]}], ['hl', 'filler', 2.0, 2.8]]}
+  ]
+};
+
+/* ---------- 7 · Doors, shelves, handles, plinth ---------- */
+STEPS.doors = {
+  cam: [[1.9, 1.6, 2.5], [0.65, 1.0, 0.4]], sun: [2.5, 4.5, 3.5, 0.7],
+  build: function(S){
+    roomBack(S, {nicheShelves: true}); backBuilt(S, {base: true, top: true, wall: true});
+    S.add('blanket', P.blanket(0.9, 1.0), {pos: [0.2, 0, 1.0], label: 'door face down on a blanket', lp: [0.45, 0.05, 0.5], lc: 'dim'});
+    // door of cabinet 2: hinged left; lying on the blanket first
+    S.add('d2', P.door(0.596, 0.796), {pos: [0.052, 0.082, 0.617], label: 'door', lp: [0.3, 0.86, 0.03]});
+    S.actors.d2.lie = {at: [0.3 - 0.052, 0.012 + 0.021 - 0.082, 1.1 - 0.617], rat: [PI / 2, 0, 0]};
+    [0.1, 0.7].forEach(function(y, i){ S.add('hg' + i, P.hinge(), {parent: 'd2', pos: [0.022, y, -0.006], rot: [PI / 2, 0, 0], label: i ? 'press the hinge into its recess, lock it' : null, lp: [0, 0.05, 0], lc: 'hot'}); });
+    [0.18, 0.78].forEach(function(y, i){ S.add('pl' + i, P.plate(), {pos: [0.068, 0.08 + y, 0.56], label: i ? 'mounting plates, ready-made holes' : null, lp: [0, 0.06, 0], lc: 'hot'}); });
+    S.add('sd', P.screwdriver(), {pos: [0.35, 0.3, 0.75], rot: [0, PI / 2, 0]});
+    S.add('adj', (function(){ var g = grp(); var a = P.arrow(0.12); a.rotation.z = -PI / 2; a.position.set(0.3, 0.5, 0.66); g.add(a); var b = P.arrow(0.12, M.green); b.rotation.x = PI / 2; b.position.set(0.3, 0.3, 0.66); g.add(b); var c = P.arrow(0.12, M.blue); c.position.set(0.3, 0.6, 0.66); g.add(c); return g; })(), {label: 'adjust: sideways · in and out · up and down, for a 2–3 mm gap', lp: [0.3, 0.75, 0.66], lc: 'hot'});
+    S.add('d3', P.door(0.596, 0.796, true), {pos: [1.248, 0.082, 0.617]});
+    S.add('d11', P.door(0.596, 0.796), {pos: [0.052, 1.426, 0.387]});
+    S.add('d12', P.door(0.596, 0.796, true), {pos: [1.248, 1.426, 0.387]});
+    S.add('h2', P.handle(), {pos: [0.052 + 0.566, 0.082 + 0.796 - 0.03 - 0.0715, 0.638], label: 'base doors: near the top, opening side', lp: [0, 0.1, 0]});
+    S.add('h3', P.handle(), {pos: [1.248 - 0.566, 0.082 + 0.796 - 0.03 - 0.0715, 0.638]});
+    S.add('h11', P.handle(), {pos: [0.052 + 0.566, 1.426 + 0.03 + 0.0715, 0.408], label: 'wall doors: near the bottom', lp: [0, -0.18, 0]});
+    S.add('h12', P.handle(), {pos: [1.248 - 0.566, 1.426 + 0.03 + 0.0715, 0.408]});
+    S.add('d128', P.dim([0.665, 0.711, 0.64], [0.665, 0.839, 0.64]), {label: '128 mm between the holes', lp: [0.05, 0.07, 0], lc: 'dimv'});
+    S.add('tpl', (function(){ var g = grp(); bx(-0.04, -0.09, 0, 0.03, 0.09, 0.002, M.card, g); return g; })(), {pos: [0.682, 0.775, 0.64], label: 'one cardboard template for every door', lp: [0, 0.12, 0], lc: 'hot'});
+    S.add('drill', P.drill(), {pos: [0.682, 0.711, 0.9], label: 'drill from the front', lp: [0, 0.12, 0.2]});
+    S.add('block', (function(){ var g = grp(); bx(-0.05, -0.08, 0, 0.05, 0.08, 0.03, M.wood, g); return g; })(), {pos: [0.682, 0.775, 0.585], label: 'scrap wood pressed behind: no chipping', lp: [0, -0.15, 0], lc: 'dim'});
+    S.add('shelf', (function(){ var g = grp(); bx(0, 0, 0, 0.562, 0.018, 0.56, M.carc, g); return g; })(), {pos: [0.069, 0.45, 0.03], label: 'shelf onto its four pins', lp: [0.28, 0.06, 0.3]});
+    S.add('caps', (function(){ var g = grp(); for (var y = 0.2; y < 0.8; y += 0.096) { cy(0.0685, 0.08 + y, 0.578, 0.004, 0.003, M.white, g, 'x', 8); cy(0.632, 0.08 + y, 0.578, 0.004, 0.003, M.white, g, 'x', 8); } return g; })(), {label: 'white caps in the unused holes (glass doors)', lp: [0.35, 0.86, 0.55], lc: 'dim'});
+    S.add('plinth', (function(){ var g = grp(); bx(0.05, 0, 0.545, 1.268, 0.08, 0.563, M.door, g); bx(1.25, 0, 0.0, 1.268, 0.08, 0.545, M.door, g); return g; })(), {label: 'plinth: cut to length, clips onto the legs · short return on the open side', lp: [0.65, 0.12, 0.56], lc: 'hot'});
+  },
+  prep: function(S){ var a = S.actors.d2; S.def.subs[0].acts.forEach(function(act){ if (act[1] === 'd2' && act[0] === 'in') act[4] = a.lie; }); },
+  subs: [
+    {cam: [[1.3, 1.1, 2.2], [0.55, 0.1, 1.35]], acts: [['in', 'blanket', 0, 0.4], ['in', 'd2', 0.3, 0.8, {at: null}], ['in', 'hg0', 1.0, 1.6, {from: [0, 0, -0.15]}], ['in', 'hg1', 1.6, 2.2, {from: [0, 0, -0.15]}], ['hl', 'hg0', 2.2, 3.0], ['hl', 'hg1', 2.2, 3.0]], show: ['hg1']},
+    {cam: [[0.75, 0.9, 1.4], [0.15, 0.5, 0.45]], acts: (function(){ var a = [['in', 'pl0', 0, 0.4, {from: [0.15, 0, 0.2]}], ['in', 'pl1', 0.3, 0.7, {from: [0.15, 0, 0.2]}], ['in', 'sd', 0.7, 1.0]];
+      var t = visit(a, 'sd', [[0.09, 0.26, 0.58], [0.09, 0.86, 0.58]], 1.0, 1.0, [-0.012, 0, 0]); a.push(['out', 'sd', t, t + 0.3]); return a; })(), show: ['pl1']},
+    {cam: [[1.4, 1.0, 1.9], [0.4, 0.5, 0.5]], acts: [['mv', 'd2', 0, 0.6, {dp: [0, 0.35, 0]}], ['mv', 'd2', 0.6, 2.0, {home: true}], ['out', 'blanket', 1.6, 2.0], ['in', 'adj', 2.1, 2.5], ['hl', 'adj', 2.5, 3.6], ['out', 'adj', 3.8, 4.1],
+      ['in', 'd3', 3.9, 4.5, {from: [0, 0, 0.3]}], ['in', 'd11', 4.3, 4.9, {from: [0, 0, 0.3]}], ['in', 'd12', 4.6, 5.2, {from: [0, 0, 0.3]}]]},
+    {cam: [[1.2, 1.25, 1.6], [0.65, 0.9, 0.5]], acts: [['in', 'h2', 0, 0.5, {from: [0, 0, 0.15]}], ['draw', 'd128', 0.5, 1.2], ['in', 'h3', 1.3, 1.7, {from: [0, 0, 0.15]}], ['in', 'h11', 1.7, 2.1, {from: [0, 0, 0.15]}], ['in', 'h12', 2.1, 2.5, {from: [0, 0, 0.15]}], ['out', 'd128', 2.6, 2.9]]},
+    {cam: [[1.55, 1.15, 1.75], [0.68, 0.76, 0.6]], acts: (function(){ var a = [['out', 'h3', 0, 0.2], ['in', 'tpl', 0, 0.4, {from: [0, 0, 0.15]}], ['in', 'block', 0.3, 0.7, {from: [0, 0, -0.1]}], ['in', 'drill', 0.6, 0.9]];
+      var t = visit(a, 'drill', [[0.682, 0.711, 0.645], [0.682, 0.839, 0.645]], 0.9, 1.0, [0, 0, -0.03]); a.push(['out', 'drill', t, t + 0.3]); a.push(['out', 'tpl', t, t + 0.3]); a.push(['out', 'block', t, t + 0.3]); a.push(['in', 'h3', t + 0.3, t + 0.7, {from: [0, 0, 0.15]}]); return a; })()},
+    {cam: [[1.1, 0.9, 1.6], [0.35, 0.5, 0.3]], acts: [['rot', 'd2', 0, 0.8, {dr: [0, -1.6, 0]}], ['out', 'h2', 0, 0.2], ['in', 'shelf', 0.8, 1.6, {from: [0, 0, 0.6]}], ['in', 'caps', 1.6, 2.0], ['hl', 'caps', 2.0, 2.8], ['rot', 'd2', 3.0, 3.8, {dr: [0, 1.6, 0]}], ['in', 'h2', 3.6, 3.9]]},
+    {cam: [[1.9, 0.7, 1.5], [0.75, 0.15, 0.4]], acts: [['in', 'plinth', 0, 1.0, {from: [0, 0, 0.35]}], ['hl', 'plinth', 1.0, 2.0]]}
+  ]
+};
+
 /*__STEPS__*/
 // open whichever step is showing
 var on = $('.gstep.on'); if (on) open(on.getAttribute('data-gid'));

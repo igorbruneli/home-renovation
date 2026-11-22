@@ -324,7 +324,7 @@ ol.gs > li{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.35rem; a
 .g3go{font-family:var(--f-mono); font-size:.72rem; font-weight:600; border:1px solid var(--rule); background:var(--sheet); color:var(--hydro-ink); padding:.3rem .45rem; cursor:pointer; border-radius:2px; white-space:nowrap; margin-top:.15rem}
 .g3go:hover{border-color:var(--hydro)}
 ol.gs > li.g3cur > label{border-color:var(--hydro); box-shadow:inset 3px 0 0 var(--hydro)}
-@media (max-width:560px){.g3d-stage{aspect-ratio:4/3; max-height:58vh} .g3d-cap{grid-template-columns:auto minmax(0,1fr)} .g3d-done{grid-column:2} .g3go{padding:.3rem .35rem}}
+@media (max-width:560px){.g3d-dots{display:none} .g3d-stage{aspect-ratio:4/3; max-height:58vh} .g3d-cap{grid-template-columns:auto minmax(0,1fr)} .g3d-done{grid-column:2} .g3go{padding:.3rem .35rem}}
 @media print{.g3d,.g3go{display:none !important}}
 </style>
 </head>
@@ -1524,7 +1524,7 @@ openGuide(ST.guide || 'prep');
 // the animated 3D steps: three.js loads only once the guide comes near the screen
 (function(){
   var g = document.getElementById('guide'); if (!g) return;
-  var files = ['../lib/three.min.js', '../lib/OrbitControls.js', 'steps3d.js?v=202611221501'], started = false;
+  var files = ['../lib/three.min.js', '../lib/OrbitControls.js', 'steps3d.js?v=202611221506'], started = false;
   function next(i){ if (i >= files.length) return; var s = document.createElement('script'); s.src = files[i]; s.onload = function(){ next(i + 1); }; document.head.appendChild(s); }
   function go(){ if (started) return; started = true; next(0); }
   if (!('IntersectionObserver' in window)) { go(); return; }
