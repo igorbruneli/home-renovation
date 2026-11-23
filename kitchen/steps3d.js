@@ -208,7 +208,7 @@ Player.prototype.add = function(id, obj, o){
   if (o.pos) obj.position.fromArray(o.pos); if (o.rot) obj.rotation.set(o.rot[0], o.rot[1], o.rot[2]);
   var a = {id: id, obj: obj, o0: o.on ? (o.o == null ? 1 : o.o) : 0, p0: obj.position.clone(), r0: new T.Vector3(obj.rotation.x, obj.rotation.y, obj.rotation.z), mats: [], line: !!obj.userData.line, label: null, st: null};
   obj.traverse(function(n){ if (n.isMesh) { if (!n.userData.m0) { var m = n.material.clone(); m.userData.op = m.transparent ? m.opacity : 1; m.userData.tr = m.transparent; n.material = m; } a.mats.push(n.material); } });
-  if (o.label) { var el = document.createElement('div'); el.className = 'g3d-l' + (o.lc ? ' ' + o.lc : ''); el.textContent = o.label; a.label = {el: el, off: V(o.lp || [0, 0.08, 0])}; this.labels.push(a); }
+  if (o.label) { var el = document.createElement('div'); el.className = 'g3d-l' + (o.lc ? ' ' + o.lc : ''); el.textContent = o.label; el.style.left = '0'; el.style.top = '0'; a.label = {el: el, off: V(o.lp || [0, 0.08, 0]), w: 0, h: 0}; this.labels.push(a); }
   this.actors[id] = a; this.list.push(a); return obj;
 };
 Player.prototype.reset = function(){
@@ -289,14 +289,15 @@ function open(gid){
   if (!R) { R = mkRenderer(); if (!R) { $$('.g3d').forEach(function(h){ h.remove(); }); return; } bindRenderer(); }
   var art = document.getElementById('gs-' + gid), def = STEPS[gid];
   if (V3 && V3.player && V3.player.gid === gid) return;
-  if (V3 && V3.player) dispose(V3.player);
-  if (!art || !def) { V3 = null; return; }
+  var old = V3 && V3.player;   // disposed only after the new scene is compiled, so shared shader programs survive
+  if (!art || !def) { if (old) dispose(old); V3 = null; return; }
   var host = $('.g3d', art);
   if (!host) { host = document.createElement('div'); host.className = 'g3d'; var after = $('.gmeta', art) || $('h4', art); after.parentNode.insertBefore(host, after.nextSibling); }
   var ui = buildUI(host); ui.stage.insertBefore(R.cv, ui.labels);
   var pl = new Player(gid, def, art); mats();
   pl.scene.background = bg(); lights(pl.scene, def.sun || [2.5, 4, 4, 0.8]);
   def.build(pl); if (def.prep) def.prep(pl);
+  warm(pl); if (old) dispose(old);
   pl.labels.forEach(function(a){ ui.labels.appendChild(a.label.el); });
   V3 = {player: pl, ui: ui, host: host};
   // list items get a "show" button
@@ -315,6 +316,24 @@ function open(gid){
   if (RO) { if (RO.cur) RO.unobserve(RO.cur); RO.observe(ui.stage); RO.cur = ui.stage; }
   resize(); placeCam(def.subs[0].cam || def.cam);
   pl.si = 0; pl.t = 0; pl.playing = !reduce; if (reduce) pl.t = pl.dur(0); pl.evalAt(0, pl.t); syncUI(); kick();
+}
+// Compile every shader and upload every texture up front. Without this, three.js compiles lazily: the first time a
+// hidden part appears or a part starts fading (opaque -> transparent is a different shader), the frame stalls while
+// the GPU driver compiles. Safari compiles synchronously, so it showed as a stutter during each animation.
+function warm(pl){
+  var r = R.r, seen = new Set(), flip = [];
+  pl.scene.traverse(function(n){
+    var m = n.material; if (!m) return; (Array.isArray(m) ? m : [m]).forEach(function(x){
+      if (seen.has(x)) return; seen.add(x);
+      if (r.initTexture) ['map', 'alphaMap', 'emissiveMap', 'normalMap', 'roughnessMap', 'bumpMap'].forEach(function(k){ if (x[k] && x[k].isTexture) r.initTexture(x[k]); });
+    });
+  });
+  pl.list.forEach(function(a){ a.mats.forEach(function(m){ if (!m.transparent && flip.indexOf(m) < 0) flip.push(m); }); });
+  try {
+    r.compile(pl.scene, R.cam);
+    flip.forEach(function(m){ m.transparent = true; m.needsUpdate = true; }); r.compile(pl.scene, R.cam);
+  } catch (e) {}
+  flip.forEach(function(m){ m.transparent = false; m.needsUpdate = true; });
 }
 function dispose(pl){ pl.labels.forEach(function(a){ a.label.el.remove(); }); pl.scene.traverse(function(n){ if (n.geometry) n.geometry.dispose(); if (n.material && n.material.userData.op != null) n.material.dispose(); }); }
 function go(i, play){
@@ -359,18 +378,22 @@ function loop(now){
 }
 var tmp = new T.Vector3();
 function placeLabels(){
-  var p = V3.player, w = R.cv.clientWidth, h = R.cv.clientHeight, placed = [];
+  // Moves labels with a transform (no page layout per frame) and measures each label once.
+  var p = V3.player, w = R.cw || R.cv.clientWidth, h = R.ch || R.cv.clientHeight, placed = [];
+  function show(L, on){ if (L.on !== on) { L.on = on; L.el.style.display = on ? '' : 'none'; } }
   p.labels.forEach(function(a){
-    var el = a.label.el; if (!a.obj.visible || a.st.o < 0.6 || !(p.cur && p.cur[a.id])) { el.style.display = 'none'; return; }
-    a.obj.getWorldPosition(tmp); tmp.add(a.label.off); tmp.project(R.cam);
-    if (tmp.z > 1 || Math.abs(tmp.x) > 1.05 || Math.abs(tmp.y) > 1.05) { el.style.display = 'none'; return; }
-    var x = (tmp.x + 1) / 2 * w, y = (1 - tmp.y) / 2 * h; el.style.display = ''; el.style.left = x.toFixed(1) + 'px'; el.style.top = y.toFixed(1) + 'px';
-    var bw = el.offsetWidth / 2 + 2, bh = el.offsetHeight / 2 + 1;
-    for (var k = 0; k < placed.length; k++) { var q = placed[k]; if (Math.abs(q.x - x) < q.bw + bw && Math.abs(q.y - y) < q.bh + bh) { el.style.display = 'none'; return; } }
+    var L = a.label, el = L.el; if (!a.obj.visible || a.st.o < 0.6 || !(p.cur && p.cur[a.id])) { show(L, false); return; }
+    a.obj.getWorldPosition(tmp); tmp.add(L.off); tmp.project(R.cam);
+    if (tmp.z > 1 || Math.abs(tmp.x) > 1.05 || Math.abs(tmp.y) > 1.05) { show(L, false); return; }
+    var x = (tmp.x + 1) / 2 * w, y = (1 - tmp.y) / 2 * h;
+    if (!L.w) { show(L, true); L.w = el.offsetWidth; L.h = el.offsetHeight; }
+    var bw = L.w / 2 + 2, bh = L.h / 2 + 1;
+    for (var k = 0; k < placed.length; k++) { var q = placed[k]; if (Math.abs(q.x - x) < q.bw + bw && Math.abs(q.y - y) < q.bh + bh) { show(L, false); return; } }
+    el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) translate(-50%,-100%)'; show(L, true);
     placed.push({x: x, y: y, bw: bw, bh: bh});
   });
 }
-function resize(){ if (!V3) return; var s = V3.ui.stage, w = s.clientWidth, h = s.clientHeight; if (!w || !h) return; R.r.setSize(w, h, false); R.cam.aspect = w / h; R.cam.updateProjectionMatrix(); kick(); }
+function resize(){ if (!V3) return; var s = V3.ui.stage, w = s.clientWidth, h = s.clientHeight; if (!w || !h) return; R.cw = w; R.ch = h; R.r.setSize(w, h, false); R.cam.aspect = w / h; R.cam.updateProjectionMatrix(); kick(); }
 function bindRenderer(){
   R.ctl.addEventListener('change', kick);
   R.ctl.addEventListener('start', function(){ if (V3) { V3.player.camT = null; V3.ui.hint.classList.add('gone'); } });
@@ -391,7 +414,7 @@ function saw(acts, id, t, n, d, ax){ var dp = [0, 0, 0]; dp[ax || 0] = d; for (v
    THE STEPS
    ===================================================================== */
 var STEPS = {};
-window.Steps3D = {open: open, steps: STEPS, P: P, mats: mats, roomBack: roomBack, roomSide: roomSide, bx: bx, grp: grp, visit: visit, saw: saw, M: function(){ return M; }, _v: function(){ return V3; }, __place: function(c){ placeCam(c); if (V3) { syncUI(); kick(); } }};
+window.Steps3D = {open: open, steps: STEPS, P: P, mats: mats, roomBack: roomBack, roomSide: roomSide, bx: bx, grp: grp, visit: visit, saw: saw, M: function(){ return M; }, _v: function(){ return V3; }, _r: function(){ return R; }, __place: function(c){ placeCam(c); if (V3) { syncUI(); kick(); } }};
 /* ---- steps_a.js ---- */
 /* ---------- 3 · Build the frames ---------- */
 STEPS.frames = {

@@ -1526,7 +1526,7 @@ openGuide(ST.guide || 'prep');
 // the animated 3D steps: three.js loads only once the guide comes near the screen
 (function(){
   var g = document.getElementById('guide'); if (!g) return;
-  var files = ['../lib/three.min.js', '../lib/OrbitControls.js', 'steps3d.js?v=202611221513'], started = false;
+  var files = ['../lib/three.min.js', '../lib/OrbitControls.js', 'steps3d.js?v=202611231056'], started = false;
   function next(i){ if (i >= files.length) return; var s = document.createElement('script'); s.src = files[i]; s.onload = function(){ next(i + 1); }; document.head.appendChild(s); }
   function go(){ if (started) return; started = true; next(0); }
   if (!('IntersectionObserver' in window)) { go(); return; }
