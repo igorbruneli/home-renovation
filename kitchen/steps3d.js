@@ -361,15 +361,20 @@ function flyCam(c){ if (!c) return; var to = new T.Vector3().fromArray(c[0]), tg
   V3.player.camT = {p0: R.cam.position.clone(), t0: R.ctl.target.clone(), p1: to, t1: tg, k: 0}; if (reduce) V3.player.camT.k = 0.999; }
 
 /* loop */
-var raf = 0, last = 0, visible = true, RO = null;
-function kick(){ if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }
-function loop(now){
-  raf = 0; if (!V3 || !V3.player) return;
-  var p = V3.player, dt = Math.min(0.05, (now - last) / 1000); last = now; var busy = false;
-  if (p.camT) { p.camT.k = Math.min(1, p.camT.k + dt / 0.9); var e = ease(p.camT.k); R.cam.position.lerpVectors(p.camT.p0, p.camT.p1, e); R.ctl.target.lerpVectors(p.camT.t0, p.camT.t1, e); if (p.camT.k >= 1) p.camT = null; busy = true; }
+// One animation chain only. While a frame runs (inLoop), kick() does nothing: OrbitControls fires 'change' (-> kick)
+// inside update() whenever the camera glides, and each of those used to start an extra chain, so the chains doubled
+// every frame and froze the page. dt is never negative: a rAF timestamp can be earlier than the performance.now()
+// taken in kick(), which used to run the camera glide backwards so that it never finished.
+var raf = 0, inLoop = false, last = 0, visible = true, RO = null;
+function kick(){ if (!raf && !inLoop) { last = performance.now(); raf = requestAnimationFrame(loop); } }
+function loop(now){ raf = 0; inLoop = true; try { frame(now); } finally { inLoop = false; } }
+function frame(now){
+  if (!V3 || !V3.player) return;
+  var p = V3.player, dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now; var busy = false;
+  if (p.camT) { p.camT.k = Math.min(1, Math.max(0, p.camT.k + dt / 0.9)); var e = ease(p.camT.k); R.cam.position.lerpVectors(p.camT.p0, p.camT.p1, e); R.ctl.target.lerpVectors(p.camT.t0, p.camT.t1, e); if (p.camT.k >= 1) p.camT = null; busy = true; }
   if (p.playing && visible) {
     p.t += dt; var D = p.dur(p.si);
-    if (p.t >= D) { p.t = D; if (p.all && p.si < p.def.subs.length - 1) { p.evalAt(p.si, p.t); go(p.si + 1, true); return; } p.playing = false; if (p.all) { p.all = false; $('[data-a="all"]', V3.ui.bar).setAttribute('aria-pressed', 'false'); } syncUI(); }
+    if (p.t >= D) { p.t = D; if (p.all && p.si < p.def.subs.length - 1) { p.evalAt(p.si, p.t); go(p.si + 1, true); raf = requestAnimationFrame(loop); return; } p.playing = false; if (p.all) { p.all = false; $('[data-a="all"]', V3.ui.bar).setAttribute('aria-pressed', 'false'); } syncUI(); }
     p.evalAt(p.si, p.t); busy = true;
   }
   if (R.ctl.update()) busy = true;
